@@ -2450,6 +2450,31 @@ mysql> drop database db1;
 > 
 > ```
 
+### Xtrabackup
+
+> Xtrabackup 开源免费热备工具。主要包含Xtrabackup 和innobackupex俩个工具。Xtrabackup 只能备份innoDB和XtraDB俩种引擎。innobackupex封装了Xtrabackup，同时增加了备份MyISAM引擎的功能。
+>
+> Xtrabackup 备份不能备份表结构、触发器等等，也不能只能区分.idb数据文件。另外innobackupex还不能完全支持增量备份，需要和xtrabackup结合起来实现全备的功能
+>
+> Xtrabackup下载地址：https://www.percona.com/downloads/  
+>
+> https://downloads.percona.com/downloads/Percona-XtraBackup-2.4/Percona-XtraBackup-2.4.23/binary/redhat/7/x86_64/Percona-XtraBackup-2.4.23-r3320f39-el7-x86_64-bundle.tar
+>
+> 依赖包下载：http://rpmfind.net/linux/atrpms/      
+>
+> http://rpmfind.net/linux/atrpms/el6-x86_64/atrpms/stable/libev-4.04-2.el6.x86_64.rpm
+
+
+
+### MySQL主从复制及读写分离
+
+> 复制的应用常见场景：
+> - 读写分离，提高查询访问性能，有效减少主数据库访问压力；
+> - 实时灾备，主数据库出现故障时，可快速切换到从数据库；
+> - 数据汇总，可将多个主数据库同步汇总到一个从数据库中，方便数据统计分析。
+
+
+
 
 
 # 参考来源
