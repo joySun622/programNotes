@@ -2476,7 +2476,149 @@ mysql> drop database db1;
 >
 > **主从复制原理介绍** 
 >
-> 传统的MySQL复制提供了一种简单的主-从复制方法。有一个主，以及一个或者多个从。主节点执行和提交事务，然后将它们(异步地)发送到从节点，以重新执行(在基于语句的复制中)或应用(在基于行的复制中)
+> - 异步复制
+>   传统的MySQL复制提供了一种简单的主-从复制方法。有一个主，以及一个或者多个从。主节点执行和提交事务，然后将它们(异步地)发送到从节点，以重新执行(在基于语句的复制中)或应用(在基于行的复制中)
+>   ![image-20210803085915981](images/image-20210803085915981.png)
+>
+> - 半同步复制
+>   在协议中添加了一个同步步骤，即主节点在提交时需要等待从节点确认它已经接受到事务，只有这样，主节点才能继续提交操作
+>   ![image-20210803090001848](images/image-20210803090001848.png)
+>
+>   
+>
+> **主从复制过程**
+>
+> 1. 开启binlog日志，通过把主库的binlog传送到从库，重新解析应用到从库；
+> 2. 复制需要3个线程(dump/io/sql)完成
+> 3. 复制是异步的过程。主从复制是异步的逻辑的SQL语句级的复制。
+
+#### 主从复制前提
+
+- 主服务器一定要打开二进制日志；
+- 必须俩台服务器(或者多个实例)；
+- 从服务器需要一次数据初始化；
+- 如果主从服务器都是新搭建的话，可以不做初始化；
+- 如果主服务器已经运行了很长时间了，可以通过备份将主数据恢复到从库；
+- 主库必须要有对从库复制请求的用户
+- 从库需要有relay-log设置，存放从主库传送过来的二进制日志 show variables like '%relay%';
+- 在第一次的时候，从库需要change master to 去连接主库，change master信息需要存放到master.info中 show variables like '%master_info%';
+- 从库通过relay-log.info记录的已经应用过的relay-log信息，获取主库是否发生新变化的信息；
+- 在复制过程中涉及到的线程
+  1. 从库会开启一个IO thread，负责连接主库，请求binlog,接收binlog并写入relay-log;
+   2. 从库会开启一个SQL thread,负责执行relay-log中的事件；
+  3. 主库会开启一个dump thread ,负责响应从IO thread的请求
+     ![image-20210803091805097](images/image-20210803091805097.png)
+
+#### MySQL复制的三种核心格式
+
+> 复制的工作原理是数据库修改记录到binlog日志并传递到slave,然后slave在本地还原的过程。而事件记录到binlob的格式会有所不同。
+1. 基于语句的复制(statement based replication)
+    基于主库经SQL语句写入到bin log中完成复制；
+2. 基于行数据的复制(row based replication)
+   基于主库将毎一行数据变化的信息作为时间写入到bin log中完成日志。默认就是基于行级别的复制，因为它相对语句复制逻辑更为严谨；
+3. 混合复制(mixed based replication)
+    上述俩者的结合。默认情况下优先使用基于语句的复制，只有当部分语句如果基于语句复制不完全的情况下才会自动切换为基于行数据的复制。
+
+#### 配置
+
+> - 主库配置
+>
+> ```
+> cat /etc/my.cnf
+> [mysqld]
+> datadir=/var/lib/mysql
+> socket=/var/lib/mysql/mysql.sock
+> default-storage-engine=INNODB
+> symbolic-links=0
+> server_id=6
+> log_bin=/var/log/mysql/mysql-bin
+> ```
+>
+> - 从库配置
+>
+> ```
+> cat /etc/my.cnf
+> [mysqld]
+> datadir=/var/lib/mysql
+> socket=/var/lib/mysql/mysql.sock
+> default-storage-engine=INNODB
+> symbolic-links=0
+> server_id=8
+> log_bin=/var/log/mysql/mysql-bin
+> relay_log=/var/log/mysql/mysql-relay
+> ```
+>
+> 1. 创建主从配置中设置的目录并授予权限
+>
+>    ```
+>    [root@mysql ~]# mkdir /var/log/mysql -p
+>    [root@mysql ~]# chown -R mysql.mysql /var/log/mysql
+>    [root@mysql ~]# ll -d /var/log/mysql
+>    [root@mysql ~]# systemctl restart mysqld
+>    [root@mysql ~]# systerctl status mysqld.service
+>    
+>    ```
+>
+> 2. 在主库上创建一个从库账号
+>
+>    ```
+>    [root@mysql ~]# mysql -u root -p'Joy.123com'
+>    mysql> create user 'slave'@'192.168.%.%' identified by 'Joy.123com';
+>    mysql> select user,host from mysql.user;
+>    mysql> grant replication slave on *.* to 'slave'@'192.168.%.%';   //授予复制权限
+>    mysql> show grants for 'slave'@'192.168.%.%'; //查看授予的权限
+>    ```
+>
+> 3. 获取主库日志信息并生成主库日志镜像
+>
+>    ```
+>    mysql> FLUSH TABLES WITH READ LOCK; //对主库上所有表加锁，停止修改，即在从库复制过程中主库不能执行UPDATE,DELETE,INSERT语句
+>    mysql> show master status;  //查看主库状态
+>    ## 备份主库数据
+>    [root@mysql ~]# mysqldump -u root -p'Joy.123com' --master-data --all-databases > joy.com-master.sql
+>    
+>    主库数据备份完毕后，释放主库锁，需要注意，在上锁这一段期间，无法对主数据库进行写操作，比如update,delete,insert
+>    
+>    ## 复制文件到从库下：
+>    [root@mysql ~]# scp joy.com-master.sql 192.168.183.136:/tmp/
+>    ## 从库还原数据
+>    [root@mysql ~]# mysql -p 'Joy.123com' < Joy.com-master.sql
+>    ```
+>
+> 4. 在从库上建立复制关系，即从库指定主库的日志信息和连接信息
+>
+>    ```
+>    mysql> CHANGE MASTER TO
+>        -> MASTER_HOST='192.168.183.140',  //主库地址
+>        -> MASTER_PORT=3306,  //主库端口号
+>        -> MASTER_USER='slave',  //主库中设置的从库用户
+>        -> MASTER_PASSWORD='Joy.123com',  //主库中设置的从库用户密码
+>        -> MASTER_LOG_FILE='/var/log/mysql/mysql-bin.000005', //主库日志文件地址
+>        -> MASTER_LOG_POS=657;  //主库已读取日志文件位置点
+>        
+>        ## 查看主库文件信息
+>        mysql> show master status;
+>    +------------------+----------+--------------+------------------+------------------------------------
+>    | File             | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set                         |
+>    +------------------+----------+--------------+------------------+------------------------------------
+>    | mysql-bin.000005 |      657 |              |                  | 4ecb9a58-173f-11eb-84c6-000c29796704:1-26 |
+>    +------------------+----------+--------------+------------------+-------------------------------------------+
+>    1 row in set (0.00 sec)
+>    
+>    
+>    ## 从库启动复制进程
+>    mysql> START SLAVE
+>    ## 查看从库状态：确认从库IO/SQL线程正常启动
+>    mysql> show SLAVE STATUS \G
+>    
+>    ## stop slave 停止从库
+>    
+>    ## 出现uuid冲突问题解决方案
+>    [root@mysql ~]# cd /var/lib/mysql
+>    [root@mysql mysql]# vi auto.cnf  //修改uuid
+>    [root@mysql mysql]# systemctl restart mysqld
+>    
+>    ```
 
 
 
