@@ -54,3 +54,72 @@
 >      - **范例**
 >        ![img](images/20191103181932432.png)
 
+## Shell
+
+### Shell的定义
+
+> Shell只是为用户与机器之间搭建成的一个桥梁，让我们能够通过Shell来对计算机进行操作和交互，从而达到让计算机为我们服务的目的。
+
+- **Shell的含义**
+
+> Shell 英文含义是‘壳’，是相对于内核来说的。它是建立在内核的基础上，面向用户的一种表现形式，比如我们看到一个球，见到的是它的壳，而非核。Linux中的Shell，是指一个面向用户的命令接口，表现形式就是一个可以由用户录入的界面，这个界面也可以反馈运行信息。
+
+- **Shell在Linux中的存在形式**
+
+> 不同于Windows,Linux是内核与界面分离的，它可以脱离图形界面而单独运行，同样也可以在内核的基础上运行图形化化的桌面。这样，在Linux系统中，就出现了俩种Shell表现形式，一种是在无图形界面下的终端运行环境下的Shell，另一种是桌面上运行的类似Windows的MS-DOS运行窗口，前者我们一般习惯性的简称为终端，后者一般直接称为Shell
+
+- **Shell如何执行用户的指令**
+
+> 1. Shell 有俩种执行指令的方式
+>
+> - 用户事先编写一个sh脚本文件，内含Shell脚本，而后使用Shell程序执行该脚本，这种方式，我们习惯称为Shell编程
+> - 用户直接在Shell界面上执行Shell命令，由于Shell界面的关系，大家都习惯一行行的书写，很少写出成套的程序来一起执行，所以也称为命令行
+
+### Shell的分类
+
+> Linux中默认的Shell是/bin/bash,流行的Shell有ash/bash/ksh/csh/zsh等，不同的Shell都有自己的特点以及用途
+
+- **bash**
+
+  > 大多数Linux系统默认使用的Shell,bash Shell是Bourne Shell的一个免费版本，它是最早的Unix Shell,bash还有一个特点，可以通过help命令来查看帮助，包含的功能几乎可以涵盖Shell所具有的功能，所以一般的Shell脚本都会指定它为执行路径
+
+- **ksh**
+
+  > Korn Shell的语法与Bourne Shell相同，同时具备了C Shell的易用特点。许多安装脚本都使用ksh.ksh有42条内部命令，与bash相比有一定的限制性。
+  >
+
+- **csh**
+
+  > C Shell使用的是‘类C’语法，csh是具有C语言风格的一种Shell，其内部命令有52个，较为庞大。目前使用的并不多，已经被/bin/tcsh所取代
+
+- **tcsh**
+
+  > tcsh是csh的增强版，与C Shell完全兼容
+
+- **zsh**
+
+  > 目前Linux里最庞大的一种,它有84个内部命令，使用起来也比较复杂。一般情况下，不会使用该Shell
+
+- **sh**
+
+  > sh是一个快捷方式，已经被/bin/bash所取代
+
+- **nologin**
+
+  > 指用户不能登录
+
+### Shell能做什么
+
+> - 自动化批量系统初始化程序(update,软件安装，时区设置，安全策略...)
+> - 自动化批量软件部署程序(LAMP,LNMP,Tomcat,LVS,Nginx)
+> - 应用管理程序(KVM,集群管理扩容，MySQL,dellr720批量RAID)
+> - 日志分析处理程序(PV,UV,top 100,grep/awk)
+> - 自动化备份恢复程序(MySQL完全备份/增量+Crond)
+> - 自动化管理程序(批量远程修改密码，软件升级，配置更新)
+> - 自动化信息采集及监控程序(收集系统/应用状态信息，CPU,Mem,Disk,Net,TCP Status,Apache,MySQL)
+> - 配合Zabbix信息采集(收集系统/应用状态信息，CPU,Mem,Disk,Net,TCP Status,Apache,MySQL)
+> - 自动化扩容(增加云主机-->业务上线)
+> - zabbix监控CPU 80%+|- 50% Python API AWS/EC2(增加/删除云主机)+Shell Script（业务上线）
+> - 俄罗斯方块，打印三角形，打印圣诞树，打印五角星，运行小火车，坦克大战，排序算法实现
+> - Shell可以做任何事(一切取决于业务需求)
+
