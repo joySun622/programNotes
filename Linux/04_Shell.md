@@ -65,6 +65,10 @@
 ### Shell的定义
 
 > Shell只是为用户与机器之间搭建成的一个桥梁，让我们能够通过Shell来对计算机进行操作和交互，从而达到让计算机为我们服务的目的。
+>
+> 用户与Linux内核沟通的桥梁，一个命令解释器
+>
+> Linux内核：管理硬件和驱动硬件。内核只能识别二进制，为软件服务，接受用户或软件指令驱动硬件
 
 - **Shell的含义**
 
@@ -112,6 +116,18 @@
 - **nologin**
 
   > 指用户不能登录
+
+### shell功能
+
+> Shell功能
+> - 命令解释功能
+> - 启动程序
+> - 输入输出重定向
+> - 管道连接
+> - 文件名置换
+> - 变量维护
+> - 环境控制
+> - shell编程
 
 ### Shell能做什么
 
@@ -885,19 +901,108 @@ $	变量中取内容值
 " "	双引号 脚本中出现的字符串可以用双引号引起来，会解释变量
 ```
 
+## Shell输入输出管理
+
+### 基本输入
+
+```
+read 命令
+默认接受键盘的输入，回车符代表输入结束
+命令选项
+-p	打印信息
+-t	限定时间,输入超时时间
+-s	不回显
+-n	输入字符数，限定输入字符数
+```
+
+
+
 ### Echo格式化输出
 
+> 将内容输出到默认显示设备
+> echo命令：在显示器上显示一段文字，将输入的字符串送往标准输出。输出的字符串以空白字符隔开，并在最后加上换行号。
+> 参数选项：
+>
+> ```
+> -n  不要在最后自动换行
 > 
+> -e  若字符串中出现以下字符，则特别加以处理，而不会将它当成一般文字输出
+> 转义字符:
+> \a 	发出警告声
+> \b	删除前一个字符
+> \c	最后不加上换行符号
+> \f	换行但贯标仍旧停留在原来的位置
+> \n	换行且光标移至行首
+> \r	光标移至行首但不换行
+> \t	插入tab
+> \v	与\f相同
+> \	插入\字符
+> \nnn	插入nnn(八进制)所代表的ASCII字符
+> -help	显示帮助
+> -version	显示版本信息
+> 
+> [root@localhost ~]# echo -e "\a\a\a"
+> [root@localhost ~]# echo -e "\t\t hehe"
+>                  hehe
+> ### 倒计时
+> [root@localhost test]# vim testEcho.sh
+> #!/bin/bash
+> for time in `seq 9 -1 0`;
+> do
+>   echo -n -e "\b$time"
+>   sleep 1
+> done
+> ```
 
 ## 变量
 
 ### 变量定义与引用
 
 > 变量：用一个固定的字符串去表示不固定的内容
+> 变量：存放临时数据到内存，以待后续使用时快速读出。内存在系统启动的时候按照1B一个单位划分若干块，然后统一编号(16进制编号)，并对内存的使用情况做记录，保存在内存跟踪表中
+>
+> 临时变量：在关机后或关闭终端后就会被清除
+>
+> 在脚本中定义变量存值的时候的变化：
+> 1. 内存占用：如果存的是一个字符则占用一个字节，如果存的是字符串则是字符串的长度加1个字节长度(\0是一个特殊字符，代表字符串结束)
+> 2. 变量名与内存空间的关系：计算机种会将对应的内存空间和变量名称绑定在一起，此时代表这段内存空间已经被程序占用，其他程序不可复用；然后将变量名对应的值存在对应内存地址空间里。
+>
+> **理解变量存储**：STRING1="ABC"
+> 1)STRING1(逻辑地址)<===>0x5...0x8(物理地址)  存取数据ABC
+> STRING1:是给人看的方便记忆
+> 0x5...0x8：内存物理地址，是计算机寻址的一句
+> 2）对于人来说STRING1上存的数据是ABC,对于计算机来说数据时存在物理地址上的；
+> 3）在建立变量的时候计算机自动将逻辑地址(变量名)和物理地址做了对应
+>
+> 变量读出
+> 1）当调用STRING1的时候，计算机会根据对应关系，找到物理地址
+> 2）定位内存地址，读出数据并返回
+>
+> **变量分类**
+>
+> 1. 本地变量：用户私有变量，只有本用户可以使用，保存在家目录下的.bash_profile/.bashrc文件中
+> 2. 全局变量:所有用户都可以使用，保存在/etc/profile、/etc/bashrc文件中
+> 3. 用户自定义变量：用户自定义，比如脚本中的变量
+>
+> **变量名命名规则**
+> - 命名只能使用英文字母，数字和下划线，首个字符不能以数字开头
+>
+> - 重点不能有空格，可以使用下划线(_)
+>
+> - 不能使用标点符号
+>
+> - 不能使用bash里的关键字(可用help命令查看保留关键字)
+>
+> - 字符串需使用单引号或双引号
+>
+>   变量名字母最好使用大写，与linux命名统一
+>
+> 
 
 1. **自定义变量**
 
 > - **定义变量**：变量名=变量值  变量名必须以字母或下划线开头，区分大小写 ip=192.168.2.115
+>   变量在使用`=`赋值时，变量名与变量值之间不能有空格
 >   - 引用变量：变量名 或 {变量名}
 >   - 查看变量：`echo $变量名`  `set(所有变量：包括自定义变量和环境变量)`
 >   - 取消变量：`unset 变量名`
@@ -913,7 +1018,7 @@ $	变量中取内容值
 >
 > 
 
-2. **环境变量**
+2. **环境变量**(全局变量)
 
 > - **定义环境变量**
 >   方法1：`export back_dir2=/home/backup`
@@ -922,6 +1027,23 @@ $	变量中取内容值
 >    - 查看环境变量：`echo $变量名`   `env  例如 env | grep back_dir2`
 >    - 取消环境变量：`unset 变量名`
 > - **环境变量作用范围**：在当前shell和子shell中有效
+
+**上述设置的变量其实都是一次性变量，系统重启就会丢失，如果希望本地变量或全局变量永久使用，可以将需要设置的变量写入文件中即可**
+
+> **定义永久变量**
+>
+> - 本地变量：用户私有变量，只有本用户可以使用，保存在家目录下的.bash_profile、.bashrc文件中
+> - 全局变量:所有用户都可以使用，保存在/etc/profile 、/etc/bashrc
+>
+> ```
+> [root@localhost ~]# vim ~/.bash_profile  //定义用户私有永久变量
+> NAME='TEST'
+> [root@localhost ~]# vim /etc/profile  //定义永久全局变量
+> export TEMP_NAME='TEST'
+> 
+> ```
+>
+> 
 
 3. **位置变量**
 
@@ -1301,6 +1423,579 @@ ${变量名:+新的变量值}
 i++ 先赋值再运算，++i先运算再赋值，俩者对变量的值没有影响，对表达式的值有影响
 ```
 
+#### shell特殊变量
+
+```
+特殊参数
+$*  代表所有参数，其间隔为IFS内定参数的第一个字元
+$@	与 * 星号类同，不同之处在于不参照IFS
+$#	代表参数数量
+$	执行上一个指令的返回值
+$-	最近执行的foreground pipeline的选项参数
+$$	本身的process ID
+$_	显示出最后一个执行的命令
+$N	shell的第几个外传参数
+
+- 范例
+#!/bin/bash
+echo "脚本的名字是：$0"
+echo "脚本的参数是:$@"
+echo "脚本的参数是:$*"
+echo "传参个数是:$#"
+echo "脚本执行进程号:$$"
+echo "最后执行的命令时:$_"
+echo "第2个参数是：$2"
+
+```
+
+
+
+## 数组
+
+### 基本数组
+
+> 数组可以让用户一次赋予多个值，需要读取数据时只需通过索引调用就可以方便读取了。
+> - **数组语法**
+> ```
+> 数组名称=(元素1 元素2 元素3...)
+> ```
+> - **数组读取**
+> ```
+> ${数组名称[索引]}
+> 索引默认是元素在数组中的排队编号，默认第一个从0开始
+> ```
+> - **数组赋值**
+>   方法1：一次赋一个值
+>
+>   ```
+>   arr0[0]='tome'
+>   arr0[1]='tony'
+>   ```
+>
+>   方法2：一次赋多个值
+>
+>   ```
+>   arr2=('a' 'b' c')
+>   ```
+>
+> - **查看数组**
+>
+> ```
+> [root@localhost ~]# declare -a  //查看已声明的数组 
+> [root@localhost ~]# declare -A //查看已声明的数组 
+> 
+> declare -a BASH_ARGC='()'
+> declare -a BASH_ARGV='()'
+> declare -a BASH_LINENO='()'
+> declare -a BASH_SOURCE='()'
+> declare -ar BASH_VERSINFO='([0]="4" [1]="2" [2]="46" [3]="2" [4]="release" [5]="x86_64-redhat-linux-gnu")'
+> declare -a DIRSTACK='()'
+> declare -a FUNCNAME='()'
+> declare -a GROUPS='()'
+> declare -a PIPESTATUS='([0]="0")'
+> [root@localhost ~]# declare -a arr1='([0]="app" [2]="orange")'  //声明一个数组
+> [root@localhost ~]# echo ${arr1[0]}
+> app
+> 
+> ```
+>
+> - **访问数组元素**
+>
+> ```
+> [root@localhost ~]# echo ${arr1[0]}  //访问数组中的第一个元素
+> app
+> [root@localhost ~]# echo ${arr1[@]}  //访问数组中的所有元素
+> app orange tony
+> [root@localhost ~]# echo ${#arr1[@]} #统计数组元素个数
+> 2
+> [root@localhost ~]# echo ${!arr1[@]} #获取数组元素索引
+> 0 2
+> [root@localhost ~]# echo ${arr1[@]:1} #从数组下标1开始
+> orange
+> [root@localhost ~]# echo ${arr1[@]:1:2} #从数组下标1开始，访问俩个元素
+> orange tony
+> ```
+>
+> - **遍历数组**
+>   - 默认数组通过数组元素的个数进行遍历
+>
+> ```
+> [root@localhost ~]# echo ${arr1[0]}
+> app
+> ```
+>
+> 	-  针对关联数组可以通过数组元素的索引进行遍历
+
+### 关联数组
+
+> 关联数组可以允许用户自定义数组的索引，这样使用更加方便、高效
+
+> - **定义关联数组**
+>
+> ```
+> ### 1. 声明一个关联数组
+> [root@localhost ~]# declare -A ass_arr
+> ### 2. 数组元素定义与赋值
+> 方法1：
+> [root@localhost ~]# ass_arr[name]="joy"
+> [root@localhost ~]# ass_arr[age]=18
+> [root@localhost ~]# echo ${ass_arr[name]}
+> joy
+> 方法2：
+> [root@localhost ~]# declare ass_arr1=([name]="joy" age=18)
+> [root@localhost ~]# echo ${ass_arr1[name]}
+> joy
+> 
+> ```
+>
+> 
+
+## shell中的运算
+
+> 查看看Linux下对test的解释（使用`man test`或者`info test`）
+>
+> ```
+> ### 使用test判断 $?前一条命令执行结果，0为真，执行成功，否则执行失败
+> [root@localhost ~]# test 1 -eq 1;echo $?
+> 0
+> [root@localhost ~]# test 1 -gt 1;echo $?
+> 1
+> [root@localhost ~]# test 1 -lt 1;echo $?
+> 1
+> 
+> ```
+>
+> 
+
+### 1. 数学比较运算
+
+```
+-eq	等于
+-gt	大于
+-lt	小于
+-ge	大于或等于
+-le	小于或等于
+-ne	不等于
+```
+
+### 2. 字符串比较运算
+
+```
+### 注意字符串需使用引号引起来
+=：	字符串包含的文本是否一样
+== 	两个字符串是否相等
+>:	比较字母的大小，比如var1 > var2,如果var1字母大于var2则返回真
+<:	和大于相反
+!= 	两个字符串不相等
+-z 	空字符串
+-n 	非空字符串
+```
+
+### 3. 文件比较和检查
+
+```
+-d	检查文件是否存在且为目录
+-e	检查文件是否存在
+-f	检查文件是否存在且为文件
+-r	检查文件是否存在且可读
+-s	检查文件是否存在且不为空
+-w	检查文件是否存在且可写
+-x	检查文件是否存在且可执行
+-O	检查文件是否存在且被当前用户拥有
+-G	检查文件是否存在并且默认组为当前用户组
+file1 -nt file2	检查file1是否比file2新  比较的是文件的更新时间
+file1 -ot file2	检查file1是否比file2旧
+```
+
+### 4. 逻辑运算
+
+```
+&&	逻辑与运算   真真为真，真假为假，假假为假
+||	逻辑或运算   真真为真  真假为真  假假为假
+!	逻辑非运算    非假为真  非真为假
+
+逻辑运算注意事项
+&& 与 || 需要俩个或以上条件，逻辑非运算只能是一个条件
+```
+
+### 5. 赋值运算
+
+```
+=	赋值运算符
+```
+
+## shell流程控制
+
+### 单if语句
+
+> - **语法格式**
+>
+> ```
+> if [ condition ]
+>   then
+>     commands
+> fi
+> ```
+>
+> 
+
+### if-then-else语句
+
+- **语法格式**
+
+```
+if [ condition ]
+	then
+		commands1
+	else
+		commands2
+fi
+```
+
+- 范例
+
+```
+[root@localhost test]# vim test_if.sh
+
+#!/bin/bash
+#Description
+#Author: Joy
+#Created Time:2021/09/17
+
+if [ $USER == 'root' ]
+  then
+    echo "管理员你好"
+  else
+    echo "guest 你好"
+fi
+
+[root@localhost test]# sh test_if.sh
+管理员你好
+```
+
+- 范例2：嵌套if-else
+
+```
+[root@localhost test]# vim test_if2.sh
+
+#/bin/bash
+# 判断俩个整数的关系
+if [ $1 -eq $2 ]
+        then
+                echo "$1 = $2"
+else
+        if [ $1 -gt $2 ]
+                then
+                        echo "$1 > $2"
+                else
+                        echo "$1 < $2"
+        fi
+fi
+
+[root@localhost test]# sh test_if2.sh 2 3
+2 < 3
+
+```
+
+
+
+### if-then-elif语句
+
+> 适用范围：多于2个以上判断结果，也可以说多于1个判断条件
+>
+> ```
+> if [ conditon 1 ]
+> 	then
+> 		commands2
+> elif [ condition 2 ]
+> 	then
+> 		commands2
+> .......
+> else
+> 	commandsX
+> fi
+> ```
+>
+> - **范例**
+>
+> ```
+> #/bin/bash
+> # 判断俩个整数的关系
+> if [ $1 -eq $2 ]
+>         then
+>                 echo "$1 = $2"
+> elif [ $1 -gt $2 ]
+>         then
+>                 echo "$1 > $2"
+> else
+>         echo "$1 < $2"
+> fi
+> ```
+
+### 高级运算表示
+
+```
+1. 条件符号使用双圆括号，可以在条件中植入数学表达式
+如：
+if (( 3>2 ))
+双圆括号中的比较运算符，使用的是传统的比较运算符：>  >=  <= == !=
+
+2. 使用双方括号，可以在条件中使用通配符
+如：
+if [[ "$var" == r* ]]  //变量var是否以r开头
+```
+
+### case条件多分支语句
+
+> 根据给予的不同条件执行不同的代码块
+
+- **case语法**
+
+```
+case 变量 in
+条件1)
+  执行代码块
+;;
+条件2)
+  执行代码块
+;;
+......
+esac
+
+注意:每个代码块执行完毕要以 ;;  结尾代表结束，case结尾要以倒过来写的esac来结束
+```
+
+- **范例**
+
+```
+#!/bin/bash
+read -p "NUM:" N
+case $N in
+1)
+  echo "haha"
+;;
+2)
+  echo "hehe"
+;;
+3|4)  #3或者4
+  echo 'xixi'
+;;
+*)
+  echo "heihei"
+;;
+esac
+
+```
+
+
+
+## Shell编程之循环结构
+
+### for语句
+
+> for循环的运作方式，是将串行的元素一一取出，依序放入指定的变量中，然后重复执行含括的命令区域(在do和done之间)，直到所有元素取尽位置
+> 其中，串行是一些字符串的组合，彼此用$IFS所定义的分隔符(如空格符)隔开，这些字符串称为字段
+
+1. **for循环的语法结构**
+
+```
+### 语法结构1：
+for 变量 in 值集合
+do
+  执行命令
+done
+
+### 语法结构2  C格式
+for (( 变量;条件;自增减运算))
+do
+  代码块
+done
+
+for ((;;))  无限循环
+```
+
+- for 每次从值集合中取一个值赋值给变量
+- do-done 将赋值后的变量代入执行的命令得到执行结果
+- 重复以上俩个步骤，直到值集合中的值被一一获取赋值给变量得到所有结果，循环结束
+
+2. **范例**
+
+```
+### 创建目录以及其子目录
+#!/bin.bash
+for a in {1..10}  // 也可以写成 for a in 1 2 3 4 5 6 7 8 9 10
+do
+  mkdir /test/demo$a
+  cd /test/demo$a
+  for b in {1..10}
+  do
+    mkdir test$b
+  done
+done
+
+for var in my name\'s Joy   //for变量赋值也可以是一个字符
+### 使用seq遍历值
+#!/bin/bash
+for k in $( seq 1 10)  # seq a b 用于产生从a 到 b之间的所有整数，
+do
+  mkdir -p /test/demo${k}
+  for i in $( seq 1 10)
+  do
+    mkdir /test/demo${k}/test${i}
+  done
+  cd ..
+done
+
+[root@localhost test]# seq 9 -2 1  //-2表示打印的数字的增量 9：为起始值 1：为最后一个值
+9
+7
+5
+3
+1
+
+
+### 查看/var目录下文件占用磁盘大小
+#!/bin/bash
+DIR="/var"
+cd $DIR
+for k in $(ls $DIR)  # 对/var目录中每个文件，进行for循环处理
+do
+  [ -d $k ] && du -sh $k  # 如果/var下的文件是目录，则使用du -sh计算该目录占用磁盘空间大小
+done
+
+
+###
+[root@localhost test]# vim test_for.sh
+#!/bin/bash
+# 一个变量循环
+for ((i=1;i<10;i++))
+do
+  echo $i
+done
+# 俩个变量循环
+for (( a=0,b=9;a<10;a++,b--))
+do
+  echo $a $b
+done
+
+
+[root@localhost test]# sh test_for.sh
+
+```
+
+### while语句
+
+1. **while 循环语法结构**
+
+```
+while 条件测试
+do
+  执行命令
+done
+```
+
+- while 首先进行条件测试，如果传回值为0(条件测试为真)，则进入循环，执行命令区域，否则不进入循环
+- 满足while测试条件，执行命令区域，直到while的测试条件不满足结束执行while循环(如果条件一直满足执行无穷循环)
+
+2. **示例**
+
+```
+###  显示读取到的内容
+[root@localhost test]# vim testWhile.sh
+#!/bin/bash
+while read a
+do
+   echo $a
+done < /etc/passwd
+
+### 累加
+#/bin/bash
+declare -i i=1
+declare -i sum=0 #声明设置i和sum为整数型
+while((i<=10)) #条件测试：只要i小于或等于10，就执行循环
+do
+  let sum+=i  # sum+=i等价于 sum=sum+i
+  let i++  # let i++,i的值递增1，此行是改变条件测试的命令，一旦i大于10可终止循环
+done   # 遇到done，回到while条件测试
+echo $sum  # 直到while条件不满足，显示sum的值
+
+### 字符串输入校验
+#/bin/bash
+read -p "login:" account
+while [ "$account" != 'root' ]
+do
+  read -p "login account:" account
+done
+
+### 九九乘法
+#/bin/bash
+n=1
+while [ $n -lt 10 ]
+do
+  for((m=1;m<=$n;m++ ))
+    do
+      echo -n -e "$m * $n = $((n*m))\t"
+    done
+  n=$((n+1))
+done
+
+```
+
+
+
+### until语句
+
+> while循环的条件测试是测真值，until循环是测假值
+
+1. **until循环的语法结构**
+
+```
+until 条件测试
+do
+  执行条件
+done
+```
+
+- until条件测试结果为假(传回值不为0)，就进入循环
+- 条件测试不满足，执行命令区域，直到until条件满足，结束until循环(如果条件一直不满足则执行无穷循环)
+
+2. **范例**
+
+```
+[root@localhost test]# vim test_until.sh
+
+#!/bin/bash
+declare -i i=10  # 声明i和sum为整数型
+declare -i sum=10
+until ((i>10))  # 条件测试：只要i值未超过10，就进入循环
+do
+        let sum+=i   
+        let ++i
+done  # 遇到done，回到until条件测试
+echo $sum  # 直到until的条件满足，显示sum的值
+
+[root@localhost test]# sh test_until.sh
+20
+
+```
+
+
+
+### 循环控制
+
+```
+break,continue,exit一般用于循环结构中控制循环的走向
+
+break n		n表示跳出循环的次数，如果省略n表示跳出整个循环;如果循环多层嵌套，循环从里往外排序1-N;如果想跳出某层循环，break N
+continue n	n表示退到第几层继续循环，如果省略n表示跳过本次循环进入下一次循环
+exit n		退出当前的shell程序，并返回n,n也可省略
+return		用于返回一个退出值给调用的函数
+shift		用于将参数列表list左移指定次数，最左端的那个参数就从列表中删除，其后边的参		数继续进入循环
+sleep n		循环执行该命令休眠n秒
+```
+
+
+
 ## Shell编程之函数
 
 > Shell函数的本质是一段可以重复使用的脚本代码，这段代码被提前编写好了，放在了指定的位置，使用时直接调取即可
@@ -1624,117 +2319,31 @@ The factorial of 5 is: 120
 
 ```
 
-## Shell编程之循环结构
 
-### for语句
 
-> for循环的运作方式，是将串行的元素一一取出，依序放入指定的变量中，然后重复执行含括的命令区域(在do和done之间)，直到所有元素取尽位置
-> 其中，串行是一些字符串的组合，彼此用$IFS所定义的分隔符(如空格符)隔开，这些字符串称为字段
+## 正则表达式
 
-1. **for循环的语法结构**
-```
-for 变量 in 值集合
-do
-  执行命令
-done
-```
-- for 每次从值集合中取一个值赋值给变量
-- do-done 将赋值后的变量代入执行的命令得到执行结果
-- 重复以上俩个步骤，直到值集合中的值被一一获取赋值给变量得到所有结果，循环结束
+> 简介：正则表达式是一种文本模式匹配，包括普通字符(例如:a到z之间的字母)和特殊字符(称为“元字符”)。它是一种字符串匹配的模式，可以用来检查一个字符串是否含有某种子串、将匹配的子串替换或者从某个字符串中取出某个条件的子串
+>
+> 正则表达式是一个三方产品，被常用计算机语言广泛使用，比如：shell,PHP,python,java,js等
+> shell也支持正则表达式，但不是所有的命令都支持正则表达式，常见的命令中只有`grep,sed,awk`命令支持正则表达式
 
-2. **范例**
+### 特殊字符
+
+> 特殊字符
+> 定位符使用技巧：同时锚定开头和结尾，做精确匹配；单一锚定开头和结尾，做模糊匹配
+> `^`	锚定开头，默认锚定一个字符, ^a:以a开头
+> `$`	锚定结尾，默认锚定一个字符。a$:以a结尾
+
+- **范例**
 
 ```
-### 创建目录以及其子目录
-#!/bin.bash
-for a in {1..10}
-do
-  mkdir /test/demo$a
-  cd /test/demo$a
-  for b in {1..10}
-  do
-    mkdir test$b
-  done
-done
-
-### 使用seq遍历值
-#!/bin/bash
-for k in $( seq 1 10)  # seq a b 用于产生从a 到 b之间的所有整数
-do
-  mkdir -p /test/demo${k}
-  for i in $( seq 1 10)
-  do
-    mkdir /test/demo${k}/test${i}
-  done
-  cd ..
-done
-
-### 查看/var目录下文件占用磁盘大小
-#!/bin/bash
-DIR="/var"
-cd $DIR
-for k in $(ls $DIR)  # 对/var目录中每个文件，进行for循环处理
-do
-  [ -d $k ] && du -sh $k  # 如果/var下的文件是目录，则使用du -sh计算该目录占用磁盘空间大小
-done
-```
-
-### while语句
-
-1. **while 循环语法结构**
-```
-while 条件测试
-do
-  执行命令
-done
-```
-- while 首先进行条件测试，如果传回值为0(条件测试为真)，则进入循环，执行命令区域，否则不进入循环
-- 满足while测试条件，执行命令区域，直到while的测试条件不满足结束执行while循环(如果条件一直满足执行无穷循环)
-
-2. **示例**
-
-```
-###  显示读取到的内容
-[root@localhost test]# vim testWhile.sh
-#!/bin/bash
-while read a
-do
-   echo $a
-done < /etc/passwd
-
-### 累加
-#/bin/bash
-declare -i i=1
-declare -i sum=0 #声明设置i和sum为整数型
-while((i<=10)) #条件测试：只要i小于或等于10，就执行循环
-do
-  let sum+=i  # sum+=i等价于 sum=sum+i
-  let i++  # let i++,i的值递增1，此行是改变条件测试的命令，一旦i大于10可终止循环
-done   # 遇到done，回到while条件测试
-echo $sum  # 直到while条件不满足，显示sum的值
-```
-
-
-
-### until语句
-
-> while循环的条件测试是测真值，until循环是测假值
-1. **until循环的语法结构**
-```
-until 条件测试
-do
-  执行条件
-done
-```
-- until条件测试结果为假(传回值不为0)，就进入循环
-- 条件测试不满足，执行命令区域，直到until条件满足，结束until循环(如果条件一直不满足则执行无穷循环)
-
-2. **范例**
-
-```
+### 精确匹配，当 ^与$同时出现时，表示精确匹配。只出现一个时表示模糊匹配
+[root@localhost test]# egrep ^a$ file  
+[root@localhost test]# egrep ^a file
+aaa
 
 ```
 
 
 
-### 循环控制
