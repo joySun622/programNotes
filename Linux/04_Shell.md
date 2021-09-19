@@ -2339,11 +2339,471 @@ The factorial of 5 is: 120
 
 ```
 ### 精确匹配，当 ^与$同时出现时，表示精确匹配。只出现一个时表示模糊匹配
+egrep  <==>  grep -E
 [root@localhost test]# egrep ^a$ file  
-[root@localhost test]# egrep ^a file
+[root@localhost test]# egrep ^a file  //以a开头
 aaa
+
+```
+
+#### 匹配符
+
+```
+匹配符		说明
+.		  匹配除回车以外的任意一个字符
+()		  字符串分组
+[]		  定义字符类，匹配括号中以一个字符
+[^]		  表示否定括号中出现字符类中的字符，取反
+\		  转义字符
+|		  或
+```
+
+- **范例**
+
+```
+[root@localhost test]# egrep "^a.c$" file    # 匹配以a开头以c结尾的字符
+[root@localhost test]# egrep "^a[1-9]c$" file  # 匹配以a开头，中间为数字，结尾为c的字符
+[root@localhost test]# egrep "^a\*c$" file  # 匹配a*c
+a*c
+[root@localhost test]# egrep "^(a|b).c$" file # 匹配以a或b开头，中间任意字符，结尾为c的字符串
+a*c
+aec
+bec
+
+
+```
+
+#### 限定符
+
+```
+匹配符			说明
+*			某个字符之后加星号表示该字符出现0次或0次以上
+？		   在某个字符后使用，表示该字符出现0次或1次
++			在某个字符后使用，表示该字符出现1次或1次以上
+{n,m}		在某个字符后使用，表示该字符出现最少n次，最多m次
+{m}			在某个字符后使用，表示该字符出现m次
+```
+
+- **范例**
+
+```
+[root@localhost test]# egrep "^ab+c$" file  #以a开头，c结尾，中间b出现一次或多次
+abc
+abbbc
+[root@localhost test]# egrep "^ab*c$" file #以a开头，c结尾，中间b出现0次或多次
+ac
+abbbc
+abbbc
+
+```
+
+### POSIX特殊字符
+
+| 特殊字符   | 说明                             |
+| ---------- | -------------------------------- |
+| [:alnum:]  | 匹配任意字母字符0-9 a-z A-Z      |
+| [:alpha:]  | 匹配任意字母，大写或小写         |
+| [:digit:]  | 数字0-9                          |
+| [:graph:]  | 非空字符(非空格控制符)           |
+| [:lower:]  | 小写字符a-z                      |
+| [:upper:]  | 大写字符A-Z                      |
+| [:cntrl:]  | 控制字符                         |
+| [:print:]  | 非空字符(包括空格)               |
+| [:punct:]  | 标点符号                         |
+| [:blank:]  | 空格或TAB字符                    |
+| [:xdigit:] | 16进制数字                       |
+| [:space:]  | 所有空白字符(新行、空格、制表符) |
+
+- **范例**
+
+```
+[root@localhost test]# egrep "^a[[:alnum:]]c$" file
+aec
+abc
+
+[[]] 双中括号：第一个中括号是匹配符[],匹配中括号中的任意一个字符，第二个[]是POSIX表达格式。如[:digit:]
+```
+
+## Shell对文件的操作
+
+> 对文件的相关操作：增加内容、修改内容、删除部分内容、查看部分内部内容
+>
+> 文件操纵工具类型：
+>
+> 1. 交互式文本编辑：vim,gedit,nano
+> 2. linux提供一些命令，可以用来进行文本操作，如perl,sed
+
+### sed命令
+
+> **简介**：
+>
+> sed是linux提供的一个外部命令，是一个行(流)编辑器，非交互式的对文件内容进行增删改查的操作，使用者只能在命令行输入编辑命令、指定文件名，然后在屏幕上查看输出。它和文本编辑器有本质区别。
+> 文本编辑器：编辑对象是文件
+> 行编辑器：编辑对象是文件中的行
+> 也就是说前者一次处理一个文本，而后者是一次处理提个文本中的一行。
+
+- **sed处理数据原理**
+
+![image-20210918162505726](images/image-20210918162505726.png)
+
+数据在缓存中处理，然后默认输出到屏幕上。如果没有操作文本，其操作不会改变文本内容
+
+```
+语法格式：
+sed [options]'{command}[flags]' [filename]
+
+命令选项
+-e script	将脚本中指定的命令添加到处理输入时执行的命令中  多条件，一行中要有多个操作
+-f script	将文件中指定的命令添加到处理输入时执行的命令中
+-n	抑制自动输出
+-i	编辑文件内容
+-i.bak	修改时同时创建.bak备份文件
+-r	使用扩展的正则表达式
+!	取反 (跟在模式条件后与shell有区别)
+
+sed常用内部命令  若不添加行匹配，会操作整个文档毎一行
+a	在匹配行尾后面添加
+i	在匹配前面添加
+p	打印
+d	删除
+s	查找替换
+c	更改
+y	转换 N D P
+
+flags  对内部命令的补充
+数字	表示新文本替换的模式
+g:	表示用新文本替换现有文本的全部实例
+p:	表示打印原始的内容
+w filename:	将替换的结果写入文件
+```
+
+- **范例**
+
+```
+[root@localhost test]# vim data
+the quick brown fox jumps over the laze dog
+[root@localhost test]# sed 'a\hello world' data  # 在毎一行后增加 hello world
+the quick brown fox jumps over the laze dog
+hello world
+[root@localhost test]# sed '3a\hello world' data # 在第3行添加hello world
+the quick brown fox jumps over the laze dog
+the quick brown fox jumps over the laze dog
+the quick brown fox jumps over the laze dog
+hello world
+[root@localhost test]# sed '2,4a\hello world' data # 2-4行添加helloworld
+the quick brown fox jumps over the laze dog
+the quick brown fox jumps over the laze dog
+hello world
+the quick brown fox jumps over the laze dog
+hello world
+the quick brown fox jumps over the laze dog
+hello world
+the quick brown fox jumps over the laze dog
+the quick brown fox jumps over the laze dog
+[root@localhost test]# sed '/3 the/a\hello world' data  #匹配添加，在匹配 3 the的行后添加hello world
+1 the quick brown fox jumps over the laze dog
+2 the quick brown fox jumps over the laze dog
+3 the quick brown fox jumps over the laze dog
+hello world
+[root@localhost test]# sed '2,4d' data  # 删除2-4行
+1 the quick brown fox jumps over the laze dog
+5 the quick brown fox jumps over the laze dog
+6 the quick brown fox jumps over the laze dog
+[root@localhost test]# sed 's/dog/cat/' data  # 替换，只会替换首次匹配的字符
+1 the quick brown fox jumps over the laze cat
+[root@localhost test]# sed 'c\helloworld' data # 更改行
+helloworld
+helloworld
+[root@localhost test]# sed 'y/abc/ABC/' data # 转换，将匹配的字母转换为大写，转换字符一一对应
+1 the quiCk Brown fox jumps over the lAze dog
+2 the quiCk Brown fox jumps over the lAze dog
+[root@localhost test]# sed 's/dog/cat/g' data  #将所有行中的dog替换成cat
+1 the quick brown fox jumps over the laze cat.cat
+2 the quick brown fox jumps over the laze cat.cat
+[root@localhost test]# sed 's/dog/cat/2' data  # 将所有行中的，第二次匹配到的dog替换成cat
+1 the quick brown fox jumps over the laze dog.cat
+[root@localhost test]# sed 's/dog/cat/w mfile' data # 将修改后的内容保存到mfile文件中
+[root@localhost test]# sed -n '3s/dog/cat/p' data  # -n限制打印行，只打印修改的行
+3 the quick brown fox jumps over the laze cat.dog
+[root@localhost test]# sed -e '3s/dog/cat/;s/brown/green/' data # 添加多个操作
+1 the quick green fox jumps over the laze dog.dog
+2 the quick green fox jumps over the laze dog.dog
+3 the quick green fox jumps over the laze cat.dog
+### 执行指定文件命令
+[root@localhost test]# vim command_file
+3s/dog/cat/
+s/brown/green/
+[root@localhost test]# sed -f command_file data
+1 the quick green fox jumps over the laze cat.dog
+[root@localhost test]# sed -i 's/dog/cat/g' data # 会修改原文件内容，修改时永久性的
+[root@localhost test]# sed -n -r '/^(root)(.*)(bash)$/p' /etc/passwd  # 使用正则表达式
+root:x:0:0:root:/root:/bin/bash
+
+```
+
+### sed小技巧
+
+```
+$= 统计文本行数
+[root@localhost test]# sed -n '$=' data
+6
+[root@localhost test]# sed '=' data # 给毎一行添加行号显示
+1
+1 the quick brown fox jumps over the laze cat.cat
+2
+2 the quick brown fox jumps over the laze cat.cat
+
+```
+
+## shell对输出流的处理
+
+### awk简介
+
+> 平行命令还有：gawk/pgawk/dgawk
+> awk:是一种可以处理数据、产生格式化报表的语言，功能十分强大。awk认为文件中的毎一行是一条记录，记录与记录的分隔符为换行符，毎一列是一个字段，字段与字段的分割符默认是一个或多个空格或tab制表符。
+> awk的工作方式是读取数据，将毎一行数据视为一条记录(record)，每条记录以字段分隔符分成若干字段，然后输出各个字段的值
+
+```
+awk语法
+awk [options][BEGIN]{program}[END][file]
+
+常用命令选项：
+-F fs	指定描绘一行数据字段的文件分割符  默认为空格
+-f file	指定读取程序的文件名
+-v var=value	定义awk程序中使用的变量和默认值
+
+注意：awk程序脚本由左大括号和右大括号定义。脚本命令必须放在俩个大括号之间。由于awk命令行假定脚本是单文本字符，
+
+awk程序运行的优先级是：
+1）BEGIN		在开始处理数据流之前执行，可选项
+2) program	如何处理数据流 必选项
+3）END		处理完数据流后执行，可选项
+awk程序的执行优先级，BEGIN是优先级最高的代码块，是在执行program之前执行的，不需要提供数据源，因为不涉及到任何数据的处理，也不依赖与program代码块；program是对数据流干什么，是必选代码块，也是默认代码块。所以在执行时必须提供数据源；END是处理完数据流后的操作，如果需要执行END代码块，就必须需要program的支持，单个无法执行
+```
+
+### awk基础用法
+
+```
+原始数据
+1 the quick brown fox jumps over the laze dog.cat
+2 the quick brown fox jumps over the laze dog.cat
+3 the quick brown fox jumps over the laze dog.cat
+4 the quick brown fox jumps over the laze dog.cat
+5 the quick brown fox jumps over the laze dog.cat
+6 the quick brown fox jumps over the laze dog.cat
+
+```
+
+#### awk对字段(列)的提取
+
+```
+字段提取：提取一个文本中的一列数据并打印输出
+字段相关内置变量：
+$0	整行文本
+$1	文本行中的第一个数据字段
+$2	文本行中的第二个数据字段
+$N	文本行中的第N个字段
+$NF	文本行中的最后一个数据字段
+```
+
+- **范例**
+
+```
+[root@localhost test]# awk '{print $0}' data  # 打印所有行文本
+1 the quick brown fox jumps over the laze cat.cat
+2 the quick brown fox jumps over the laze cat.cat
+3 the quick brown fox jumps over the laze cat.cat
+4 the quick brown fox jumps over the laze cat.cat
+5 the quick brown fox jumps over the laze cat.cat
+6 the quick brown fox jumps over the laze cat.cat
+[root@localhost test]# awk '{print $NF}' data  #打印最后一个数据字段
+cat.cat
+cat.cat
+[root@localhost test]# awk '{print $3}' data  #打印第三个字段
+quick
+quick
+[root@localhost test]# awk '{print $1,$3}' data  # 打印第1列，第3列
+1 quick
+[root@localhost test]# awk -F ":" 'NR==1{print $1}' /etc/passwd # 定义分隔符为 : ，打印第一行第一列
+root
+[root@localhost test]# awk -F: 'NR==1{print $1 "-" $3 "-" $5}' /etc/passwd
+root-0-root
+
+[root@localhost test]# awk -F ":" 'NR==1{print $1 "-" $3 "-" $5}' /etc/passwd  #打印多列，并格式化
+root-0-root
+
+```
+
+#### awk对记录(行)的提取
+
+```
+记录提取：提取一个文本中的一行并打印输出
+记录的提取方法有俩种：a. 通过行号；b. 通过正则匹配
+
+记录相关内置变量：
+NR：指定行号
+
+[root@localhost test]# awk 'NR==3{print $0}' data  #打印第3行
+3 the quick brown fox jumps over the laze cat.cat
+
+```
+
+#### awk设置变量
+
+```
+[root@localhost test]# awk -va=1 '{print $1,$(1+a)}' data
+1 the
+2 the
+3 the
+4 the
+5 the
+6 the
+```
+
+#### awk正则字符串匹配
+
+```
+~ 表示模式开始  // 中是模式
+
+### 匹配包含root的行
+[root@localhost test]# awk '/root/' /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+operator:x:11:0:operator:/root:/sbin/nologin
+[root@localhost test]# awk '$0 ~/root/' /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+operator:x:11:0:operator:/root:/sbin/nologin
+
+```
+
+#### awk忽略大小写
+
+```
+### 忽略大小写，匹配包含root的行
+[root@localhost test]# awk 'BEGIN{IGNORCASE=1} /root/' /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+operator:x:11:0:operator:/root:/sbin/nologin
+
+```
+
+#### awk模式取反
+
+```
+### 获取不包含root的行
+[root@localhost test]# awk '$0 !~/root/' /etc/passwd
 
 ```
 
 
 
+#### awk程序的优先级
+
+```
+### 优先级展示
+[root@localhost test]# awk 'BEGIN{print "hello Joy"}{print $0}END{print "bye Joy"}' data
+hello Joy
+1 the quick brown fox jumps over the laze cat.cat
+2 the quick brown fox jumps over the laze cat.cat
+3 the quick brown fox jumps over the laze cat.cat
+4 the quick brown fox jumps over the laze cat.cat
+5 the quick brown fox jumps over the laze cat.cat
+6 the quick brown fox jumps over the laze cat.cat
+bye Joy
+
+### BEGIN不需要数据源，可执行
+[root@localhost test]# awk 'BEGIN{print "hello Joy"}'
+hello Joy
+
+### END若没有提供数据流，无法执行成功
+[root@localhost test]# awk 'END{print "hello Joy"}'
+
+```
+
+
+
+### awk高级用法
+
+>  awk是一门语言，那么就会符合语言的特性，除了可以定义变量外，还可以定义数组，还可以进行运算，流程控制。
+
+#### awk定义数组
+```
+数组定义方式：数组名[索引]=值
+
+- 范例
+### 定义俩个元素，并打印这俩个元素
+[root@localhost test]# awk 'BEGIN{arr[0]=100;arr[1]=200;print arr[0],arr[1]}'
+100 200
+### 定义变量，并打印
+[root@localhost test]# awk 'BEGIN{name="Joy";print name}'
+Joy
+
+```
+
+#### awk运算
+
+```
+=						赋值运算
+> >= == <  <= !=		比较运算
++ - * / %  **  ++  --		数学运算
+&&  ||					逻辑运算
+~  !~					匹配运算
+
+
+### 赋值运算
+变量赋值：a=122
+数组赋值：arr[0]=222
+
+### 比较运算
+如果比较的是字符串则按ascii编码顺序表比较。如果结果返回为真则用1表示，如果返回值为假则用0表示
+[root@localhost test]# awk 'BEGIN{print "a" >= "b"}'
+0
+[root@localhost test]# awk 'BEGIN{print "a" <= "b"}'
+1
+[root@localhost test]# awk 'BEGIN{print 11 <= 1}'
+0
+### 逻辑运算
+[root@localhost test]# awk 'BEGIN{print 100>=2 && 100>=3}'
+1
+### 数学运算
+[root@localhost test]# awk 'BEGIN{print 2**3}'
+8
+### 匹配运算
+分为精确匹配和模糊匹配，可使用正则进行匹配
+
+```
+
+### awk环境变量
+
+| 变量        | 描述                                                   |
+| ----------- | ------------------------------------------------------ |
+| FIELDWINTHS | 以空格分隔的数字列表，用空格定义每个数据字段的精确宽度 |
+| FS          | 输入字段分隔符号                                       |
+| OFS         | 输出字段分隔符号                                       |
+| RS          | 输入记录分隔符号                                       |
+| ORS         | 输出记录分隔符号                                       |
+
+```
+### 重新定义列宽并打印，注意不可以使用$0打印所有，因为$0是打印本行全内容，不会打印你定义的字段
+[root@localhost test]# awk 'BEGIN{FIELDWIDTHS="5  2  8"}NR==1{print $1,$2,$3}' /etc/passwd
+root: x: 0:0:root
+
+### 指定字段分隔符，等价于命令选项 -F
+[root@localhost test]# awk 'BEGIN{FS=":"}NR==1{print $1,$3,$NF}' /etc/passwd
+root 0 /bin/bash
+
+### OFS:指定输出到屏幕字段分隔符
+[root@localhost test]# awk 'BEGIN{FS=":";OFS="-"}NR==1{print $1,$3,$NF}' /etc/passwd
+root-0-/bin/bash
+
+### RS 指定输入记录的分割符，默认记录分隔符是\n
+[root@localhost test]# awk 'BEGIN{RS=""}{print $1,$2,$3}' num #指定记录分隔符为空格
+ 1 2 3
+
+```
+
+### awk流程控制
+
+> 1. if判断语句
+> 2. for循环语句
+> 3. while循环语句
+> 4. do...while语句
+> 5. 循环控制
