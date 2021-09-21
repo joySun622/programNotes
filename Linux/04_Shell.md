@@ -2807,3 +2807,152 @@ root-0-/bin/bash
 > 3. while循环语句
 > 4. do...while语句
 > 5. 循环控制
+
+#### if判断语句
+
+```
+### 单if语句
+[root@localhost test]# awk '{if($1>5) print $0}' data
+6 the quick brown fox jumps over the laze cat.cat
+### if...else语句
+[root@localhost test]# awk '{
+if ($1<5)
+  print $1*2
+else
+print $1/2
+}' data
+
+```
+
+#### for循环语句
+
+```
+### 累加
+[root@localhost test]# awk -v 'sum=0' '{sum+=$1} END{print sum}' data
+21
+[root@localhost test]# awk '{
+> for (i=1;i<4;i++)
+>   sum+=$i
+> print sum}' num
+[root@localhost test]# awk '{sum=0; for(i=1;i<4;i++){sum+=$i} print sum}' num
+
+```
+
+#### while循环语句
+
+```
+[root@localhost test]# awk '{
+> sum=0
+> i=1
+> while (i<4){
+>   sum+=$i
+>   i++
+> }
+> print sum
+> }' num
+
+[root@localhost test]# awk '{sum=0;i=1;while(i<4){sum+=$i;i++} print sum}' num
+
+```
+
+#### do...while语句
+
+```
+[root@localhost test]# awk '{  
+sum=0
+i=1
+do {
+  sum+=$i
+  i++
+} while (i<4)
+print sum
+}' num
+
+```
+
+#### 循环控制
+
+> break 跳出循环，执行后续语句
+>
+> ```
+> [root@localhost test]# awk '{
+> sum=0
+> i=1
+> while (i<4){
+>   sum+=$i
+>   if (sum>4)
+>     break
+>   i++
+> }
+> print sum }' num
+> 
+> ```
+
+- **小技巧**
+
+```
+### 打印文本行数
+[root@localhost test]# awk 'END{print NR}' data
+6
+### 打印文本最后一行
+[root@localhost test]# awk 'END{print $0}' data
+6 the quick brown fox jumps over the laze cat.cat
+### 打印文本列数
+[root@localhost test]# awk 'END{print NF}' data
+10
+```
+
+### 范例
+
+#### 1. 监控目标主机状态
+
+```
+1. 监控方法：ping ICMP协议
+2. 报警阈值：3次全部失败，报警
+3. ping 的频率 秒级 5s or 1s
+ping三次，每次发送一个包，如果不设置会一直ping下去，3次都失败告警，避免网络延迟造成的误差。
+
+#!/bin/bash
+for((i=1;i<4;i++))
+do
+  # 测试连通性
+  if ping -c1 $1 &>/dev/null # 当我们需要命令的退出状态而非命令的输出时,常使用 &>/dev/null  (有点没有明白这个判断成立的原因) 其过程应该是 if $?  ，即判断命令退出状态，然后进行判断
+    then
+     export ping_count"$i"=1
+   else
+     export ping_count"$i"=0
+  fi
+#时间间隔
+   sleep 1
+done
+# 3次ping失败报警
+if [ $ping_count1 -eq $ping_count2 ] && [ $ping_count2 -eq $ping_count3 ] && [ $ping_count1 -eq 0 ]
+  then
+   echo "$1 is down"
+  else
+   echo "$1 is up"
+fi
+ unset ping_count1
+ unset ping_count2
+ unset ping_count3
+
+```
+
+#### 2. 监控一个端口的存活状态
+
+```
+[root@localhost ~]# yum -y install telnet
+[root@localhost ~]# telnet 192.168.167.222  33  # 检验端口是否连接成功
+Trying 192.168.167.222...
+telnet: connect to address 192.168.167.222: Connection refused
+[root@localhost ~]# which telnet
+/usr/bin/telnet
+
+ 监控方法：
+1）通过systemctl service 服务启动状态
+2）lsof 查看端口是否存在
+3）查看进程是否存在
+--- 压力过大 无法响应 | 服务down了 上述东西还在
+4） 测试端口是否有响应  推荐 telnet协议
+```
+
