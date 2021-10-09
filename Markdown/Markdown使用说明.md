@@ -159,8 +159,21 @@ $(document).ready(function () {
 
 ```
 
-
 # 链接&跳转
+
+## 文档间跳转
+
+> 从a.md文档，打开b.md文档，在Typora中的设置。
+>
+> a文档设置：
+>
+> ```
+> [b文档](./b.md)
+> 小括号中需为b.md的路径，相对路径，或者是绝对路径。最好是相对路径，绝对路径如果文档换个存储位置，就无法链接到。
+> ./b.md  :表示在当前目录下的b.md文件
+> ```
+>
+> 
 
 ## 行内链接
 
@@ -633,7 +646,7 @@ Note right of C: 没人陪我玩
 ​```
 ```
 
-### 参考资料
+# 参考资料
 
 1. [菜鸟教程](https://www.runoob.com/markdown/md-advance.html)
 2. https://www.jianshu.com/p/4898c2e9a36d
