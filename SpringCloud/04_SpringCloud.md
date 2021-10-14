@@ -5148,15 +5148,113 @@ public class FlowLimitController {
 > 1. http://localhost:84/consumer/paymentSQL/1
 > 2. 测试84调用9003，此时故意关闭9003微服务提供者，看84消费者自动降级，不会被耗死
 
-
-
-
-
-
-
 #### 熔断框架比较
 
 ![image-20211012173607397](images/image-20211012173607397.png)
+
+#### 规则持久化
+
+> 一旦我们重启应用，Sentinel规则将消失，生产环境需要将配置规则进行持久化。
+> **解决方案**：将限流配置规则持久化进Nacos保存，只要刷新8401某个rest地址，sentinel控制台的流控规则就能看到，只要Nacos里面的配置不删除，针对8401上Sentinel上的流控规则持续有效
+
+##### 1. 修改：cloudalibaba-sentinel-service8401
+
+##### 2. POM
+
+```
+<dependency>
+    <groupId>com.alibaba.csp</groupId>
+    <artifactId>sentinel-datasource-nacos</artifactId>
+</dependency>
+```
+
+##### 3. YML
+
+```
+server:
+  port: 8401
+
+spring:
+  application:
+    name: cloudalibaba-sentinel-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848 #Nacos服务注册中心地址
+    sentinel:
+      transport:
+        dashboard: localhost:8080 #配置Sentinel dashboard地址
+        port: 8719
+      datasource:
+        ds1:
+          nacos:
+            server-addr: localhost:8848
+            dataId: cloudalibaba-sentinel-service
+            groupId: DEFAULT_GROUP
+            data-type: json
+            rule-type: flow
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+feign:
+  sentinel:
+    enabled: true # 激活Sentinel对Feign的支持
+```
+
+##### 4. 添加Nacos业务规则配置
+
+![img](images/wps2E29.tmp.jpg) 
+
+· **内容解析**
+
+```
+[
+    {
+         "resource": "/rateLimit/byUrl",
+         "limitApp": "default",
+         "grade": 1,
+         "count": 1,
+         "strategy": 0,
+         "controlBehavior": 0,
+         "clusterMode": false 
+    }
+]
+```
+
+
+
+![img](images/wps2E39.tmp.jpg)
+
+##### 5. 启动8401后刷新
+
+> 可以发现sentinel发现业务规则有了
+> ![image-20211014123621817](images/image-20211014123621817.png)
+>
+> - **测试**
+>
+> 1. **快速访问测试接口**
+>
+> http://localhost:8401/rateLimit/byUrl
+>
+> 默认
+>
+> ![img](images/wps1A52.tmp.jpg) 
+>
+> 2. **停止8401再看sentinel**
+>
+> ![img](images/wps1A53.tmp.jpg) 
+>
+> 3. **重新启动8401再看sentinel**
+>
+>    一看还是没有，稍等一会儿
+>
+>    多次调用 http://localhost:8401/rateLimit/byUrl
+>
+>    重新配置出现了，持久化验证通过
 
 
 
