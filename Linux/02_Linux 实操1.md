@@ -2786,9 +2786,9 @@ $ sftp admin@192.168.0.1 2222
 > 
 > [Service]
 > Type=forking
-> ExeStart=/usr/sbin/nginx  //配置nginx执行命令路径
-> ExecReload=/usr/sbin/nginx -s reload
-> ExecStop=/usr/sbin/nginx -s quit
+> ExecStart=/usr/local/nginx/sbin/nginx
+> ExecReload=/usr/local/nginx/sbin/nginx -s reload
+> ExecStop=/usr/local/nginx/sbin/nginx -s quit
 > PrivateTmp=true
 > 
 > [Install]
