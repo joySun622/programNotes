@@ -58,10 +58,265 @@
 >    5. 支持队列等特殊功能
 >
 > 3. MongoDB(Document-Web)
+>
+>    
+>
+> - **数据库大小写**
+>
+>   MySQL 在 windows 下是不区分大小写的，将 script 文件导入 MySQL 后表名也会自动转化为小写，结果再 想要将数据库导出放到 linux 服务器中使用时就出错了。因为在 linux 下表名区分大小写而找不到表，查了很多都是说在 linux 下更改 MySQL 的设置使其也不区分大小写，但是有没有办法反过来让 windows 下大小写敏感呢。其实方法是一样的，相应的更改 windows 中 MySQL 的设置就行了。
+>
+>   **具体操作**：
+>
+>   在 MySQL 的配置文件 my.ini 中增加一行：
+>
+>   `lower_case_table_names = 0`
+>
+>   其中 0：区分大小写，1：不区分大小写
+>
+>   - **MySQL 在 Linux 下数据库名、表名、列名、别名大小写规则是这样的**：
+>
+>   1. 数据库名与表名是严格区分大小写的；
+>2. 表的别名是严格区分大小写的；
+>   3. 列名与列的别名在所有的情况下均是忽略大小写的；
+>4. 变量名也是严格区分大小写的； MySQL 在 Windows 下都不区分大小写
+
+### 常用存储引擎
+
+#### **MyISAM**
+
+> MyISAM 存储引擎是 MySQL 最常用的引擎。
+>
+> • 它管理的表具有以下特征：
+>
+> –  使用三个文件表示每个表：
+>
+> • 格式文件 — 存储表结构的定义（mytable.frm） 
+>
+> • 数据文件 — 存储表行的内容（mytable.MYD） 
+>
+> • 索引文件 — 存储表上索引（mytable.MYI） 
+>
+> – 灵活的 AUTO_INCREMENT 字段处理
+>
+> – 可被转换为压缩、只读表来节省空间
+
+#### **InnoDB**
+
+> InnoDB 存储引擎是 MySQL 的缺省引擎。
+>
+> • 它管理的表具有下列主要特征：
+>
+> – 每个 InnoDB 表在数据库目录中以.frm 格式文件表示
+>
+> – InnoDB 表空间 tablespace 被用于存储表的内容
+>
+> – 提供一组用来记录事务性活动的日志文件
+>
+> – 用 COMMIT(提交)、SAVEPOINT 及 ROLLBACK(回滚)支持事务处理
+>
+> – 提供全 ACID 兼容
+>
+> – 在 MySQL 服务器崩溃后提供自动恢复
+>
+> – 多版本（MVCC）和行级锁定
+>
+> – 支持外键及引用的完整性，包括级联删除和更新
+
+#### **MEMORY**
+
+> 使用 MEMORY 存储引擎的表，其数据存储在内存中，且行的长度固定，这两个特点使得 MEMORY 存储引擎非
+>
+> 常快。
+>
+> • MEMORY 存储引擎管理的表具有下列特征：
+>
+> – 在数据库目录内，每个表均以.frm 格式的文件表示。
+>
+> – 表数据及索引被存储在内存中。
+>
+> – 表级锁机制。
+>
+> – 不能包含 TEXT 或 BLOB 字段。
+>
+> • MEMORY 存储引擎以前被称为 HEAP 引擎
+
+#### 合适引擎的选择
+
+> • MyISAM 表最适合于大量的数据读而少量数据更新的混合操作。MyISAM 表的另一种适用情形是使用压缩的只
+>
+> 读表。
+>
+> • 如果查询中包含较多的数据更新操作，应使用 InnoDB。其行级锁机制和多版本的支持为数据读取和更新的混合
+>
+> 操作提供了良好的并发机制。
+>
+> • 可使用 MEMORY 存储引擎来存储非永久需要的数据，或者是能够从基于磁盘的表中重新生成的数据。
+
+### 事务隔离级别
+
+> • InnoDB 实现了四个隔离级别，用以控制事务所做的修改，并将修改通告至其它并发的事务：
+>
+> – **读未提交（READ UMCOMMITTED）**
+>
+> 允许一个事务可以看到其他事务未提交的修改。
+>
+> – **读已提交（READ COMMITTED）**
+>
+> 允许一个事务只能看到其他事务已经提交的修改，未提交的修改是不可见的。
+>
+> – **可重复读（REPEATABLE READ）**
+>
+> 确保如果在一个事务中执行两次相同的 SELECT 语句，都能得到相同的结果，不管其他事务是否提交这些修改。（银行总账）
+>
+> 该隔离级别为 InnoDB 的缺省设置。
+>
+> – **串行化（SERIALIZABLE） 【序列化】**
+>
+> 将一个事务与其他事务完全地隔离。
+>
+> 事务的隔离级别决定了事务之间可见的级别。
+>
+> • 
+>
+> **当多个客户端并发地访问同一个表时，可能出现下面的一致性问题**：
+>
+> – **脏读取（Dirty Read）**
+>
+> 一个事务开始读取了某行数据，但是另外一个事务已经更新了此数据但没有能够及时提交，这就出现了脏读取。
+>
+> – **不可重复读（Non-repeatable Read）**
+>
+> 在同一个事务中，同一个读操作对同一个数据的前后两次读取产生了不同的结果，这就是不可重复读。
+>
+> – **幻像读（Phantom Read）**
+>
+> 幻像读是指在同一个事务中以前没有的行，由于其他事务的提交而出现的新行。
+> ![image-20211019171451564](images/image-20211019171451564.png)
+
+#### 设置服务器缺省隔离级别
+
+##### 1. 通过修改配置文件设置
+
+> • 可以在 my.ini 文件中使用 transaction-isolation 选项来设置服务器的缺省事务隔离级别。
+>
+> • 该选项值可以是：
+>
+> – READ-UNCOMMITTED
+>
+> – READ-COMMITTED
+>
+> – REPEATABLE-READ
+>
+> – SERIALIZABLE
+>
+> • 例如：
+>
+> [mysqld]
+>
+> transaction-isolation = READ-COMMITTED
+
+##### **2. 通过命令动态设置隔离级别**
+
+> 隔离级别也可以在运行的服务器中动态设置，应使用 `SET TRANSACTION ISOLATION LEVEL` 语句。
+>
+> • 其语法模式为
+>
+> `SET [GLOBAL | SESSION] TRANSACTION ISOLATION LEVEL <isolation-level>`
+>
+> 其中的<isolation-level>可以是：
+>
+> – READ UNCOMMITTED
+>
+> – READ COMMITTED
+>
+> – REPEATABLE READ
+>
+> – SERIALIZABLE
+>
+> • 例如： SET TRANSACTION ISOLATION LEVEL **REPEATABLE READ**;
+
+#### 隔离级别的作用范围
+
+> 事务隔离级别的作用范围分为两种：
+>
+> – 全局级：对所有的会话有效
+>
+> – 会话级：只对当前的会话有效
+>
+> • 例如，设置会话级隔离级别为 READ COMMITTED ：
+>
+> mysql> SET TRANSACTION ISOLATION LEVEL READ COMMITTED；
+>
+> 或：
+>
+> mysql> SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED； 
+>
+> • 设置全局级隔离级别为 READ COMMITTED ：
+>
+> mysql> SET GLOBAL TRANSACTION ISOLATION LEVEL READ COMMITTED；
+
+#### 查看隔离级别
+
+```
+服务器变量 tx_isolation（包括会话级和全局级两个变量）中保存着当前的会话隔离级别。
+• 为了查看当前隔离级别，可访问 tx_isolation 变量：
+– 查看会话级的当前隔离级别：
+mysql> SELECT @@tx_isolation;
+或：
+mysql> SELECT @@session.tx_isolation;
+– 查看全局级的当前隔离级别：
+mysql> SELECT @@global.tx_isolation;
+```
+
+### 并发事务与隔离级别示例
+
+#### 1. **read uncommitted(**未提交读  **) --**脏读 (Drity Read)
+
+| 会话一             | 会话二                                                       |
+| ------------------ | ------------------------------------------------------------ |
+| mysql> prompt s1>  | mysql> use bjpowernode                                       |
+| s1>use bjpowernode | mysql> prompt s2>|
+|`s1>create table tx ( id int(11), num int (10) ); `          |     |
+|   s1>set  global  transaction  isolation  level  read uncommitted;                 |     |
+|   s1>start transaction;           |     |
+|                   |  s2>start transaction;   |
+|          s1>insert into tx values (1,10);          |  s2>select * from tx;    |
+|    s1>rollback;               |  s2>select * from tx;    |
+
+####  2. read committed(已提交读)
+
+| 会话1                                                      | 会话2                 |
+| ---------------------------------------------------------- | --------------------- |
+| s1> set global transaction isolation level read committed; |                       |
+| s1>start transaction;                                      |                       |
+|                                                            | s2>start transaction; |
+| s1>insert into tx values (1,10);                           |                       |
+| s1>select * from tx;                                       |                       |
+|                                                            | s2>select * from tx;  |
+| s1>commit;                                                 |                       |
+|                                                            | s2>select * from tx;  |
+
+#### 3. repeatable read(可重复读)
+
+| 会话1                                                       | 会话2                 |
+| ----------------------------------------------------------- | --------------------- |
+| s1> set global transaction isolation level repeatable read; |                       |
+| s1>start transaction;                                       | s2>start transaction; |
+| s1>select * from tx;                                        |                       |
+| s1>insert into tx values (1,10);                            |                       |
+|                                                             | s2>select * from tx;  |
+| s1>commit;                                                  |                       |
+|                                                             | s2>select * from tx;  |
+
+
+
+
+
+![img](images/wps58D0.tmp.png)![i!
 
 ## 安装MySQL数据库
 
-> 可参考MySQL[官方说明文档](https://dev.mysql.com/doc/refman/5.7/en/)进行安装，安装方式不限于yum安装。
+> 可参考MySQL[官方说明文档](https://dev.mysql.com/doc/refman/5.7/en/)进行安装，安装方式不限于yum安装。[MySQL yum源下载](https://dev.mysql.com/downloads/repo/yum/)
 
 > 1. **默认yum存储库安装**
 >
@@ -118,7 +373,7 @@
 > [root@mysql ~]# mysql -uroot -p'1>>AB!Ylb;nt'  		# 登录mysql,首次登陆未修改密码前无法操作数据库
 > mysql> alter user 'root'@'localhost' identified by 'Joy.123com'; #修改mysql数据库密码(密码必须符合复杂性要求，																	  包含字母大小写，数字，特殊符号，长度不少于8位)
 > Query OK, 0 rows affected (0.00 sec)
-> mysql> \q    # 退出 或者使用 exit 退出
+> mysql> \q    # 退出 或者使用 exit 或者 ctrl+c 退出 
 > Bye
 > [root@mysql ~]# mysql -uroot -p'Joy.123com'  # 使用新密码登录mysql
 > 
@@ -148,6 +403,15 @@
 > 1 row in set (0.00 sec)
 > 
 > 
+> ### 本地客户端连接数据库
+> [root@mysql ~]# mysql -uroot -p'Joy.123com'
+> ### 连接指定IP数据库
+> [root@mysql ~]# mysql -uroot -p'Joy.123com' -h192.168.183.140
+> ### 退出数据库操作:\q、QUIT 或 EXIT 或者 ctrl+c
+> 
+> ### 设置数据库对表名大小写不敏感
+> 修改/etc/my.cnf，在末尾添加：lower_case_table_names=1 
+> 1 为不区分大小写；2 为区分大小写。之前已经安装好启动了，但没有设置表名大小写不敏感，就想通过修改/etc/my.cof 添加lower_case_table_names=1，结果mysql启动报错，只能重装卸载mysql或者不修改
 > ```
 >
 > 4. **重启MySQL服务**
@@ -161,11 +425,11 @@
 
 > 结构化查询语言(Structured Query Language)简称SQL，是数据库的标准查询语言。可以通过DBMS对数据库进行定义数据，操纵数据，查询数据，数据控制等。
 >
-> 1. 数据定义语言(DDL)
-> 2. 数据操纵语言(DML)
-> 3. 事务控制语言(TCL)
-> 4. 数据查询语言(DQL)
-> 5. 数据控制语言(DCL)
+> 1. **数据定义语言(DDL-Data Definition Language)**: 关键字：create ,drop,alter
+> 2. **数据操纵语言(DML-Data Manipulation Language)**: 关键字：insert,delete,update
+> 3. **事务控制语言(TCL-Transactional Control Language)**: 关键字：commit ,rollback;
+> 4. **数据查询语言(DQL-Data Query Language)**: 关键字：select
+> 5. **数据控制语言(DCL-Data Control Language)**:关键字：grant,revoke
 
 #### 1. 数据定义语言(DDL)
 
@@ -1123,14 +1387,15 @@ mysql> drop database db1;
 
 ## MySQL索引
 
-> 索引作为一种数据结构，其用途是用于提升检索数据的效率。
+> 索引作为一种数据结构，其用途是用于提升检索数据的效率。主键，unique 都会默认的添加索引
 >
 > - **MySQL索引的分类**:
 >   - 普通索引(INDEX)：索引列值可重复
 >   - 唯一索引(UNIQUE):索引列必须唯一，可以为NULL;
 >   - 主键索引(PRIMARY KEY):索引列值唯一，不能为NULL,一个表只能有一个主键索引；
->   - 全文索引(FULL TEXT):给每个字段创建索引。
->
+>   - 联合索引：多个列组成的索引
+> - 全文索引(FULL TEXT):给每个字段创建索引。
+>   
 > - **MySQL不同类型索引用途和区别**:
 >   - 普通索引常用于过滤数据。例如，以商品种类作为索引，检索种类为“手机”的商品；
 >   - 唯一索引主要是用于表示一列数据不允许重复的特性，相比主键索引不常用于检索的场景；
@@ -2620,12 +2885,56 @@ mysql> drop database db1;
 >    
 >    ```
 
+## 数据库设计的三范式
+
+### 第一范式
+
+> 第一范式要求：**数据库表中不能出现重复记录，每个字段是原子性的不能再分。**
+>
+> - 行唯一：每个表必须有主键，主键通常采用数值型或定长字符串表示；
+> - 列不可再分：列的不可再分应根据具体情况来决定。如联系方式，为了开发上的便利可能就采用一个字段了。
+>
+> ![image-20211016161355331](images/image-20211016161355331.png)
+
+### 第二范式
+
+>  **第二范式是建立在第一范式基础上的，另外要求所有非主键字段完全依赖主键，不能产生部分依赖**
+> ![image-20211016161523142](images/image-20211016161523142.png)
+> ![image-20211016161556877](images/image-20211016161556877.png)
+> **以上是一种典型的“多对多”的设计**
 
 
 
+### 第三范式
+
+> 建立在第二范式基础上的，非主键字段不能传递依赖于主键字段。（**不要产生传递依赖**）
+
+![image-20211016161803092](images/image-20211016161803092.png)
+
+<img src="images/image-20211016161826908.png" alt="image-20211016161826908" style="zoom: 80%;" />
+
+> **以上设计是一种典型的一对多的设计，一存储在一张表中，多存储在一张表中，在多的那张表中添加外键指向一的一方的主键**
+
+- **总结**
+
+> 第一范式：有主键，具有原子性，字段不可分割
+>
+> 第二范式：完全依赖，没有部分依赖
+>
+> 第三范式：没有传递依赖
+>
+> 数据库设计尽量遵循三范式，但是还是根据实际情况进行取舍，有时可能会拿冗余换速度，最终用目的要满足客户需
+>
+> 求
+>
+> - **范例**：
+>
+>   一对一设计，有两种设计方案：
+>
+>   第一种设计方案：**主键共享**
+>
+>   第二种设计方案：**外键唯一**
 
 # 参考来源
-
-
 
 1. https://www.bilibili.com/video/BV1pz4y1D73n?p=186

@@ -52,9 +52,62 @@
 
   然后重新开启虚拟机就好了
 
+## 虚拟机克隆
+
+1. **选中要克隆的虚拟机，点击克隆**
+   ![image-20211016130704280](images/image-20211016130704280.png)
+
+2. **选择克隆类型**：创建新的完全独立的虚拟机，选中创建完整克隆
+   ![image-20211016130827800](images/image-20211016130827800.png)
+
+3. **设置新虚拟机位置以及文件存储目录**
+   ![image-20211016131041340](images/image-20211016131041340.png)
+   点击完成后，虚拟机克隆完成
+
+4. **重新设置克隆虚拟机IP与主机名**
+
+   > 克隆虚拟机与原虚拟机的主机名和IP配置完全一致，需重新设置，否则同启用俩台虚拟机时，会产生冲突
+
+   ```
+   ### 1. 修改主机名
+   [root@localhost ~]# vi /etc/hostname
+   ### 2. 修改IP
+   [root@localhost ~]# vi /etc/sysconfig/network-scripts/ifcfg-ens33
+   TYPE="Ethernet"
+   PROXY_METHOD="none"
+   BROWSER_ONLY="no"
+   BOOTPROTO="static"
+   DEFROUTE="yes"
+   IPV4_FAILURE_FATAL="no"
+   IPV6INIT="yes"
+   IPV6_AUTOCONF="yes"
+   IPV6_DEFROUTE="yes"
+   IPV6_FAILURE_FATAL="no"
+   IPV6_ADDR_GEN_MODE="stable-privacy"
+   NAME="ens33"
+   UUID="78cfafd2-4b3e-41b2-8cf8-77f03ff36d82"
+   DEVICE="ens33"
+   ONBOOT="yes"
+   IPADDR=192.168.183.135 # 修改IP
+   PREFIX=24
+   NETMASK=255.255.255.0
+   GATEWAY="192.168.183.2"
+   IPV6_PRIVACY="no"
+   BROADCAST=192.168.183.2
+   DNS1=8.8.8.8
+   DNS2=8.8.4.4
+   
+   [root@localhost ~]# systemctl restart network 
+   
+   ### 3.测试链接是否正常
+   [root@localhost ~]# ping www.baidu.com
+   ```
+
+   
+
 # CentOS 7
 
-> 安装版本为：CentOS-7-x86_64-DVD-2003.iso
+> 安装版本为：CentOS-7-x86_64-DVD-  2003.iso
 
 ## 下载
 
@@ -156,7 +209,7 @@
 
 11. **虚拟机删除**
 
-> 怎样将建立好的虚拟机从磁盘删除，选中要删除的虚拟机，右击——>管——>从磁盘删除
+> 怎样将建立好的虚拟机从磁盘删除，选中要删除的虚拟机，右击——>管理——>从磁盘删除
 >
 > ![image-20200925232454678](images/image-20200925232454678.png)
 
