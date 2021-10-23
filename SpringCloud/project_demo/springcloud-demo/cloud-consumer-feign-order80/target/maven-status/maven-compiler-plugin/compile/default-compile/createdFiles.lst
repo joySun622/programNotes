@@ -1,0 +1,4 @@
+com\joy\springcloud\FeignConfig.class
+com\joy\springcloud\controller\OrderFeignController.class
+com\joy\springcloud\OrderFeignMain.class
+com\joy\springcloud\service\PaymentFeignService.class

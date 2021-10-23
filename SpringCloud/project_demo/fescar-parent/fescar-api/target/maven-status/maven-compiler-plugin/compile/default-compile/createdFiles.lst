@@ -1,0 +1,8 @@
+com\joysun\feign\UserInfoFeign.class
+com\joysun\pojo\UserInfo.class
+com\joysun\config\DataSourceProxyConfig.class
+com\joysun\pojo\LogInfo.class
+com\joysun\feign\ItemInfoFeign.class
+com\joysun\pojo\OrderInfo.class
+com\joysun\pojo\ItemInfo.class
+com\joysun\feign\OrderInfoFeign.class

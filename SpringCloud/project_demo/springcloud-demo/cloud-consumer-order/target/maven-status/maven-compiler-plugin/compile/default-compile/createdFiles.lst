@@ -1,0 +1,4 @@
+com\joy\springcloud\ApplicationContextConfig.class
+com\joy\springcloud\controller\OrderController.class
+com\joy\springcloud\OrderMain.class
+com\joy\myrule\MyselfRule.class

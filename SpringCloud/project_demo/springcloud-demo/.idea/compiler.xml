@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+      </profile>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="cloud-provider-payment-8002" />
+        <module name="cloudalibaba-provider-payment9001" />
+        <module name="cloud-provider-hystrix-payment8002" />
+        <module name="cloud-provider-hystrix-payment8001" />
+        <module name="cloudalibaba-config-nacos-client3377" />
+        <module name="cloud-api-commons" />
+        <module name="cloud-consumer-hystrix-dashboard9001" />
+        <module name="cloud-consumer-order" />
+        <module name="cloud-eureka-server" />
+        <module name="cloudalibaba-sentinel-service8401" />
+        <module name="cloudalibaba-consumer-nacos-order84" />
+        <module name="cloudalibaba-consumer-nacos-order83" />
+        <module name="cloud-consumer-feign-hystrix-order80" />
+        <module name="cloud-provider-payment" />
+        <module name="cloud-gateway-gateway9527" />
+        <module name="cloud-provider-hystrix-payment8003" />
+        <module name="cloud-consumer-feign-order80" />
+        <module name="cloudalibaba-provider-payment9003" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="cloud-provider-payment8002" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

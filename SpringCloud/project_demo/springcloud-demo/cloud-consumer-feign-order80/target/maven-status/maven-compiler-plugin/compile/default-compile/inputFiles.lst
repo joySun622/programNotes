@@ -1,0 +1,4 @@
+D:\idea_workspace\springcloud-demo\cloud-consumer-feign-order80\src\main\java\com\joy\springcloud\OrderFeignMain.java
+D:\idea_workspace\springcloud-demo\cloud-consumer-feign-order80\src\main\java\com\joy\springcloud\service\PaymentFeignService.java
+D:\idea_workspace\springcloud-demo\cloud-consumer-feign-order80\src\main\java\com\joy\springcloud\FeignConfig.java
+D:\idea_workspace\springcloud-demo\cloud-consumer-feign-order80\src\main\java\com\joy\springcloud\controller\OrderFeignController.java
