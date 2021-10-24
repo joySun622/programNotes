@@ -651,7 +651,65 @@
 >
 >    shell 一个程序，命令解释器。定义命令，接收命令，执行命令。有很多版本：ru :ashell,bshell,tshell,cshell,bash
 
-#### 下载文件
+#### 文件下载&上传
+
+##### curl 
+
+> curl是一个非常实用的、用来与服务器之间传输数据的工具；支持的协议包括 (DICT, FILE, FTP, FTPS, GOPHER, HTTP, HTTPS, IMAP, IMAPS, LDAP, LDAPS, POP3, POP3S, RTMP, RTSP, SCP, SFTP, SMTP, SMTPS, TELNET and TFTP)，curl设计为无用户交互下完成工作；curl提供了一大堆非常有用的功能，包括代理访问、用户认证、ftp上传下载、HTTP POST、SSL连接、cookie支持、断点续传。。。
+>
+> [官网下载地址](https://curl.se/download.html)
+
+```
+### curl命令语法：
+curl [options] [URL...]
+
+### 实例
+### 下载页面：下载http://aiezu.com 页面内容到index.html
+curl -o index.html http://aiezu.com
+ 
+### 下载文件并显示简单进度条：
+curl -# -o centos6.8.iso http://mirrors.aliyun.com/centos/6.8/isos/x86_64/CentOS-6.8-x86_64-minimal.iso
+ 
+### 断点续传：
+#继续完成上次终止的未完成的下载
+curl -# -o centos6.8.iso -C - http://mirrors.aliyun.com/centos/6.8/isos/x86_64/CentOS-6.8-x86_64-minimal.iso
+
+### 伪造来源页面：
+#告诉爱E族，我是从百度来的
+curl -e http://baidu.com http://aiezu.com
+
+### 伪造代理设备：
+#告诉爱E族，我是GOOGLE爬虫蜘蛛（其实我是curl命令）
+curl -A " Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)" http://aiezu.com
+ 
+### 告诉爱E族，我用的是微信内置浏览器
+curl -A "Mozilla/5.0 AppleWebKit/600 Mobile MicroMessenger/6.0" http://aiezu.com
+ 
+### http头：
+# 看看本站的http头是怎么样的
+curl -I  http://aiezu.com
+输出：
+HTTP/1.1 200 OK
+Date: Fri, 25 Nov 2016 16:45:49 GMT
+Server: Apache
+Set-Cookie: rox__Session=abdrt8vesprhnpc3f63p1df7j4; path=/
+Expires: Thu, 19 Nov 1981 08:52:00 GMT
+Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+Pragma: no-cache
+Vary: Accept-Encoding
+Content-Type: text/html; charset=utf-8
+ 
+### 设置http请求头：
+curl -H "Cache-Control:no-cache"  http://aiezu.com
+
+### 发送表单数据：
+curl -F "pic=@logo.png" -F "site=aiezu"  http://aiezu.com/
+
+### 发送cookie：
+curl -b "domain=aiezu.com"  http://aiezu.com
+```
+
+
 
 ##### wget
 
