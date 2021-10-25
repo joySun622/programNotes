@@ -663,9 +663,21 @@
 ### curl命令语法：
 curl [options] [URL...]
 
+### 安装
+yum install curl
+
+### 查看是否安装curl
+rpm -qa | grep curl
+curl --version
+
 ### 实例
-### 下载页面：下载http://aiezu.com 页面内容到index.html
+### 下载文件：下载http://aiezu.com 页面内容到index.html
 curl -o index.html http://aiezu.com
+curl -o dodo1.jpg http:www.linux.com/dodo1.JPG
+
+### 下载网页中的文件
+curl -O http://www.linux.com/hello.sh  //下载文件到当前目录，以服务器上的名称保存文件到本地
+curl -O /etc/tmp/hello.sh http://www.linux.com/hello.sh  //下载文件并指定目录和名称
  
 ### 下载文件并显示简单进度条：
 curl -# -o centos6.8.iso http://mirrors.aliyun.com/centos/6.8/isos/x86_64/CentOS-6.8-x86_64-minimal.iso
@@ -3671,6 +3683,8 @@ sz yourfilename
 
 #### 文件打包和压缩
 
+##### tar
+
 > - **简介**
 >
 >   tar命令是Unix/Linux系统中备份文件的可靠方法，
@@ -3777,6 +3791,33 @@ sz yourfilename
 >   -w, --words            print the word counts //打印单词数
 > 
 > ```
+
+##### unzip&zip
+
+```
+### 安装
+yum -y install unzip zip
+
+unzip参数：
+参数：
+-o 不必先询问用户，unzip执行后覆盖原有文件 （非常好用，会自动覆盖）
+-d<目录> 指定文件解压缩后要存储的目录
+
+### 将11.zip解压缩到当前目录下：
+[root@solr1 ~]# unzip -o 11.zip  或者 unzip -o 11.zip -d ./    （不建议使用unzip 11.zip，因为不会自动覆盖相同文件）
+[root@solr1 ~]# ls
+[root@solr1 ~]# 11  11.zip
+
+zip参数：
+-r 递归处理，将指定目录下的所有文件和子目录一并处理
+
+### # 将 /usr/local/static下的trace 压缩成 trace.zip
+[root@solr1 static]# zip -r trace.zip trace       （必须加参数 -r,否则生成的是一个空文件夹）
+[root@solr1 static]# ls
+11  trace  trace.zip
+```
+
+
 
 ### 软件安装
 
@@ -6259,6 +6300,7 @@ root     pts/2    :0               11:38   21.00s  0.03s  0.03s bash
 8. https://www.cnblogs.com/wshlym/p/13159420.html
 9. https://developer.aliyun.com/mirror/docker-ce?spm=a2c6h.13651102.0.0.3e221b11w5PryI
 10. https://docs.jumpserver.org/zh/master/install/step_by_step/#10-lina
+11. https://blog.csdn.net/wudinaniya/article/details/81978667
 
 
 
