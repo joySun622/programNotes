@@ -971,7 +971,7 @@ mysql> drop database db1;
 > ERROR 1264 (22003): Out of range value for column 'num' at row 1
 > ```
 >
-> - **int**int(n)需要注意：
+> - **int(n)**需要注意：
 >   1. 无论N等于多少，int永远占4个字节；
 >   2. N表示的是显示的宽度，不足的用0补足，超过的无视长度而直接显示整个数字，但要整型设置了unsigned zerofill才有效。(unsigned:无视符号 zerofill：0填补)
 >
@@ -1201,7 +1201,7 @@ mysql> drop database db1;
 ### 非空约束
 
 > ```
-> 注意：如果约束不生小可以先设置sql_mode
+> 注意：如果约束不生效可以先设置sql_mode
 > mysql> set session sql_mode='STRICT_TRANS_TABLES';
 > 
 > ### 非空约束:限制数据库表中某个字段值是否可以为空，null：字段值可以为空，not null：字段值不可为空
@@ -1394,8 +1394,7 @@ mysql> drop database db1;
 >   - 唯一索引(UNIQUE):索引列必须唯一，可以为NULL;
 >   - 主键索引(PRIMARY KEY):索引列值唯一，不能为NULL,一个表只能有一个主键索引；
 >   - 联合索引：多个列组成的索引
-> - 全文索引(FULL TEXT):给每个字段创建索引。
->   
+>   - 全文索引(FULL TEXT):给每个字段创建索引。
 > - **MySQL不同类型索引用途和区别**:
 >   - 普通索引常用于过滤数据。例如，以商品种类作为索引，检索种类为“手机”的商品；
 >   - 唯一索引主要是用于表示一列数据不允许重复的特性，相比主键索引不常用于检索的场景；
