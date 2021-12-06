@@ -487,7 +487,7 @@
 >
 >    mv a.txt e.txt  				修改文件名a 为 e；若源路径与目标路径相同，操作等价于改名
 >
->   
+>   $ mv /usr/udt/* .    将/usr/udt中的所有文件移到当前目录(用”.”表示)中
 
 #### 删除
 
@@ -507,13 +507,19 @@
 
 >   cat  /root/file1.txt   
 >
+>   ```
+>   ### 查看操作系统版本信息：
+>   [root@mysql bin]# cat /etc/redhat-release
+>   CentOS Linux release 7.8.2003 (Core)
+>   ```
+>
 >   more  /root/file1.txt 翻页查看文件,可设置每页展示行数，如：more -3 root/file1.txt
 >
->    head   /root/file1.txt  查看文件头几行，默认10行 ，可通过设置行数，查看文档的头几行，如： head -3 /root/file1.txt
+>   head   /root/file1.txt  查看文件头几行，默认10行 ，可通过设置行数，查看文档的头几行，如： head -3 /root/file1.txt
 >
->    tail      /root/file1.txt   查看文件尾部，默认10行，可通过设置行数，查看文档的尾部几行，如： tail -3 /root/file1.txt
+>   tail      /root/file1.txt   查看文件尾部，默认10行，可通过设置行数，查看文档的尾部几行，如： tail -3 /root/file1.txt
 >
->    grep  过滤关键字  ,如：grep aa a.txt  ，显示a.txt有关aa的行
+>   grep  过滤关键字  ,如：grep aa a.txt  ，显示a.txt有关aa的行
 
 #### 修改文件内容
 
@@ -521,7 +527,65 @@
 >
 >   重定向：# ls -a > e.txt  将前面命令产生的结果写入e.txt
 >
->   
+
+#### 连接文件
+
+> 共有两种连接文件：一种是类似与Windows的快捷方式(软链接)，另一种就是通过文件系统的inode来产生的新的文件名(硬链接)。
+>
+> - **硬链接**：由于硬链接有不可以跨文件系统，不能为目录等限制，因此使用较少。
+>
+> ```
+> ### 创建命令: ln 文件名 新连接名
+> 
+> [root@mysql test]# ln a.txt c.txt
+> [root@mysql test]# ll -i
+> 101260517 -rw-r--r--. 2 root root         0 12月  5 04:53 a.txt
+> 101260517 -rw-r--r--. 2 root root         0 12月  5 04:53 c.txt
+> 
+> 可以看到这时候，两个文档的inode是一样的，而且连接数也从1变成了2。
+> 这时候，不论修改哪个文档，内容都会一起变。因为他们都是指向同一个block。
+> 但是当你删掉了其中一个文档的时候，是对另一个没有影响。
+> ```
+>
+> - **软连接**：这个就类似于Windows的快捷方式，使用较多。
+>
+> ```
+> 使用方式：ln [-sf] 源文件 目标文件
+> 选项：-s 就表示创建软链接了，不加的话就是创建硬链接
+> 　　  -f 表示存在的时候删除再创建
+> 　　  
+> [root@mysql test]# ln -s a.txt b.txt
+> [root@mysql test]# ll -i
+> 总用量 278804
+> 101260517 -rw-r--r--. 2 root root         0 12月  5 04:53 a.txt
+> 102382321 lrwxrwxrwx. 1 root root         5 12月  5 04:58 b.txt -> a.txt
+> 
+> 可以看到，新创建的软连接和源文件的inode是不一样的。
+> 需要注意的是，新链接的大小为5，这刚好就是源文件名的5个字符。而他的名字中，也正确的显示了指向哪个文件。
+> 因为在软链接中，只是保存了指向的文件的名字而已。当编辑软链接这个文件的时候，首先通过指向的文件，找到指向的文件，
+> 然后通过指向文件的inode来找到实体存放的inode，所以我们编辑软链接文件的时候，实际上修改的就是真是存放的block中的内容。
+> 
+> [root@mysql bin]# ln -snf /usr/bin/python3.6 /usr/bin/python
+> ```
+>
+> - `ln (options)(参数)`
+>
+> ```
+> options说明：
+> -b或--backup：删除，覆盖目标文件之前的备份；
+> -d或-F或——directory：建立目录的硬连接；
+> -f或——force：强行建立文件或目录的连接，不论文件或目录是否存在；
+> -i或——interactive：覆盖既有文件之前先询问用户；
+> -n或--no-dereference：把符号连接的目的目录视为一般文件；
+> -s或——symbolic：对源文件建立符号连接，而非硬连接；
+> -S<字尾备份字符串>或--suffix=<字尾备份字符串>：用"-b"参数备份目标文件后，备份文件的字尾会被加上一个备份字符串，预设的备份字符串是符号“~”，用户可通过“-S”参数来改变它；
+> -v或——verbose：显示指令执行过程；
+> -V<备份方式>或--version-control=<备份方式>：用“-b”参数备份目标文件后，备份文件的字尾会被加上一个备份字符串，这个字符串不仅可用“-S”参数变更，当使用“-V”参数<备份方式>指定不同备份方式时，也会产生不同字尾的备份字符串；
+> --help：在线帮助；
+> --version：显示版本信息。
+> 
+> ```
+>
 
 ####   vim的使用
 
@@ -645,7 +709,20 @@
 >
 >   ls -a   	将隐藏文件也显示出来
 >
-> 10. vim未正常关闭，产生的临时文件解决办法
+>   ls -i    查看到该文档的inode,
+>   ![img](images/979960-20170725085542750-1666444347.png)
+>
+>   其中最前面一列的数字就表示inode，它保存了该文档很多信息，其中有一项就是该文件真正内容的指向。
+>
+>   在linux的文件系统中，我们上面看到的Desktop，Documents这些个文件夹中其实并没有真正的保存数据，而只是一个文件档的名字而已。
+>
+>   真正的数据是保存在block中。这个文件档的inode中记录了该文档的很多信息，包括指向真实保存数据的block信息。
+>
+>   
+>
+>   ll -python*  显示以python开头的文件
+>
+>   10. vim未正常关闭，产生的临时文件解决办法
 >
 >    需清除系统自动保存的文件信息。如发现`.a.txt.swap`隐藏文件，为正常编辑a.txt文件，需删除对应隐藏文件.swap文件
 >
@@ -3874,7 +3951,7 @@ zip参数：
 >    4).无法解决依赖关系
 >    5).无法自行下载软件包
 
-- **YUM工具**
+##### **YUM工具**
 
 > > 1. 本地源：系统安装光盘:通过系统光盘获得软件包，并安装软件。设置一次后，即可安装所有包
 > >
@@ -4162,7 +4239,7 @@ zip参数：
 >
 > 
 
-- **RPM工具操作**
+##### **RPM工具操作**
 
 > - **简介**
 >
@@ -4196,6 +4273,10 @@ zip参数：
 > ### 卸载（e）
 > #### 卸载软件包：安装是使用的是软件包全名，卸载时需省略后缀
 > -e, --erase=<package>+           erase (uninstall) package
+> -v  显示详细信息
+> -h --hash                       软件包安装的时候列出哈希标记 (和 -v
+>                                    一起使用效果更好)
+> 
 > [root@localhost Packages]# rpm -evh wget-1.14-18.el7_6.1.x86_64.rpm
 > error: package wget-1.14-18.el7_6.1.x86_64.rpm is not installed
 > [root@localhost Packages]# rpm -evh wget-1.14-18.el7_6.1.x86_64
@@ -4205,6 +4286,15 @@ zip参数：
 > 
 > #### 再次查询，发现已经卸载 -q query
 > [root@localhost Packages]# rpm -q  wget-1.14-15.el7.x86_64
+> ### 查询指定软件包
+> [root@mysql bin]# rpm -qa | grep python3
+> python3-libs-3.6.8-18.el7.x86_64
+> python3-setuptools-39.2.0-10.el7.noarch
+> python3-3.6.8-18.el7.x86_64
+> 
+> ### 查询指定软件包安装详情
+> [root@mysql bin]# rpm -ql python3-3.6.8-18.el7.x86_64
+> 
 > ```
 >
 > 
@@ -5680,7 +5770,239 @@ mount: /dev/sr0 is already mounted or /mnt/cdrom busy
 
 ```
 
+### systemd服务管理
 
+####  unit配置文件
+
+systemd管理着许多的资源，可以认为每一个资源就是unit（单元）unit由其相关的配置文件进行标识、识别和配置；
+
+文件中主要包含了系统服务、监听的socket、保存的快照以及其他与init相关的信息。这些配置文件主要保存在：
+
+```text
+/etc/systemd/system  存放系统启动的默认级别及启动的unit的软连接，优先级最高。
+/run/systemd/system，系统执行过程中产生的服务脚本，优先级次之。
+/usr/lib/systemd/system 存放系统上所有的启动文件。优先级最低
+/lib/systemd/system  目录/lib/systemd/system以及/usr/lib/systemd/system其实指向的是同一目录
+[root@localhost /]# ll
+total 28
+lrwxrwxrwx.   1 root root    7 Jul  3 09:43 bin -> usr/bin
+dr-xr-xr-x.   5 root root 4096 Jul 19 12:04 boot
+drwxr-xr-x.  19 root root 3080 Jul 19 04:03 dev
+drwxr-xr-x.  76 root root 8192 Jul 19 20:07 etc
+drwxr-xr-x.   4 root root   39 Jul 19 04:37 home
+lrwxrwxrwx.   1 root root    7 Jul  3 09:43 lib -> usr/lib
+lrwxrwxrwx.   1 root root    9 Jul  3 09:43 lib64 -> usr/lib64
+drwxr-xr-x.   2 root root    6 Apr 11  2018 media
+drwxr-xr-x.   2 root root    6 Apr 11  2018 mnt
+drwxr-xr-x.   3 root root   23 Jul  3 20:33 opt
+dr-xr-xr-x. 118 root root    0 Jul 19 04:03 proc
+dr-xr-x---.  10 root root 4096 Jul 20 06:31 root
+drwxr-xr-x.  27 root root  760 Jul 19 16:00 run
+lrwxrwxrwx.   1 root root    8 Jul  3 09:43 sbin -> usr/sbin
+drwxr-xr-x.   2 root root    6 Apr 11  2018 srv
+dr-xr-xr-x.  13 root root    0 Jul 19 04:03 sys
+drwxrwxrwt.  10 root root 4096 Jul 20 03:37 tmp
+drwxr-xr-x.  13 root root  155 Jul  3 09:43 usr
+drwxr-xr-x.  21 root root 4096 Jul 19 13:34 var
+
+```
+
+Systemd 默认从目录/etc/systemd/system/读取配置文件。
+
+但是，里面存放的大部分文件都是符号链接，指向目录/usr/lib/systemd/system/，真正的配置文件存放在那个目录。
+
+#### unit常见类型
+
+![preview](images/v2-109bd01b71925f2776f2447042196932_r.jpg)
+
+#### 管控unit单元
+
+##### **启动、停止、重启等服务（service类型）**
+
+```
+#启动httpd服务
+[root@bogon ~]# systemctl start httpd.service
+#停止httpd服务
+[root@bogon ~]# systemctl stop httpd.service
+#重启httpd服务
+[root@bogon ~]# systemctl restart httpd.service
+#条件式重启httpd服务（只会在服务运行的时候才会重启服务）
+[root@bogon ~]# systemctl try-restart httpd.service
+#重新加载httpd服务的配置文件
+[root@bogon ~]# systemctl reload httpd.service
+```
+
+##### **查看unit的状态**
+
+```text
+[root@bogon ~]# systemctl status httpd.service
+```
+
+上边active行时某服务的运行的状态，有以下几种：
+
+![img](images/v2-361b3392cd0f44e3e38273da1e1e36bd_720w.jpg)
+
+```text
+#查看某服务当前激活与否的状态
+[root@bogon ~]# systemctl is-active httpd.service
+active
+#查看所有已激活服务的状态
+[root@bogon ~]# systemctl list-units --type service
+#查看所有服务的状态
+[root@bogon ~]# systemctl list-units --type service -all
+#查看服务的依赖关系
+[root@bogon ~]# systemctl list-dependencies httpd.service
+```
+
+##### **查看、设置服务开机状态**
+
+```text
+#设置httpd服务开机启动
+[root@bogon ~]# systemctl enable httpd.service
+Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service to /usr/lib/systemd/system/httpd.service.
+#禁止httpd服务开机启动
+[root@bogon ~]# systemctl disable httpd.service
+Removed symlink /etc/systemd/system/multi-user.target.wants/httpd.service.
+#查看httpd服务能否开机启动
+[root@bogon ~]# systemctl is-enabled httpd.service
+disabled
+#禁止httpd服务设定为开机启动
+[root@bogon ~]# systemctl mask httpd.service
+Created symlink from /etc/systemd/system/httpd.service to /dev/null.
+#取消禁止httpd服务开机启动
+[root@bogon ~]# systemctl unmask httpd.service
+Removed symlink /etc/systemd/system/httpd.service.
+```
+
+#### 管理target unit
+
+target主要用来管理centos7上的运行级别，有许多个target unit来组成。与sysvinit的runlevel功能很相似。runlevel和target的对应关系如下：
+
+![img](images/v2-0226fecd0210e577168070ca83db4f3e_720w.jpg)
+
+它与init进程的主要差别如下。
+
+```text
+（1）默认的 RunLevel（在/etc/inittab文件设置）现在被默认的 Target 取代，位置是/etc/systemd/system/default.target，通常符号链接到graphical.target（图形界面）或者multi-user.target（多用户命令行）。
+（2）启动脚本的位置，以前是/etc/init.d目录，符号链接到不同的 RunLevel 目录 （比如/etc/rc3.d、/etc/rc5.d等），现在则存放在/lib/systemd/system和/etc/systemd/system目录。
+（3）配置文件的位置，以前init进程的配置文件是/etc/inittab，各种服务的配置文件存放在/etc/sysconfig目录。现在的配置文件主要存放在/lib/systemd目录，在/etc/systemd目录里面的修改可以覆盖原始设置。
+```
+
+##### **管理运行级别命令**
+
+```text
+#级别间切换
+[root@bogon ~]# systemctl isolate runlevel3.target
+
+#查看级别
+[root@bogon ~]# systemctl list-units --type target
+
+#查看当前运行level
+[root@bogon ~]# who -r
+运行级别 3 2019-04-19 10:39
+
+#查看所有运行级别
+[root@bogon ~]# systemctl list-units --type target -all
+#获取默认运行级别
+[root@bogon ~]# systemctl get-default
+multi-user.target
+
+#设定默认运行级别
+[root@bogon ~]# systemctl set-default graphical.target
+Removed symlink /etc/systemd/system/default.target.
+Created symlink from /etc/systemd/system/default.target to /usr/lib/systemd/system/graphical.target.
+
+#切换至紧急救援模式
+[root@bogon ~]# systemctl rescue
+
+#切换至emergency模式
+[root@bogon ~]# systemctl emergency
+```
+
+#### **unit文件配置信息（service类型）**
+
+使用vim打开查看：
+
+/usr/lib/systemd/system/httpd.service的信息。
+
+```text
+[root@bogon ~]# vim /usr/lib/systemd/system/httpd.service 
+  1 [Unit]
+  2 Description=The Apache HTTP Server
+  3 After=network.target remote-fs.target nss-lookup.target
+  4 Documentation=man:httpd(8)
+  5 Documentation=man:apachectl(8)
+  6 
+  7 [Service]
+  8 Type=notify
+  9 EnvironmentFile=/etc/sysconfig/httpd
+ 10 ExecStart=/usr/sbin/httpd $OPTIONS -DFOREGROUND
+ 11 ExecReload=/usr/sbin/httpd $OPTIONS -k graceful
+ 12 ExecStop=/bin/kill -WINCH ${MAINPID}
+ 13 # We want systemd to give httpd some time to finish gracefully, but still want
+ 14 # it to kill httpd after TimeoutStopSec if something went wrong during the
+ 15 # graceful stop. Normally, Systemd sends SIGTERM signal right after the
+ 16 # ExecStop, which would kill httpd. We are sending useless SIGCONT here to give
+ 17 # httpd time to finish.
+ 18 KillSignal=SIGCONT
+ 19 PrivateTmp=true
+ 20 
+ 21 [Install]
+ 22 WantedBy=multi-user.target
+```
+
+##### **service unit信息组成**
+
+service类型的unit通常由以下三个字段组成：
+
+**[unit]**：定义与unit类型无关的通用选项；用于提供unit类型的描述信息、unit行为以及依赖关系。
+
+```text
+unit常用选项：
+Description：描述信息，意义性描述
+After：定义unit的启动顺序。表示当前unit应该晚于哪些unit启动；其功能与before相反
+Requies：依赖到的其它的unit，强依赖，如果被依赖的unit无法启动时，那么该unit无法激活
+Wants：依赖到的其它的unit，弱依赖，如果被依赖的unit无法启动时，那么该unit也会正常激活
+Conflicts：定义units间的冲突关系
+```
+
+**[service]**：定义与特定类型相关的专用选项，只有service类型的unit才有这个字段。
+
+```text
+service字段的常用选项：
+Type：用于定义影响ExecStart及相关参数的额功能的unit进程启动类型；具有以下几个值：
+Type=simple：默认值，执行Execstart指定的命令，  启动主进程。
+Type=forking：以fork方式从父进程创建子进程，父进程在创建后立即退出
+Type=oneshot：一次性进程，systemd会等当前服务退出后，在进行往下执行
+Type=dbus：当前服务通过d-bus启动
+Type=notify：当前服务启动完毕，会告知systemd，继续往下执行
+Type=idle：若有其它服务执行完毕，当前服务才会执行
+ExecStart：启动当前服务的命令
+ExecStartPre：启动当前服务之前执行的命令
+ExecStartPost：启动当前服务之后执行的命令
+ExecReload：重启当前服务时执行的命令
+ExecStop：停止当前服务时执行的命令
+ExecStopPost：停止当前服务之后执行的命令
+RestartSec：自定义当前服务重启间隔的秒数
+Restart：定义何种情况 Systemd 会自动重启当前服务，可能的值包括always（总是重启）、on-success、on-failure、on-abnormal、on-abort、on-watchdog
+TimeoutSec：定义systemd停止当前服务等待的秒数
+Environment：指定环境变量
+```
+
+**[Install]**：通常是配置文件里的最后一个，主要用来定义如何启动以及是否开机自动启动，如下：
+
+```text
+WantedBy：它的值是一个或多个Target，当前unit激活时，符号链接会放入/etc/systemd/system目录下面以 Target 名 + .wants后缀构成的子目录中
+RequiredBy：它的值是一个或多个 Target，当前 Unit 激活时，符号链接会放入/etc/systemd/system目录下面以 Target 名 + .required后缀构成的子目录中
+Alias：当前 Unit 可用于启动的别名
+Also：当前 Unit 激活（enable）时，会被同时激活的其他 Unit
+```
+
+注意：对于新创建的[unit文件](https://www.zhihu.com/search?q=unit文件&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra={"sourceType"%3A"article"%2C"sourceId"%3A373314866})或修改了的unit文件，要通知systemd重载此配置文件。
+
+```text
+# systemctl daemon-reload
+```
 
 ### 其他
 
@@ -6301,6 +6623,8 @@ root     pts/2    :0               11:38   21.00s  0.03s  0.03s bash
 9. https://developer.aliyun.com/mirror/docker-ce?spm=a2c6h.13651102.0.0.3e221b11w5PryI
 10. https://docs.jumpserver.org/zh/master/install/step_by_step/#10-lina
 11. https://blog.csdn.net/wudinaniya/article/details/81978667
+12. https://zhuanlan.zhihu.com/p/373314866
+13. https://wiki.archlinux.org/title/Systemd
 
 
 
