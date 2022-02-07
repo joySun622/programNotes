@@ -8,6 +8,14 @@
 > 2）企业版：基于商业协议，需付费使用
 >
 > [MongoDB文档说明](https://docs.mongodb.com/)
+>
+> - **OLTP系统和OLAP系统区别**
+>
+> OLTP：联机事务处理系统(OnLine Transaction Processing)
+>
+> OLAP：联机分析处理系统(OnLine Analytical Processing)
+>
+> ![img](images/1489371-20190712163720194-1843731105.png)
 
 ## 1.1 MongoDB VS 关系型数据库
 
@@ -1288,6 +1296,31 @@ db.user.find({"age":{"$gt":18}}).count()
 3）结果文档输出给下一步骤
 
 ![image-20211206201823363](images/image-20211206201823363.png)
+
+- **聚合运算的基本格式**
+
+```
+pipeline= [$stage1,$stage2,...$stageN];
+
+db.<Collection>.aggregate(
+	pipeline,
+	{options}
+)
+```
+
+- **常见步骤**
+
+  | 步骤            | 作用     | SQL等价运算符   |
+  | --------------- | -------- | --------------- |
+  | $matcn          | 过滤     | WHERE           |
+  | $project        | 投影     | AS              |
+  | $sort           | 排序     | ORDER BY        |
+  | $group          | 分组     | GROUP BY        |
+  | \$skip/$limit   | 结果限制 | SKIP/LIMIT      |
+  | $lookup         | 左外连接 | LEFT OUTER JOIN |
+  | \$unwind        | 展开数据 | N/A             |
+  | $graphLookup    | 图搜索   | N/A             |
+  | \$facet/$bucket | 分面搜索 | N/A             |
 
 MongoDB聚合为aggregate，主要用到的聚合函数如下
 
