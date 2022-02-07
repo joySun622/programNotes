@@ -214,11 +214,19 @@ setter方法标签：
 ## 时间格式设置
 
 ```
+### 格式化日期
 /*
- * 
+ *
  * @author JoySun
  * ${currentDate:date('yyyy-MM-dd HH:mm')}
  */
+ 
+ ### 中文日期
+  /**
+  * 
+  * @author JoySun
+  * @date ${date}${time}
+  */
 
 ```
 

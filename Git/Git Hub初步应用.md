@@ -302,6 +302,8 @@ git add -h  获得add参考资料
 
 ### 7. 报错集结
 
+#### 公库可以提交，私库无法提交
+
 1. **场景描述**：在github上创建了一个公有库，一个私有库。公有库可以正常提交文件，私有库无法push数据。报错信息如下
 
    ```
@@ -384,7 +386,68 @@ git add -h  获得add参考资料
    > $ git config -e
    > ```
 
-   
+#### 提交时端口连接超时
+
+- **问题描述**
+
+> `git push`时，提示连接超时，报错信息如下
+>
+> ```
+> 12613@JoysSun MINGW64 /e/study/programNotes (master)
+> $ git push
+> ssh: connect to host github.com port 22: Connection timed out
+> fatal: Could not read from remote repository.
+> 
+> Please make sure you have the correct access rights
+> and the repository exists.
+> ```
+
+- **原因探索**
+
+```
+### 检测了下22端口连接情况，发现无法连接
+12613@JoysSun MINGW64 /e/study/programNotes (master)
+$ ssh -T git@github.com
+ssh: connect to host github.com port 22: Connection timed out
+
+### 尝试了链接443端口，发现可以连接
+12613@JoysSun MINGW64 /e/study/programNotes (master)
+$  ssh -T -p 443 git@ssh.github.com
+Warning: Permanently added the RSA host key for IP address '[20.205.243.160]:443' to the list of known hosts.
+Hi joySun622! You've successfully authenticated, but GitHub does not provide shell access.
+```
+
+猜测：22端口因为某种原因，导致连接超时
+
+- **解决方案**
+
+方案1：修改提交文件时的端口
+
+```
+### 进入~/.ssh/目录下修改config文件，建议直接在终端中输入vim ~/.ssh/config，使用vim编辑器打开此文件，一般是为空，然后加上以下代码
+12613@JoysSun MINGW64 /e/study/programNotes (master)
+$ cd ~/.ssh
+12613@JoysSun MINGW64 /e/study/programNotes (master)
+$ vim config
+ Host github.com
+    User "1260462288@qq.com" #github用户账号
+    port 443  #服务端口
+    HostName ssh.github.com  #服务器地址
+    PreferredAuthentications publickey #采用公钥
+    IdentityFile ~/.ssh/id_rsa
+~
+
+
+ESC键后，输入 :wq  保存退出
+
+### 测试修改是否有效
+12613@JoysSun MINGW64 ~/.ssh
+$ ssh -T git@github.com
+Hi joySun622! You've successfully authenticated, but GitHub does not provide shell access.
+
+```
+
+
 
 ### 参考资料
 
