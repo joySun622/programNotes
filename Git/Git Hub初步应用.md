@@ -393,7 +393,7 @@ git add -h  获得add参考资料
 > `git push`时，提示连接超时，报错信息如下
 >
 > ```
-> 12613@JoysSun MINGW64 /e/study/programNotes (master)
+> 12613@JoySun MINGW64 /e/study/programNotes (master)
 > $ git push
 > ssh: connect to host github.com port 22: Connection timed out
 > fatal: Could not read from remote repository.
@@ -406,12 +406,12 @@ git add -h  获得add参考资料
 
 ```
 ### 检测了下22端口连接情况，发现无法连接
-12613@JoysSun MINGW64 /e/study/programNotes (master)
+12613@JoySun MINGW64 /e/study/programNotes (master)
 $ ssh -T git@github.com
 ssh: connect to host github.com port 22: Connection timed out
 
 ### 尝试了链接443端口，发现可以连接
-12613@JoysSun MINGW64 /e/study/programNotes (master)
+12613@JoySun MINGW64 /e/study/programNotes (master)
 $  ssh -T -p 443 git@ssh.github.com
 Warning: Permanently added the RSA host key for IP address '[20.205.243.160]:443' to the list of known hosts.
 Hi joySun622! You've successfully authenticated, but GitHub does not provide shell access.
@@ -425,9 +425,9 @@ Hi joySun622! You've successfully authenticated, but GitHub does not provide she
 
 ```
 ### 进入~/.ssh/目录下修改config文件，建议直接在终端中输入vim ~/.ssh/config，使用vim编辑器打开此文件，一般是为空，然后加上以下代码
-12613@JoysSun MINGW64 /e/study/programNotes (master)
+12613@JoySun MINGW64 /e/study/programNotes (master)
 $ cd ~/.ssh
-12613@JoysSun MINGW64 /e/study/programNotes (master)
+12613@JoySun MINGW64 /e/study/programNotes (master)
 $ vim config
  Host github.com
     User "1260462288@qq.com" #github用户账号
@@ -437,13 +437,17 @@ $ vim config
     IdentityFile ~/.ssh/id_rsa
 ~
 
-
 ESC键后，输入 :wq  保存退出
 
 ### 测试修改是否有效
-12613@JoysSun MINGW64 ~/.ssh
+12613@JoySun MINGW64 ~/.ssh
 $ ssh -T git@github.com
 Hi joySun622! You've successfully authenticated, but GitHub does not provide shell access.
+
+### 连接443可以连接成功，但是 push时，出现问题
+12613@JoySun MINGW64 ~/.ssh
+$ git push
+fatal: not a git repository (or any of the parent directories): .git
 
 ```
 
