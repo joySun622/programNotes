@@ -300,7 +300,45 @@ git help config  获得 git config 命令的手册
 git add -h  获得add参考资料
 ```
 
-### 7. 报错集结
+### 7. 如何生成token
+
+1. 打开Github，在个人设置页面，找到【Setting】，然后打开找到【Devloper Settting】，如下图。
+
+<img src="images/v2-6a98ae08aec7c13d244fee90d0a3a527_720w.jpg" alt="img" style="zoom:67%;" />
+
+2. 选择个人访问令牌【Personal access tokens】，然后选中生成令牌【Generate new token】。
+
+![img](images/v2-884a1c7ca1dcc7938e3c45ed82771710_720w.jpg)
+
+在上个步骤中，选择要授予此令牌token的范围或权限。
+
+- 要使用token从命令行访问仓库，请选择repo
+- 要使用token从命令行删除仓库，请选择delete_repo
+- 其他根据需要进行勾选
+
+3. 点击【Generate token】生成令牌。
+
+![img](images/v2-7c8f6f9c6585c63aa84667f1bf2c4373_720w.jpg)
+
+![img](images/v2-92092524d68638b7ef808b8b5a4a850d_720w.jpg)
+
+4. 生成token后，记得把你的token保存下来，以便进行后面的操作。把token直接添加远程仓库链接中，这样就可以避免同一个仓库每次提交代码都要输入token了。
+
+```text
+git remote set-url origin https://<your_token>@github.com/<USERNAME>/<REPO>.git
+```
+
+- `<your_token>`：换成你自己得到的token
+- `<USERNAME>`：是你自己github的用户名
+- `<REPO>`：是你的仓库名称
+
+下面是一个实例：
+
+```text
+git remote set-url origin https://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@github.com/shliang0603/Yolov4_DeepSocial.git/
+```
+
+### 8. 报错集结
 
 #### 公库可以提交，私库无法提交
 
@@ -421,7 +459,7 @@ Hi joySun622! You've successfully authenticated, but GitHub does not provide she
 
 - **解决方案**
 
-方案1：修改提交文件时的端口
+- - **方案1**：修改提交文件时的端口
 
 ```
 ### 进入~/.ssh/目录下修改config文件，建议直接在终端中输入vim ~/.ssh/config，使用vim编辑器打开此文件，一般是为空，然后加上以下代码
@@ -451,11 +489,100 @@ fatal: not a git repository (or any of the parent directories): .git
 
 ```
 
+**结果**：方案1无法解决问题，文件依旧无法提交
 
+
+
+- - **方案**2：修改`C:\Windows\System32\drivers\etc\host`host文件，添加映射端口
+
+  ```
+  192.30.253.112 github.com
+  151.101.88.249 github.global.ssl.fastly.net
+  ```
+
+  **结果**：解决方案无效，文件提交失败
+
+
+
+- - **方案3**：修改config配置
+    将config中的`url=git@github.com:`修改为`https://github.com/`
+
+  ```
+  12613@JoySun MINGW64 /e/study/programNotes
+  $ git config --local -e
+  
+  [core]
+          repositoryformatversion = 0
+          filemode = false
+          bare = false
+          logallrefupdates = true
+          symlinks = false
+          ignorecase = true
+  [remote "origin"]
+  		//url = git@github.com:joySun622/programNotes.git //原始url
+          url=https://github.com/joySun622/programNotes.git //修改后url
+          fetch = +refs/heads/*:refs/remotes/origin/*
+  [branch "master"]
+          remote = origin
+          merge = refs/heads/master
+  ### 修改配置后提交
+  $ git push
+  fatal: unable to access 'https://github.com/joySun622/programNotes.git/': Failed to connect to github.com port 443: Timed out
+  
+  ### 重新配置了下用户和用户名
+  12613@DESKTOP-427LQB7 MINGW64 /e/study/programNotes (master)
+  $ git config --global user.name "joySun622"
+  
+  12613@DESKTOP-427LQB7 MINGW64 /e/study/programNotes (master)
+  $ git config --global user.email "123@qq.com"
+  ### 重新提交后提示密码/账号验证在2021.8.13移除了，需要使用token进入
+  12613@DESKTOP-427LQB7 MINGW64 /e/study/programNotes (master)
+  $ git push
+  remote: Support for password authentication was removed on August 13, 2021. Please use a personal access token instead.
+  remote: Please see https://github.blog/2020-12-15-token-authentication-requirements-for-git-operations/ for more information.
+  fatal: Authentication failed for 'https://github.com/joySun622/programNotes.git/
+  
+  GitHub不再支持密码验证解决方案：SSH免密与Token登录配置
+  ### 重新生成了SSH KEY并在git hub setting 中配置好
+  $ ssh-keygen -t rsa -C "1123@qq.com"
+  Generating public/private rsa key pair.
+  Enter file in which to save the key (/c/Users/12613/.ssh/id_rsa):
+  /c/Users/12613/.ssh/id_rsa already exists.
+  Overwrite (y/n)? y
+  Enter passphrase (empty for no passphrase):
+  Enter same passphrase again:
+  Your identification has been saved in /c/Users/12613/.ssh/id_rsa.
+  Your public key has been saved in /c/Users/12613/.ssh/id_rsa.pub.
+  The key fingerprint is:
+  SHA256:jb5/T/YuqIGNnvqQ7KkEqCR+gAH2fIwosxluygf78wI 1260462288@qq.com
+  The key's randomart image is:
+  +---[RSA 3072]----+
+  |..               |
+  结果：提交失败，于是决定使用token来尝试下
+  ```
+
+  **结果**：方案无效，提交失败
+
+- - **方案4**:由方案3结果决定使用token作为验证方式
+
+  参照[如何生成token](#7. 如何生成token)
+
+  ```
+  ### 生成token后重新设置utl
+  12613@DESKTOP-427LQB7 MINGW64 /e/study/programNotes (master)
+  $ git remote set-url origin https://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@github.com/joySun622/programNotes.git
+  
+  12613@DESKTOP-427LQB7 MINGW64 /e/study/programNotes (master)
+  $ git push
+  Enumerating objects: 76, done.
+  Counting objects: 100% (76/76), 
+  ```
+
+  **结果**：除了网络原因导致的端口问题，最终呈现出导致无法提交成功的原因：GIT HUB的验证方式发生了改变。这个需要时刻关注官方信息，不然会浪费一大堆时间去寻找出问题的地方。
 
 ### 参考资料
 
 1. https://www.cnblogs.com/iisheng/p/13425658.html
-
 2. https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/error-agent-admitted-failure-to-sign
 3. https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
+4. https://zhuanlan.zhihu.com/p/414028184
