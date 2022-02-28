@@ -230,3 +230,22 @@ setter方法标签：
 
 ```
 
+# 配置jdk的src.zip源码
+
+1. 点 “window”-> “Preferences” -> “Java” -> “Installed JRES”
+
+2.此时”Installed JRES”右边是列表窗格，列出了系统中的 JRE 环境，选择你的JRE，然后点边上的 “Edit…”， 会出现一个窗口(Edit JRE)
+
+3.选中rt.jar文件的这一项：“G:\Java\jdk1.6.0_24\lib\rt.jar”，就是你的java安装目录，然后点 左边的“+” 号展开它，
+
+4.展开后，可以看到“Source Attachment:(none)”，点这一项，点右边的按钮“Source Attachment…”, 选择你的JDK目录下的 “src.zip”文件
+
+5.一路点”ok”,结束。
+
+在MyEclipse配置JDK的过程中接触到的dt.jar是关于运行环境的类库,主要是swing的包
+
+tools.jar是关于一些工具的类库
+
+rt.jar包含了jdk的基础类库，也就是你在java  doc里面看到的所有的类的class文件
+
+这样，MyEclipse配置JDK就完成了。可以在MyEclipse中查看JDK类库的源代码了。

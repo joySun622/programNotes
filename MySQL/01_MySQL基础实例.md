@@ -244,6 +244,12 @@ mysql> show variables like '%char%';
 | character_set_filesystem             | binary                     |
 | character_set_results                | utf8                       |
 | character_set_server                 | utf8mb4 
+
+### 修改数据库编码
+centos:7
+mysql:5.7
+
+
 ```
 
 ##### 创建表加入约束

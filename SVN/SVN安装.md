@@ -24,6 +24,7 @@ SVN Server版本：VisualSVN-Server-4.3.6-x64
 ### 2. 配置
 
 > 安装完成后，start svn server manage
+> 命令行启动：启动VisualSVN Server
 
 1) **首先配置groups，添加两个组，一个adminis组，一个guest组**
 

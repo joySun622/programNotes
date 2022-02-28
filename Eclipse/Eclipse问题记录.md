@@ -1,5 +1,22 @@
 [Toc]
 
+# Debug失效
+
+- **问题详情**
+
+  > 使用eclipse以debug方式启动一个web项目，发现项目中的断点都直接跳过去了
+
+- **解决方案**
+
+  1. 查看是否选择`skip all breakpoints`
+     ![image-20220209165717416](images/image-20220209165717416.png)
+
+     <img src="images/6ca98461862541936cf1f9b0df1bd10ff326abad.jpg" alt="eclipse中打断点debug无效是什么原因？" style="zoom:67%;" />
+
+  2. 勾选`Skip breakpoints during a 'Run to Line' operation  `
+
+<img src="images/image-20220209165139046.png" alt="image-20220209165139046" style="zoom:67%;" />
+
 # 启动Tomcat报错
 
 - **环境&问题说明**
