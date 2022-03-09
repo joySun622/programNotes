@@ -568,7 +568,7 @@ fatal: not a git repository (or any of the parent directories): .git
   参照[如何生成token](#7. 如何生成token)
 
   ```
-  ### 生成token后重新设置utl
+  ### 生成token后重新设置url
   12613@DESKTOP-427LQB7 MINGW64 /e/study/programNotes (master)
   $ git remote set-url origin https://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@github.com/joySun622/programNotes.git
   

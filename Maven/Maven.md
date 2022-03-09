@@ -11,6 +11,8 @@
 > ![image-20211009154450318](images/image-20211009154450318.png)
 >
 > 下载完成后，直接解压到指定目录下，如：D:\programApp\apache-maven-3.6.2
+>
+> - [Maven中央仓库地址](https://search.maven.org/)
 
 ### 2. 环境变量配置
 
@@ -89,7 +91,11 @@
 </mirror>
 ```
 
+# POM配置
 
+## `dependencyManagement`
+
+## `build`
 
 
 

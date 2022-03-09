@@ -54,6 +54,59 @@ java.lang.Error: Unresolved compilation problems:
 
 <img src="images/image-20220207163216082.png" alt="image-20220207163216082" style="zoom: 67%;" />
 
+# 导入Maven Web项目
+
+## 1. 导入Maven项目
+
+- 在项目空白处右击，选中【Import】,
+  ![image-20220302142116164](images/image-20220302142116164.png)
+
+## 2. 将Maven项目转为Web项目
+
+选中导入的Maven项目转换成一个Dynamic Web Module: 选中Maven项目右击，选中最后一项【Properties】在左边的列表中选择
+
+【project facets】
+
+![这里写图片描述](images/20160802161109167)
+
+## 3. 添加Maven Dependencies
+
+继续右键项目->properties->Deployment Assembly，如图中红框所示，只有src下的四个文件夹：
+
+![这里写图片描述](images/20160802162734408)
+
+点击Add后如图所示：
+
+![img](images/20160802162417785)
+
+![这里写图片描述](images/20160802162432184)
+
+
+
+由以上的3步，导入的Maven项目就转化为一个可运行的web项目了。
+
+然后再新建一个Web Server,这需要将Tomcat安装好，并且被整合进Eclipse中，这样就可以创建Web Server了，在创建好Web Server后，右键我们导入的项目，选择“Run As”，选择Run on Server就可以了.右键项目->run on server即可。
+
+# 修改项目SVN路径
+
+- **场景描述**
+  项目svn路径发生改变，需要重新修改项目的提交&更新路径
+
+- **解决方案**
+
+  1. 右键点击项目--->Team--->断开连接--->选择“并且从文件系统中删除svn元信息”--->Yes
+
+     可以看到项目后面的地址没有了
+
+  2. 右键点击项目--->Team--->Share Project--->选择SVN--->选择创建新的资源库位置--->输入改变后的svn URL--->finish即可
+
+  这样就完成了svn地址切换，关联完成会同步项目，显示本地资源与svn服务器不同。
+
+
+
+
 # 参考资料
 
 1. https://www.itdaan.com/blog/2017/09/11/42289157e165c9c5e69f262c27f4fdae.html
+2. https://blog.csdn.net/w12345_ww/article/details/52094756
+3. https://blog.csdn.net/qq_26673953/article/details/51202036

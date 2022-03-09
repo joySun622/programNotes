@@ -7,6 +7,7 @@
 3. [VUE2.0官方教程](https://cn.vuejs.org/v2/guide/)
 4. [VUE3.0官方教程](https://v3.cn.vuejs.org/guide/introduction.html)
 5. vue2.0&vue3.0:vue3.0向下兼容vue2.0
+6. vue架构：MVVM
 
 # 下载网址
 
@@ -23,6 +24,7 @@
   原解释：脚手架是为了保证各施工过程顺利进行而搭设的工作平台。
   编程中的脚手架：为了保证快速的开发功能，而搭建的架构，开发员在搭建好的架构上，无需关心底层架构，可以直接关注业务，直接运用已有架构的东西，完成业务功能的顺利实现。
 - **渐进式框架**：随着需求的增多，VUE可以推出更多的组件以满足需求。
+- **数据驱动模型**：Vue主要是数据的操作
 
 # Vue2.0安装方式
 
@@ -304,6 +306,8 @@ vm.message = 'Hello!'
 
 # vue 模板语法
 
+## 基本应用
+
 - **指令**：带有`v-`前缀的特殊属性
 
   ```
@@ -348,16 +352,16 @@ vm.message = 'Hello!'
 </head>
 <body>
     <div id="box">
-         <!-- vue实例下DOM中变量操作============================================================================================-->
+      <!-- vue实例下DOM中变量操作=================================================================-->
         <!--在vue绑定的dom元素下的{{}}中，适用所有JS语法操作-->
         {{myName}} <!--结果显示为data中定义的myName状态值-->
         {{10>20?'aaa':'bbb'}}
 
-         <!-- 事件绑定============================================================================================-->
+         <!-- 事件绑定========================================================================-->
         <button @click="handleClick">click</button><!--绑定点击事件，@ 为必需符号，简略写法-->
         <button v-on:click="handleClick">click</button><!-- 绑定事件完整写法 -->
 
-         <!-- 属性操作============================================================================================-->
+         <!-- 属性操作===================================================================================-->
         <!-- :attributeName 写法等价于v-bind:attributeName -->
         <div :class="whichColor">动态切换class</div> <!--速写方式：引用属性变量语法  :attitudeName  这种方式绑定，才会将属性中的值解析为变量，然后被vue渲染-->
         <div v-bind:class="whichColor">动态切换class</div><!-- 绑定属性完整写法 -->
@@ -366,7 +370,7 @@ vm.message = 'Hello!'
         <!-- 在属性绑定的属性变量定义中，可以使用所有JS语法 -->
         <div :class="isHidden?'hidden':''">动态显示和隐藏-class</div>
 
-        <!-- 指令============================================================================================-->
+        <!-- 指令================================================================================-->
 
         <!--使用vue中定义的指令实现div动态显示和隐藏，可以通过操作定义的isShow变量的值，控制div的显示和隐藏-->
         <div v-show="isShow">动态显示和隐藏-指令</div>
@@ -413,21 +417,1804 @@ vm.message = 'Hello!'
 </html>
 ```
 
+## 范例：TODOList功能
+
+- **功能介绍**
+
+> 1. 输入内容，点击add后可以将输入的内容添加到序列中；
+> 2. 点击删除，可以删除序列表的item的内容;
+> 3. 点击列表某项，高亮显示该列；
+>
+> 简单的记事本功能
+
+- **源码**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+    <style>
+    .active{
+        background-color: red
+    }
+    </style>
+</head>
+<body>
+    <div id="box">
+        <!-- v-model ：双向绑定指令。该指令绑定的变量，其变化是双向的：即在输入框中输入值，
+            会改变该变量的值；在data中状态myText发送改变时，也会改变该输入框的值
+        只能绑定表单元素：textarea,input(text,checkbox,radio),select 等标签
+
+        text 和 textarea 元素使用 value property 和 input 事件；
+        checkbox 和 radio 使用 checked property 和 change 事件；
+        select 字段将 value 作为 prop 并将 change 作为事件  
+        -->
+        <input type="text" v-model="myText">
+        <button @click="handleAdd()">add</button>
+        <div v-show="!dataList.length">代办事项为空</div>
+        <ul>
+            <li  v-for="(item,index) in dataList" :class="contentColor==index?'active':''" @click="handleColor(index)">
+                {{item}}
+                <button @click="handleDel(index)">del</button>
+            </li>
+        </ul>
+    </div>
+
+    <script>
+        new Vue({
+            el:"#box",
+            data:{
+                myText:"",
+                dataList:[],
+                contentColor:0,
+            },
+            methods:{
+                handleAdd(){
+                    console.log("add"+this.myText);
+                    this.dataList.push(this.myText);
+                    this.myText="";
+                },
+                handleDel(index){
+                    /**
+                     * slice删除数组元素:arr.splice(0,1); 第一个参数为删除元素索引，第二元素定义应删除多少元素
+                     * slice添加数组元素：fruits.splice(2, 0, "Lemon", "Kiwi");
+                     * 第一个参数（2）定义了应添加新元素的位置（拼接）。
+                     * 第二个参数（0）定义应删除多少元素。
+                     * 其余参数（“Lemon”，“Kiwi”）定义要添加的新元素。
+                     * 
+                     * */
+                    this.dataList.splice(index,1);
+                },
+                handleColor(index){
+                    //点击li序列后颜色改变
+                    this.contentColor=index;
+                }
+            }
+
+        })
+    </script>
+</body>
+</html>
+```
+
 
 
 # class&style
 
+## 动态操作对象&数组
+
+```
+Vue2不支持动态增加对象属性，Vue3支持动态增加属性的拦截。
+Vue2 对于已经创建的实例，Vue 不允许动态添加根级别的响应式 property。解决方法如下：
+### 动态给对象添加属性,Vue2解决方案：
+#### 方案1：
+Vue.set(object, propertyName, value)  object:要添加属性的对象，propertyName:属性名，value:属性值
+#### 方案2：使用对象实例。全局Vue.set的别名vm.$set  this.$set
+var vm=new Vue({
+    data:{
+    	aa:1,
+    }
+})
+vm.$set(object, propertyName, value)或this.$set(object, propertyName, value)
+
+### 动态增加数组元素，并触发Vue动态响应机制
+var vm = new Vue({
+  data: {
+    items: ['a', 'b', 'c']
+  }
+})
+vm.items[1] = 'x' // 不是响应性的
+vm.items.length = 2 // 不是响应性的
+
+// 方式1：Vue.set
+Vue.set(vm.items, indexOfItem, newValue)
+// 方式2：Array.prototype.splice
+vm.items.splice(indexOfItem, 1, newValue)
+//方式3：Vue.set别名
+vm.$set(vm.items, indexOfItem, newValue)
+//方式4:
+vm.items.push(newItem);
+
+#### 改变数组长度
+vm.items.splice(newLength)
+```
+
+- **范例**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+    <style>
+    .active {
+        background-color: red
+    }
+
+    .aa {
+
+    }
+    .bb {
+
+    }
+    .cc {
+
+    }
+    </style>
+</head>
+<body>
+    <div id="box">
+        <div :class="classObj">动态切换class-1-对象写法</div>
+        <div :class="classArr">动态切换class-2-数组写法</div>
+
+        <div :style="styleObj">动态切换style-1-对象写法</div>
+        <div :style="styleArr">动态切换style-2-数组写法</div>
+    </div>
+
+    <script>
+        var vm = new Vue({
+            el:"#box",
+            data:{
+                classObj:{//通过一个对象，通过对象属性为true或false，控制class显示。会在Vue初始化的时候进行渲染。
+                aa:true,//当值为true时，在class中存在，值为false：不存在。为true是触发defineProperty set/get方法
+                bb:true,
+                cc:false
+            },
+            classArr:["aa","bb"],//通过数组内值控制dom class属性值
+            styleObj:{
+                backgroundColor:'red',
+            },
+            styleArr:[{backgroundColor:'red'}]
+            },
+           
+        })   
+        
+        /** Vue2 动态添加对象属性值:
+         * 方式1：
+         * Vue.set(object, propertyName, value)  object:要添加属性的对象，propertyName:属性名，value:属性值
+         * 方式2；
+         *Vue.$set(object, propertyName, value)
+         * 
+         * */
+        Vue.set(vm.classObj,"ee",true);
+        vm.$set(vm.classObj,"dd",true);
+        Vue.set(vm.styleObj,"fontSize","30px");//动态添加style属性
+        
+        /**
+         * 动态添加数组元素
+         * */
+        //方式1
+        Vue.set(vm.classArr,2,"dd");
+        //方式2
+        vm.$set(vm.classArr,3,"ee");
+        //方式3
+        vm.classArr.push("ff");
+
+        vm.styleArr.push({"fontSize":"20px"});
+    </script>
+</body>
+</html>
+```
+
+- **Vue3范例**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.global.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="box">{{myName}}
+        <div :class = "classObj">class Test <button @click="addClassProperty()">addClassProperty</button></div>
+    </div>
+    <script>
+        var obj={
+            data(){
+                return{
+                    "myName":"aaa",
+                    "classObj":{
+                        aa:true,
+                        bb:true,
+                        cc:false
+                    }
+                }
+            },
+            methods:{
+                addClassProperty(){
+                    this.classObj.dd=true; //vue3可以直接动态操作属性
+                }
+            }
+        }
+       Vue.createApp(obj).mount("#box");
+    </script>
+</body>
+</html>
+```
+
 # 条件渲染
+
+```
+v-if    条件性地渲染一块内容,在条件表达式为true时，进行渲染
+v-else-if  紧跟在v-if或v-else-if后面；当其后的条件表达式为true时进行渲染
+v-else  紧跟在v-if或v-else-if后面，指令表示`else 块`
+```
+
+## template 
+
+> `template `包装元素，不会真正创建在页面上
+> Vue 会尽可能高效地渲染元素，通常会复用已有元素而不是从头开始渲染
+
+## 用 `key` 管理可复用的元素
+
+> 通过定义`key`值，标明该元素的独立性，与同`input`元素区分开。有点类似以前dom元素通过定义'id,class'等属性，区分不同元素。定义`key`值后的输入框会被重新渲染。如果不定义`key`值，vue不会重新渲染input元素，只是替换`input` placeholder的值
+
+```
+<template v-if="loginType === 'username'">
+  <label>Username</label>
+  <input placeholder="Enter your username" key="username-input">
+</template>
+<template v-else>
+  <label>Email</label>
+  <input placeholder="Enter your email address" key="email-input">
+</template>
+```
+
+## `v-show`
+
+> 1. 注意，`v-show` 不支持 `<template>` 元素，也不支持 `v-else`;
+> 2. 带有 `v-show` 的元素始终会被渲染并保留在 DOM 中。`v-show` 只是简单地切换元素的 CSS property `display`
+
+## `v-if` vs `v-show`
+
+> - `v-if` 是“真正”的条件渲染，因为它会确保在切换过程中条件块内的事件监听器和子组件适当地被销毁和重建。
+>
+> - `v-if` 也是**惰性的**：如果在初始渲染时条件为假，则什么也不做——直到条件第一次变为真时，才会开始渲染条件块。
+>
+> - 相比之下，`v-show` 就简单得多——不管初始条件是什么，元素总是会被渲染，并且只是简单地基于 CSS 进行切换。
+>
+> 一般来说，`v-if` 有更高的切换开销，而 `v-show` 有更高的初始渲染开销。因此，如果需要非常频繁地切换，则使用 `v-show` 较好；如果在运行时条件很少改变，则使用 `v-if` 较好。
+
+- **范例**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+    <style>
+    
+    </style>
+</head>
+<body>
+    <div id="box">
+        <ul>
+            <li v-for="item in dataList">
+                {{item.title}}
+                <span v-if ="item.state===0">未支付</span>
+                <span v-else-if ="item.state===1">待发货</span>
+                <span v-else-if ="item.state===2">已发货</span>
+                <span v-else>已签收</span>
+            </li>
+        </ul>
+    <!-- Vue 会尽可能高效地渲染元素，通常会复用已有元素而不是从头开始渲染。 -->
+        <template v-if="isCreated">
+            <div>1111</div>
+            <div>2222</div>
+            <div>3333</div>
+        </template>
+    </div>
+
+    <script>
+        var vm = new Vue({
+            el:"#box",
+            data:{
+                dataList:[
+                    {title:"1111",state:0},
+                    {title:"2222",state:1},
+                    {title:"3333",state:2},
+                    {title:"4444",state:3},
+                ]
+            }
+        })   
+    </script>
+</body>
+</html>
+```
+
+
 
 # 列表渲染
 
+## `v-for`
+
+> 当 Vue 正在更新使用 `v-for` 渲染的元素列表时，它默认使用“就地更新”的策略。如果数据项的顺序被改变，Vue 将不会移动 DOM 元素来匹配数据项的顺序，而是就地更新每个元素，并且确保它们在每个索引位置正确渲染。
+> 这个默认的模式是高效的，但是**只适用于不依赖子组件状态或临时 DOM 状态 (例如：表单输入值) 的列表渲染输出**。
+>
+> 重新创建DOM，代价很高，因为一个DOM元素所包含的属性太多。虚拟DOM的存在，可以减少创建DOM元素的代价。根据新数组生成虚拟DOM，与原虚拟DOM进行比对，然后根据比对结果，以最小的代价更新真实DOM
+>
+> Vue在渲染dom元素过程
+> ![image-20220301171831037](images/image-20220301171831037.png)
+
+> - `v-for` 指令基于一个数组来渲染一个列表
+>
+> ```
+> //迭代显示dataList写法1 item为数组元素别名
+> v-for="item in dataList"
+> //迭代显示dataList写法2item为数组元素别名
+> v-for="item of dataList"
+> 
+> ### 俩个参数：item 数组元素别名，index 数组元素下标别名
+> v-for="(item, index) in items"
+> ```
+>
+> - `v-for`遍历对象属性
+>   在遍历对象时，会按 `Object.keys()` 的结果遍历，但是**不能**保证它的结果在不同的 JavaScript 引擎下都一致。
+>
+> ```
+> ### 遍历一个对象的 property
+> //遍历object,value为对象object属性值
+> v-for="value in object"
+> //提供第二个的参数为 property 名称 (也就是键名),对象的里的属性名
+> v-for="(value, name) in object"
+> //第三个参数作为索引
+> v-for="(value, name, index) in object"
+> ```
+
+### `key`
+
+> 【相当于给特殊元素一个独立的标识，与其他相同元素区别开来，以便跟踪每个节点的身份，从而重用和重新排序现有元素】
+>
+> 为了给 Vue 一个提示，以便它能跟踪每个节点的身份，从而重用和重新排序现有元素，你需要为每项提供一个**唯一** `key` attribute：
+
+```
+<div v-for="item in items" v-bind:key="item.id">
+  <!-- 内容 -->
+</div>
+或缩写
+<div v-for="item in items" :key="item.id">
+  <!-- 内容 -->
+</div>
+```
+
+> - 建议尽可能在使用 `v-for` 时提供 `key` attribute，除非遍历输出的 DOM 内容非常简单，或者是刻意依赖默认行为以获取性能上的提升。
+> - 不要使用对象或数组之类的非基本类型值作为 `v-for` 的 `key`。请用字符串或数值类型的值。
+>   **预期**：`number | string | boolean (2.4.2 新增) | symbol (2.5.12 新增)`
+> - 不要直接使用数组索引作为key，会可能根据数组的变化而产生渲染错误，需保证`key`值的唯一性
+
+## 数组更新检测
+
+### 变更方法
+
+Vue 将被侦听的数组的变更方法进行了包裹，所以它们也将会触发视图更新。这些被包裹过的方法包括：
+
+- `push()`
+- `pop()`
+- `shift()`
+- `unshift()`
+- `splice()`
+- `sort()`
+- `reverse()`
+
+### 替换数组
+
+变更方法，顾名思义，会变更调用了这些方法的原始数组。相比之下，也有非变更方法，例如 `filter()`、`concat()` 、`map()`和 `slice()`。它们不会变更原始数组，而**总是返回一个新数组**。当使用非变更方法时，可以用新数组替换旧数组：
+
+```
+example1.items = example1.items.filter(function (item) {
+  return item.message.match(/Foo/)
+})
+```
+
+你可能认为这将导致 Vue 丢弃现有 DOM 并重新渲染整个列表。幸运的是，事实并非如此。Vue 为了使得 DOM 元素得到最大范围的重用而实现了一些智能的启发式方法，所以用一个含有相同元素的数组去替换原来的数组是非常高效的操作。
+
+### 注意事项
+
+```
+### 不能检测一下变动的数组
+var vm = new Vue({
+  data: {
+    items: ['a', 'b', 'c']
+  }
+})
+vm.items[1] = 'x' // 不是响应性的
+vm.items.length = 2 // 不是响应性的
+```
+
+### 范例
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+    <style>
+    
+    </style>
+</head>
+<body>
+    <div id="box">
+        <!-- 遍历数组 in -->
+        <ul>
+            <li v-for="item in dataList">
+                {{item.title}}
+                <span v-if ="item.state===0">未支付</span>
+                <span v-else-if ="item.state===1">待发货</span>
+                <span v-else-if ="item.state===2">已发货</span>
+                <span v-else>已签收</span>
+            </li>
+        </ul>
+        <!-- 遍历数组 of 取代in -->
+        <ul>
+                <li v-for="item of dataList">
+                    {{item.title}}
+                    <span v-if ="item.state===0">未支付</span>
+                    <span v-else-if ="item.state===1">待发货</span>
+                    <span v-else-if ="item.state===2">已发货</span>
+                    <span v-else>已签收</span>
+                </li>
+            </ul>
+            <!-- 遍历对象 -->
+        <ul>
+            <li v-for="(value,name,index) in testObj">
+                {{value}}--{{name}}--{{index}}
+
+            </li>
+        </ul>
+        <!-- 遍历纯数字 -->
+        <ul>
+            <li v-for="item in 10"> {{item}}</li>
+        </ul>
+        <!-- 添加给元素绑定key -->
+        <ul>
+                <li v-for="item in dataList" :key="item.state">
+            <!-- 绑定方式2 <li v-for="item in dataList" v-bind:key="item.state">  -->
+                {{item.state}}
+            </li>
+        </ul>
+    </div>
+
+    <script>
+        var vm = new Vue({
+            el:"#box",
+            data:{
+                dataList:[
+                    {title:"1111",state:0},
+                    {title:"2222",state:1},
+                    {title:"3333",state:2},
+                    {title:"4444",state:3},
+                ],
+                testObj:{
+                    name:"aaa",
+                    title:"bbb",
+                    subName:"ccc"
+                }
+            }
+        })   
+        
+    </script>
+</body>
+</html>
+```
+
+## 模糊查询
+
+### 范例1
+
+> 使用数组的`filter`函数实现模糊查询，比较笨一点的实现方式
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="box">
+        <!-- @input事件：当input value值发生改变的时候触发 
+             change事件与input事件区别：change事件会在失去焦点的时候触发，但是当值未发生改变时，失去焦点也不会触发-->
+        <input type="text" @input="inputHandle()" v-model="myText"/>
+        <ul>
+            <li v-for="item in dataList" :key="item">{{item}}</li>
+        </ul>
+    </div>
+
+    <script>
+     new Vue({
+         el:"#box",
+         data:{
+             myText:"",
+             dataList:["aaa","bbb","ccc","ddd","abc","aac"],
+             originList:["aaa","bbb","ccc","ddd","abc","aac"],
+         },
+         methods:{
+            inputHandle(){
+                this.dataList=this.originList.filter(item => item.includes(this.myText));
+                console.log(this.dataList);
+            },
+         }
+     });
+
+<!-- 以下为测试代码 -->
+    //  箭头函数item=>true表示，item存在就返回
+    var arr=[1,2,3,4,5];
+    var newArr=arr.filter(item=>true);
+    //item=>item > 3 表示item>3的元素返回
+    var newArr=arr.filter(item=> item > 3);
+    console.log(newArr);
+
+    //字符串包含
+    var arr2=["aaa","bbb","ccc"];
+    // item=>item.includes("a") :包含字符a的item元素返回
+    var newArr2=arr2.filter(item=>item.includes("a"));
+    console.log(newArr2);
+    </script>
+</body>
+</html>
+```
+
+### 范例2
+
+> 使用函数表达式，实现模糊查询
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="box">
+        <!-- @input事件：当input value值发生改变的时候触发 
+             change事件与input事件区别：change事件会在失去焦点的时候触发，但是当值未发生改变时，失去焦点也不会触发-->
+        <input type="text" v-model="myText"/>
+        <ul>
+            <li v-for="item in filterData()" :key="item">{{item}}</li>
+        </ul>
+    </div>
+
+    <script>
+     new Vue({
+         el:"#box",
+         data:{
+             myText:"",
+             dataList:["aaa","bbb","ccc","ddd","abc","aac"],
+         },
+         methods:{
+             filterData(){
+                 return this.dataList.filter(item=> item.includes(this.myText));
+             }
+         }
+     });
+    </script>
+</body>
+</html>
+```
+
 # 事件处理器
+
+## 1. 监听事件-直接触发代码
+
+> ```
+>  <button @click="count++">add_表达式写法</button>
+> ```
+
+## 2. 方法事件处理器-写函数名
+
+> ```
+> <button @click="addCount">add_2</button>
+> ```
+
+## 3. 内联处理器方法-执行函数表达式
+
+> ```
+> <button @click="addCount3($event,1)">add_3</button>
+> ```
+
+### 范例
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="box">
+       {{count}}
+       <!-- 无参数触发事件写法 -->
+       <button @click="addCount()">add_1</button>
+       <button @click="addCount">add_2</button>
+       <!-- 使用无()触发事件时，会默认传递事件对象。可以通过event.target该对象获取触发该事件的DOM元素 -->
+       <button @click="addCount2">add_2_2</button>
+       <!-- 直接使用表达式，监听事件 -->
+       <button @click="count++">add_表达式写法</button>
+       <!-- 传递事件对象,使用特殊变量 $event  -->
+       <button @click="addCount3($event,1)">add_3</button>
+    </div>
+
+    <script>
+     new Vue({
+         el:"#box",
+         data:{
+             count:0,
+         },
+         methods:{
+            addCount(){
+                this.count++;
+            },
+            addCount2(evt){
+                this.count++;
+                console.log(evt.target);
+            },
+            addCount3(event,val){
+                this.count+val;
+                console.log(event.target);
+            }
+         }
+     });
+    </script>
+</body>
+</html>
+```
+
+## **4. 事件修饰符**
+
+在事件处理程序中调用 `event.preventDefault()` 或 `event.stopPropagation()` 是非常常见的需求。尽管我们可以在方法中轻松实现这点，但更好的方式是：方法只有纯粹的数据逻辑，而不是去处理 DOM 事件细节。
+
+> 为了解决这个问题，Vue.js 为 `v-on` 提供了**事件修饰符**。之前提过，修饰符是由点开头的指令后缀来表示的。
+>
+> - `.stop`
+> - `.prevent`
+> - `.capture`
+> - `.self`
+> - `.once`
+> - `.passive`
+>
+> ```
+> <!-- 阻止单击事件继续传播：阻止事件冒泡 -->
+> <a v-on:click.stop="doThis"></a>
+> <!--简略写法--->
+> <a @click.stop="doThis"></a>
+> 
+> <!-- 提交事件不再重载页面 -->
+> <form v-on:submit.prevent="onSubmit"></form>
+> 
+> <!-- 修饰符可以串联 -->
+> <a v-on:click.stop.prevent="doThat"></a>
+> 
+> <!-- 只有修饰符，prevent:阻止默认行为 -->
+> <form v-on:submit.prevent></form>
+> 
+> <!-- 添加事件监听器时使用事件捕获模式 -->
+> <!-- 即内部元素触发的事件先在此处理，然后才交由内部元素进行处理 -->
+> <div v-on:click.capture="doThis">...</div>
+> 
+> <!-- 只当在 event.target 是当前元素自身时触发处理函数 -->
+> <!-- 即事件不是从内部元素触发的 -->
+> <div v-on:click.self="doThat">...</div>
+> 
+> <!-- 点击事件将只会触发一次 不像其它只能对原生的 DOM 事件起作用的修饰符，.once 修饰符还能被用到自定义的组件事件上。如果你还没有阅读关于组件的文档，现在大可不必担心。-->
+> <a v-on:click.once="doThis"></a>
+> 
+> <!-- 滚动事件的默认行为 (即滚动行为) 将会立即触发 -->
+> <!-- 而不会等待 `onScroll` 完成  -->
+> <!-- 这其中包含 `event.preventDefault()` 的情况 -->
+> <!--不要把 .passive 和 .prevent 一起使用，因为 .prevent 将会被忽略，同时浏览器可能会向你展示一个警告。请记住，.passive 会告诉浏览器你不想阻止事件的默认行为。-->
+> <div v-on:scroll.passive="onScroll">...</div>
+> ```
+>
+> **使用修饰符时，顺序很重要**；相应的代码会以同样的顺序产生。因此，用 `v-on:click.prevent.self` 会阻止**所有的点击**，而 `v-on:click.self.prevent` 只会阻止对元素自身的点击。
+
+## 5. 按键修饰符
+
+```
+<!-- 只有在 `key` 是 `Enter` 时调用 `vm.submit()` -->
+<input v-on:keyup.enter="submit">
+<!--简略写法-->
+<input @keyup.enter="submit">
+
+### 直接将 KeyboardEvent.key 暴露的任意有效按键名转换为 kebab-case 来作为修饰符
+<input v-on:keyup.page-down="onPageDown"> //处理函数只会在 $event.key 等于 PageDown 时被调用
+
+### keyCode 的事件用法已经被废弃了并可能不会被最新的浏览器支持。
+使用 keyCode attribute 也是允许的：
+<input v-on:keyup.13="submit">
+为了在必要的情况下支持旧浏览器，Vue 提供了绝大多数常用的按键码的别名：
+.enter
+.tab
+.delete (捕获“删除”和“退格”键)
+.esc
+.space
+.up
+.down
+.left
+.right
+
+### 有一些按键 (.esc 以及所有的方向键) 在 IE9 中有不同的 key 值, 如果你想支持 IE9，这些内置的别名应该是首选。
+你还可以通过全局 config.keyCodes 对象自定义按键修饰符别名：
+
+// 可以使用 `v-on:keyup.f1`
+Vue.config.keyCodes.f1 = 
+```
+
+### 范例
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="box">
+      <input type="text" @keyup="handleKeyUp" v-model="myText">
+    </div>
+
+    <script>
+     new Vue({
+         el:"#box",
+         data:{
+            myText:"aa",
+         },
+         methods:{
+            handleKeyUp(evt){
+                console.log(this.myText+"==="+evt.keyCode);
+            },
+           
+         }
+     });
+    </script>
+</body>
+</html>
+```
+
+## 6. 系统修饰键
+
+可以用如下修饰符来实现仅在按下相应按键时才触发鼠标或键盘事件的监听器。
+
+- `.ctrl`
+- `.alt`
+- `.shift`
+- `.meta`
+
+```
+<!-- Alt + C -->
+<input v-on:keyup.alt.67="clear">
+<!--简略写法-->
+<input @keyup.alt.67="clear">
+
+<!-- Ctrl + Click -->
+<div v-on:click.ctrl="doSomething">Do something</div>
+
+### 请注意修饰键与常规按键不同，在和 keyup 事件一起用时，事件触发时修饰键必须处于按下状态。换句话说，只有在按住 ctrl 的情况下释放其它按键，才能触发 keyup.ctrl。而单单释放 ctrl 也不会触发事件。如果你想要这样的行为，请为 ctrl 换用 keyCode：keyup.17。
+```
+
+### `.exact` 修饰符
+
+```
+.exact 修饰符允许你控制由精确的系统修饰符组合触发的事件。
+```
+
+### 鼠标按钮修饰符
+
+```
+.left
+.right
+.middle
+这些修饰符会限制处理函数仅响应特定的鼠标按钮。
+```
 
 # 表单控件绑定
 
-# 计算属性
+> `v-model` 会忽略所有表单元素的 `value`、`checked`、`selected` attribute 的初始值而总是将 Vue 实例的数据作为数据来源。
+
+## 范例:基础绑定范例
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="box">
+        <!-- 绑定文本框 -->
+        <div>
+        用户名：<input type="text" v-model="myText">
+            <input type="checkbox" v-model="isRemember">记住用户名
+            <button @click="handLogin">登录</button>
+        </div>
+
+        <!-- checkbox 组 双向绑定，会自动更新所选项数组-->
+        <div>
+            <h1>注册页面-兴趣爱好</h1>
+            <input type="checkbox" v-model="checkList" value="0"/> vue
+            <input type="checkbox" v-model="checkList" value="1"/>react
+            <input type="checkbox" v-model="checkList" value="2"/>java
+            {{checkList}}
+        </div>
+        <!-- 单选按钮 -->
+        <h1>性别选择</h1>
+        <div>
+                <input type="radio" v-model="sex" value="0"/> 男
+                <input type="radio" v-model="sex" value="1"/>女
+                {{sex}}
+        </div>
+        <!-- 下拉选 如果 v-model 表达式的初始值未能匹配任何选项，<select> 元素将被渲染为“未选中”状态。 -->
+        <div>
+            <h1>单项下拉选</h1>
+            <select v-model="select">
+                <option disabled  value="">请选择</option>
+                <option value="aaa">aaa</option>
+                <option value="bbb">bbb</option>
+                <option value="ccc">ccc</option>
+            </select>
+            <span>{{select}}</span>
+        </div>
+
+        <div>
+            <h1>多选下拉选——多选时 (绑定到一个数组)：</h1>
+            <select v-model="selected" multiple >
+                    <option disabled  value="">请选择</option>
+                    <option  value="aaa">aaa</option>
+                    <option value="bbb">bbb</option>
+                    <option value="ccc">ccc</option>
+                </select>
+                <span>{{selected}}</span>
+        </div>
+    </div>
+
+    <script>
+     new Vue({
+         el:"#box",
+         data:{
+            myText:localStorage.getItem("userName"),
+            isRemember:true,
+            checkList:[],
+            sex:"",
+            select:"",
+            selected:[],
+         },
+         methods:{
+            handLogin(evt){
+                if(this.isRemember){
+                    console.log("aaa");
+                    localStorage.setItem("userName",this.myText);//保存用户名到本地
+                }
+            },
+         }
+     });
+    </script>
+</body>
+</html>
+```
+
+## 范例：vue3.0 购物车
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.global.js"></script>
+    <title>Document</title>
+    <style>
+       li{
+           display: flex,
+           
+       }
+    </style>
+</head>
+<body>
+    <div id="box">
+        <div><input type="checkbox" v-model="isCheckAll"   @change="selectAll">全选/全不选</div>
+        <ul>
+            <li v-for="(item,index) in dataList" :key="item.id" >
+                <!-- v-model，在Vue3中，对象和数组的双向绑定不需手动处理。可以双向绑定整个对象 -->
+                <input type="checkbox" v-model="checkList" :value="item" @change="handleCheckItem()"/>
+                <img :src="item.imgUrl" alt="">
+                商品: {{item.name}}
+                价格: {{item.price}}
+                <button @click="item.number--;sum();" :disabled="item.number===1">-</button>
+                {{item.number}}
+                <button @click="item.number++;sum();" :disabled="item.number===item.limit">+</button>
+                <button @click="handleDel(item.id)">删除</button>
+            </li>
+        </ul>
+        <div>
+            总价： {{sum()}}
+
+           
+        </div>
+    </div>
+    <script>
+        var obj={
+            data(){
+                return{
+                    //total:0,
+                    checkList:[],
+                    isCheckAll:false,
+                    dataList:[{
+                        id:1,
+                        name:"商品1",
+                        price:10,
+                        limit:5,
+                        number:0,
+                        imgUrl:"",
+                    },{
+                        id:2,
+                        name:"商品2",
+                        price:20,
+                        limit:10,
+                        number:0,
+                        imgUrl:"",
+                    },{
+                        id:3,
+                        name:"商品3",
+                        price:30,
+                        limit:15,
+                        number:0,
+                        imgUrl:"",
+                    }],
+                }
+            },
+            methods:{
+                handleDel(id){
+                    this.dataList=this.dataList.filter(item => item.id != id);
+                    //this.dataList.splice(index,1);
+                    this.checkList=this.checkList.filter(item=> item.id !=id);
+                    //同步选中事件
+                    this.handleCheckItem();
+                    console.log(this.dataList);
+                },
+                sum(){
+                    var tmpTotal=0;
+                    this.checkList.forEach(item => {tmpTotal += (item.price * item.number)});
+                    return tmpTotal;
+                },
+                //自动选中全选/全不选
+                handleCheckItem(){
+                    this.checkList.length===this.dataList.length ? this.isCheckAll=true : this.isCheckAll=false;
+                },
+                //全选&全不选
+                selectAll(){
+                    console.log(this.isCheckAll);
+                    this.isCheckAll?this.checkList= this.dataList : this.checkList =[];
+                }
+            }
+        }
+       Vue.createApp(obj).mount("#box");
+    </script>
+    
+</body>
+</html>
+```
+
+## 表单修饰符
+
+### `.laze`
+
+在默认情况下，`v-model` 在每次 `input` 事件触发后将输入框的值与数据进行同步 (除了[上述](https://cn.vuejs.org/v2/guide/forms.html#vmodel-ime-tip)输入法组合文字时)。你可以添加 `lazy` 修饰符，从而转为在 `change` 事件_之后_进行同步：
+
+```
+<!-- 在“change”时而非“input”时更新 -->
+<input v-model.lazy="msg">
+```
+
+### `.number`
+
+如果想自动将用户的输入值转为数值类型，可以给 `v-model` 添加 `number` 修饰符：
+
+```
+<input v-model.number="age" type="number">
+```
+
+这通常很有用，因为即使在 `type="number"` 时，HTML 输入元素的值也总会返回字符串。如果这个值无法被 `parseFloat()` 解析，则会返回原始的值。
+
+### `.trim`
+
+如果要自动过滤用户输入的首尾空白字符，可以给 `v-model` 添加 `trim` 修饰符：
+
+```
+<input v-model.trim="msg">
+```
+
+# 计算属性(`computed`)
+
+> 计算属性：负责逻辑放在计算属性实现。通过逻辑计算，获取想要的数据形式或状态。
+> 优点：防止模板过重，难以维护。
+>
+> 在Vue中，计算属性有独立的模块`computed`，其内定义的属性类似函数定义，但是在页面引用的时候，以全局变量的方式引用.
+>
+> 计算属性存在的意义：将一些需要通过简单的逻辑/数字等运算才能得到的数据，集中在`computed`模块中处理。使代码美观，使用简便清晰，相对函数更高效。
+>
+> 计算属性有缓存，但是基于依赖的缓存：所谓的依赖只的是计算结果依赖计算过程中的变量，当变量值发生改变时，属性计算结果也会发生改变。
+>
+> ```
+> <!DOCTYPE html>
+> <html lang="en">
+> <head>
+>     <meta charset="UTF-8">
+>     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+>     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+>     <script src="./plugins/vue.min.js"></script>
+>     <title>Document</title>
+> </head>
+> <body>
+>     <div id="box">
+>         <!-- 首字母大写 -->
+>            {{myText.substring(0,1).toUpperCase() + myText.substring(1)}}
+>         <!-- 显示计算属性中的属性值，不能使用myComputedName()引用 -->
+>            {{myComputedName}}
+>     </div>
+>     <script>
+>       new Vue({
+>           el:"#box",
+>           data:{
+>               myText:"hello"
+>           },
+>           computed:{
+>               myComputedName(){
+>                   return this.myText.substring(0,1).toUpperCase() + this.myText.substring(1);
+>               }
+>           }
+>       })
+>     </script>
+> </body>
+> </html>
+> ```
+
+# `watch`
+
+> `watch`监听某个状态的改变。可以在其中定义逻辑。
+> 适用于类似`ajax`等异步改变数据状态的场景，常规的事件触发函数的写法，对于异步改变状态值的场景不适用。
+
+## 对比
+
+> - `data`:状态,被拦截
+> - `method`:主要用于定义事件绑定的函数，进行一些复杂的逻辑运算。可以不用return,没有缓存；
+> - `computed`:计算结果(重视结果)，解决模板过重问题，必须有return,只求结果，有缓存，只能做同步；
+> - `watch`:重视过程，监听一个值的改变。不用返回值，异步同步
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="box">
+       <input type="text" v-model="myText"/>
+       <ul>
+           <li v-for="item in dataList">{{item}}</li>
+       </ul>
+    </div>
+    <script>
+      new Vue({
+          el:"#box",
+          data:{
+              myText:"",
+              dataList:["aaa","bbb","ccc"],
+              originList:["aaa","bbb","ccc"],
+          },
+          watch:{
+              //参数可选，newVal：状态最新值；oriVal:状态改变前的值
+              myText(newVal,oriVal){//watch定义的函数名，需与监听的状态相同，表明监听的是哪个状态的改变
+                console.log("改变了"+newVal+"==="+oriVal);//当myText一发生改变，就会被监听到
+                setTimeout(()=>{//当异步改变状态值时，会被监听到
+                      this.dataList=this.originList.filter(item=>item.includes(newVal))
+                  },1000)
+              }
+          }
+      })
+    </script>
+</body>
+</html>
+```
+
+# `fetch&axios`
+
+> XMLHttpRequest是一个设计粗糙的API,配置和调用方法非常混乱.原始定义http请求标准，也可直接在浏览器中使用。基于 Promise
+>
+> `fetch`：定义的标准，不需任何引用，可直接在浏览器中使用。针对`XMLHttpRequest`有了些优化。`fetch`兼容性不是很好。
+>
+> ![image-20220303130118972](images/image-20220303130118972.png)
+>
+> - [window.fetch polyfill](https://github.com/camsong/fetch-ie8)
+> - [fetch介绍](https://developer.mozilla.org/zh-CN/docs/Web/API/Fetch_API/Using_Fetch)
+>   [Fetch API](https://developer.mozilla.org/zh-CN/docs/Web/API/Fetch_API) 提供了一个 JavaScript 接口，用于访问和操纵 HTTP 管道的一些具体部分，例如请求和响应。它还提供了一个全局 [`fetch()`](https://developer.mozilla.org/zh-CN/docs/Web/API/fetch) 方法，该方法提供了一种简单，合理的方式来跨网络异步获取资源。
+> - 浏览器兼容性查询网址：https://caniuse.com/   
+>   <img src="images/image-20220303131057364.png" alt="image-20220303131057364" style="zoom:50%;" />
+
+## `fetch-get`
+
+- **范例**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+        <div id="box">
+            <input type="text" />
+            <button @click="handleFetch"> fetch数据</button>
+        </div>
+
+    <script>
+        new Vue({
+            el:"#box",
+            data:{
+            	testData:{},
+            },
+            methods:{
+                handleFetch(){
+                    fetch("./json/data.json")//在同一服务器下，可省略项目访问地址：http://localhost:8080/
+                   // .then(res=>res.json()) //简略写法
+                    .then(res=>{
+                        //此时只能拿到状态码，响应头，获取不到数据
+                        console.log(res);
+                        //结果：Response {type: 'basic', url: 'http://127.0.0.1:5500/MyDemo/json/data.json', redirected: false, status: 200, ok: true, …}
+                        // res.text() //返回的是字符串
+                        return res.json();//将数据返回
+                    })
+                    .then(res=>{
+                        console.log(res);
+                       //结果： {name: 'lisi', age: 2, sex: 'f'}
+                       this.testData=res;//将获取的数据赋值
+                    })
+                    .catch(err=>{
+                        console.log(err)
+                    })
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+```
+
+## `fetch-post`
+
+> `fetch post`请求需设置请求数据类型.原因：get的数据形式唯一，而post数据形式需选择。
+>
+> ```
+> get   url路径？name=lisi&age=10
+> post  body请求体
+> 1）x-www-formurlencoded  :name=lisi&age=10
+> 2) json :{"name":"lisi","age":10}
+> ....
+> ```
+
+```
+fetch('/users', {
+  method: 'post',
+  headers: {//设置请求头数据类型
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({//请求体
+    name: 'Hubot',
+    login: 'hubot',
+  })
+})
+```
+
+### 范例
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+        <div id="box">
+            <input type="text" />
+            <button @click="handleFetch"> fetch数据</button>
+            <button @click="handleFetch2"> fetch数据</button>
+        </div>
+
+    <script>
+        new Vue({
+            el:"#box",
+            data:{},
+            methods:{
+                handleFetch(){
+                    fetch("./json/getData",{//post不支持直接请求静态资源
+                        method:"post",
+                        headers:{
+                            "Content-Type":"application/x-www-form-urlencoded",
+                        },
+                        body:"name=lisi&age=10"
+                    })//在同一服务器下，可省略项目访问地址：http://localhost:8080/
+                   // .then(res=>res.json()) //简略写法
+                    .then(res=>{
+                        //此时只能拿到状态码，响应头，获取不到数据
+                        console.log(res);
+                        //结果：Response {type: 'basic', url: 'http://127.0.0.1:5500/MyDemo/json/data.json', redirected: false, status: 200, ok: true, …}
+                        // res.text() //返回的是字符串
+                        return res.json();//将数据以Json形式返回
+                    })
+                    .then(res=>{
+                        console.log(res);
+                       //结果： {name: 'lisi', age: 2, sex: 'f'}
+                    })
+                    .catch(err=>{
+                        console.log(err)
+                    })
+                },
+                handleFetch2(){
+                    fetch("./json/getData",{//post不支持直接请求静态资源
+                        method:"post",
+                        headers:{
+                            "Content-Type":"application/json",
+                        },
+                        body:JSON.stringify({"":"lisi","age":10})
+                    })//在同一服务器下，可省略项目访问地址：http://localhost:8080/
+                   // .then(res=>res.json()) //简略写法
+                    .then(res=>{
+                        //此时只能拿到状态码，响应头，获取不到数据
+                        console.log(res);
+                        //结果：Response {type: 'basic', url: 'http://127.0.0.1:5500/MyDemo/json/data.json', redirected: false, status: 200, ok: true, …}
+                        // res.text() //返回的是字符串
+                        return res.json();//将数据以Json形式返回
+                    })
+                    .then(res=>{
+                        console.log(res);
+                       //结果： {name: 'lisi', age: 2, sex: 'f'}
+                    })
+                    .catch(err=>{
+                        console.log(err)
+                    })
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+```
+
+# axios
+
+> `axios`第三方插件，异步请求数据插件
+>
+> [中文说明文档](http://www.axios-js.com/docs/)
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <script src="./plugins/axios/axios.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+        <div id="box">
+            <button @click="handleFetch"> fetch数据</button>
+        </div>
+
+    <script>
+        new Vue({
+            el:"#box",
+            data:{},
+            methods:{
+                handleFetch(){
+                    axios.get("./json/data.json").then(
+                        res=>{
+                            console.log(res);//包含响应后的所有数据:包含请求头等信息
+                            console.log(res.data);//响应数据
+                        }
+                    );
+                }
+            }
+               
+        });
+    </script>
+</body>
+</html>
+```
+
+# 过滤器
+
+> **备注：Vue3 不支持过滤器**
+>
+> Vue.js 允许你自定义过滤器，可被用于一些常见的文本格式化。过滤器可以用在两个地方：**双花括号插值和 `v-bind` 表达式** (后者从 2.1.0+ 开始支持)。过滤器应该被添加在 JavaScript 表达式的尾部，由“管道”符号指示：
+>
+> ```
+> <!-- 在双花括号中 -->
+> {{ message | capitalize }}
+> 
+> <!-- 在 `v-bind` 中 -->
+> <div v-bind:id="rawId | formatId"></div>
+> ```
+>
+> 1. **一个组件的选项中定义本地的过滤器**：
+>
+> ```
+> filters: {
+>   capitalize: function (value) {
+>     if (!value) return ''
+>     value = value.toString()
+>     return value.charAt(0).toUpperCase() + value.slice(1)
+>   }
+> }
+> ```
+>
+> 2. **在创建 Vue 实例之前全局定义过滤器**：
+>
+> ```
+> Vue.filter('capitalize', function (value) {
+>   if (!value) return ''
+>   value = value.toString()
+>   return value.charAt(0).toUpperCase() + value.slice(1)
+> })
+> 
+> new Vue({
+>   // ...
+> })
+> ```
+
+## **范例**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <script src="./plugins/axios/axios.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+        <div id="box">
+                <button @click="handleFetch"> fetch数据</button>
+            <ul>
+                <li v-for="item in dataList">
+                    <span>name:{{item.name}}</span>
+                    
+                    <!-- <img :src="handleImgUrl()" alt="">  处理图片中特殊字符，原始处理方式，定义在methods的函数中进行处理，代码不够美观-->
+                    <!-- 管道方式，参照angular. |号前的值，为 | 后函数的参数 -->
+                    <img :src="item.img | imgFilter" />
+                </li>
+            </ul>
+            
+        </div>
+
+    <script>
+        Vue.filter("imgFilter",(url)=>{
+            return url.replace("dd",'')+"dadf";
+        });
+        new Vue({
+            el:"#box",
+            data:{
+                dataList:[],
+            },
+            methods:{
+                handleFetch(){
+                    axios.get("./json/data.json").then(
+                        res=>{
+                           this.dataList=res.data;
+                        }
+                    );
+                },
+                handleImgUrl(){
+                    
+                }
+            }
+               
+        });
+    </script>
+</body>
+</html>
+```
+
+# 组件
+
+> - **为什么组件化**：扩展HTML元素，封装可重用代码。将`js,css,dom`封装在一个模块中，扩展HTML元素，提高代码复用性。
+> - **组件的分类**：全局组件&局部组件
+> - **需要组件封装的情况**
+>   1）在多处重复使用的代码，css,dom等，可以封装成一个组件；
+>   2）独立功能，也可以封装成一个组件
+>   组件的封装的主要意义是：方便代码复用
+
+## 全局组件&局部组件
+
+### **目前原始组件定义注意事项&缺点**
+
+> 1. 名称：js驼峰写法，html使用链接符 `-`；
+> 2. dom片段：没有代码提示，没有高亮显示 ——vue单文件组件解决；
+> 3. css只能写成行内——vue单文件组件解决；
+> 4. template 只能包含一个根节点；
+> 5. 组件是孤岛，无法【直接】访问外面的组件的状态或者方法。——间接的组件通信来交流；
+> 6. 自定义的组件：data必须是一个函数；
+> 7. 所有组件都在一起，显得很混乱——vue单文件解决
+
+### 全局组件定义
+
+> - 自定义的组件，只能在Vue实例化的根节点中使用；
+> - 全局组件可以在Vue绑定的根节点下任意位置使用；
+
+- **范例**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+        <div id="box">
+              <navbar></navbar>
+            
+        </div>
+
+    <script>
+        // 定义一个全局组件 navbar。组件是一个封闭区间，外部无法直接进行操作。注意：Vue中组件名最好使用小写，多个单词用 -  连接
+       Vue.component("navbar",{
+           data(){//在组件中的data必须是函数形式的写法
+               return {
+                   myText:"aaa",
+               }
+           },
+           //dom,js,css
+           template:`<div><button @click='handleLeft' style='background-color:red'>
+            left</button>猫眼{{myText}}<button @click='handleRight'>right</button></div>`,
+           methods:{
+            handleLeft(){
+                console.log("left");
+            },
+            handleRight(){
+                console.log("right");
+            }
+           },
+           watch:{},
+           computed:{}
+       });
+        new Vue({
+            el:"#box",
+        });
+    </script>
+</body>
+</html>
+```
+
+### 局部组件定义
+
+> 局部组件只能在其定义的节点内使用。如：在`<div></div>`包裹中定义的局部组件，只能在其内使用
+
+- **范例**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+        <div id="box">
+              <part-div></part-div>
+        </div>
+    <script>
+        new Vue({
+            el:"#box",
+            components:{//局部组件：只能在其定义的dom元素内使用
+                "part-div":{
+                data(){
+                    return {
+                        myText:"dddd",
+                    }
+                },
+                template:`<div><button @click='handleLeft' style='background-color:red'>
+            left</button>猫眼{{myText}}<button @click='handleRight'>right</button></div>`,
+            methods:{
+            handleLeft(){
+                console.log("left");
+            },
+            handleRight(){
+                console.log("right");
+            }
+           },
+        }}
+        });
+    </script>
+</body>
+</html>
+```
 
 
+
+## 父传子
+
+> 从父组件向子组件传递数据
+
+- **范例**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+        <div id="box">
+            <div style="background-color:yellow">根组件标题</div>
+            <!-- 传递布尔值时，需动态传递。若使用myright="false"传递的是一个字符串 -->
+              <navbar myname="电影" :myright="false"></navbar>
+              <navbar myname="电视剧" :myright="true"></navbar>
+        </div>
+    <script>
+       Vue.component("navbar",{
+           data(){
+               return {
+                   myText:"aaa",
+               }
+           },
+           props:["myname","myright"],//定义接收父组件的属性名
+           //dom,js,css
+           template:`<div  style='background-color:red'>
+           <button @click='handleLeft' v-show='myright'>left</button>
+            {{myname}} //显示父组件传递过来的属性值
+            <button @click='handleRight' v-show='myright'>right</button></div>`,
+           methods:{
+            handleLeft(){
+                console.log("left");
+            },
+            handleRight(){
+                console.log("right");
+            }
+           },
+           watch:{},
+           computed:{}
+       });
+        new Vue({
+            el:"#box",//根组件
+        });
+    </script>
+</body>
+</html>
+```
+
+## 属性验证&默认属性
+
+> - 从父组件向子组件传递数据时，可以预先定义子组件属性类型
+
+- **范例**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+        <div id="box">
+            <div style="background-color:yellow">根组件标题</div>
+              <navbar myname="电影" :myright="false"></navbar>
+              <navbar myname="电视剧" :myright="true"></navbar>
+              <navbar myname="电视剧"></navbar>
+        </div>
+    <script>
+       Vue.component("navbar",{
+           data(){
+               return {
+                   myText:"aaa",
+               }
+           },
+           //props:["myname","myright"],//方式1：定义接收父组件的属性名，未定义属性类型
+           /**
+           props:{//确定好接收父组件传递的数据类型，父组件须传递对应类型的数据给子组件，否则会报错
+               myname:String,
+               myright:Boolean
+               },
+               **/
+            props:{//定义属性的默认属性,当使用组件时，没有在组件标签中使用定义的组件属性，此时需要给该属性一个默认值，以免属性值被其他标签的相同属性影响
+                myname:{
+                    type:String,//属性验证：定义接收属性值的数据类型
+                    default:""//属性默认值：当没有使用该属性时，默认该属性值为定义的默认值
+                },
+                myright:{
+                    type:Boolean,
+                    default:false
+                }
+            } ,
+           //dom,js,css
+           template:`<div  style='background-color:red'>
+           <button @click='handleLeft' v-show='myright'>left</button>
+            {{myname}} //显示父组件传递过来的属性值
+            <button @click='handleRight' v-show='myright'>right</button></div>`,
+           methods:{
+            handleLeft(){
+                console.log("left");
+            },
+            handleRight(){
+                console.log("right");
+            }
+           },
+           watch:{},
+           computed:{}
+       });
+        new Vue({
+            el:"#box",//根组件
+        });
+    </script>
+</body>
+</html>
+```
+
+
+
+## 子传父
+
+> 子组件给父组件传递参数
+
+- **范例**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+        <div id="box">
+              <navbar @myevent="handleEvent"></navbar>
+              <sidebar v-show="isShow"></sidebar>
+
+              
+        </div>
+    <script>
+       Vue.component("navbar",{
+           data(){
+               return {
+                   myText:"aaa",
+               }
+           },
+           
+           template:`<div  style='background-color:red'>
+           <button @click='handleClick'>点击显示/隐藏</button>`,
+           methods:{
+            handleClick(){
+                console.log("告诉父组件，改变isShow的值");
+                //emit 触发事件  myevent：自定义监听事件  触发父组件定义的函数
+                this.$emit("myevent");
+                //this.$emit("myevent",10000);//子向父组件传递参数
+            },
+           
+           },
+       });
+       Vue.component("sidebar",{
+           template:`<div style="backgroun-color:yellow" >
+                <ul>
+                    <li>dddd</li>
+                    <li>dddd</li>
+                    <li>dddd</li>
+                </ul>
+              </div>`,
+           
+       });
+        new Vue({
+            el:"#box",//根组件
+            data:{
+                isShow:true
+            },
+            methods:{
+                handleEvent(data){//data=10000
+                    console.log("父组件事件");
+                    this.isShow=!this.isShow;
+                },
+            }
+        });
+    </script>
+</body>
+</html>
+```
+
+# 中间人模式
+
+# 中央事件总线
 
 # 参考资料
 
