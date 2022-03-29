@@ -11,3 +11,18 @@ netstat -ano | findstr "LISTENING" | findstr ":8080"
 C:\Users\12613>taskkill /f /pid 17024
 ```
 
+## 查看IP&物理地址信息
+
+```
+### 查看本机所有网络配置信息
+ipconfig /all
+```
+
+
+
+## 查看本机开启的端口
+
+```
+netstat -a -n
+```
+

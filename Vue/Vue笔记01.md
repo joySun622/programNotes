@@ -2162,8 +2162,6 @@ fetch('/users', {
         <div id="box">
               <navbar @myevent="handleEvent"></navbar>
               <sidebar v-show="isShow"></sidebar>
-
-              
         </div>
     <script>
        Vue.component("navbar",{
@@ -2212,12 +2210,1305 @@ fetch('/users', {
 </html>
 ```
 
-# 中间人模式
+## 中间人模式
 
-# 中央事件总线
+<img src="images/image-20220310080714492.png" alt="image-20220310080714492" style="zoom:50%;" />
+
+- **范例**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <script src="./plugins/axios/axios.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+        <div id="box">
+              <button @click="handleFetch">获取数据</button>
+              <!-- 组件1 -->
+              <my-item v-for="item in dataList" :key="item.id" :itemdata="item" @myevent="handleEvent"></my-item>
+              <!-- 组件2 -->
+              <item-detail :item-text="itemText"></item-detail>
+
+              
+        </div>
+    <script>
+       Vue.component("my-item",{
+           props:["itemdata"],
+           template:`
+           <div>
+              {{itemdata.name}} -- {{itemdata.age}}
+              <button @click='handleClick'>显示详情</button>
+           <div>
+           `,
+           methods:{
+            handleClick(){
+                console.log("将信息传递给父组件");
+                //emit 触发事件  myevent：自定义监听事件  触发父组件定义的函数
+                console.log(this.itemdata);
+                //触发父组件事件，传递数据给父组件
+                this.$emit("myevent",this.itemdata.name);
+            },
+           
+           },
+       });
+       Vue.component("item-detail",{
+           props:["itemText"],
+           template:`<div style="backgroun-color:yellow;float:right;" >
+                {{itemText}}
+              </div>`,
+           
+       });
+        new Vue({
+            el:"#box",//根组件
+            data:{
+                dataList:[],
+                itemText:"",
+                itemdata:{}
+            },
+            methods:{
+                handleFetch(){
+                    axios.get("./json/data.json").then(
+                        res=>{
+                            console.log(res);//响应请求所有数据:包含请求头等信息
+                            console.log(res.data);//响应数据
+                            this.dataList=res.data;
+                        }
+                    );
+                },
+                handleEvent(data){
+                    //接收子组件传来的数据
+                    this.itemText=data;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+```
+
+## 中央事件总线
+
+- **原理**
+  ![image-20220310133700916](images/image-20220310133700916.png)
+- **范例**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <script src="./plugins/axios/axios.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+        <div id="box">
+              <button @click="handleFetch">获取数据</button>
+              <!-- 组件1 -->
+              <my-item v-for="item in dataList" :key="item.id" :itemdata="item"></my-item>
+              <!-- 组件2 -->
+              <item-detail></item-detail>
+
+              
+        </div>
+    <script>
+       var bus = new Vue();
+       Vue.component("my-item",{
+           props:["itemdata"],
+           template:`
+           <div>
+              {{itemdata.name}} -- {{itemdata.age}}
+              <button @click='handleClick'>显示详情</button>
+           <div>
+           `,
+           methods:{
+            handleClick(){
+                console.log("将信息传递给父组件");
+                //emit 触发事件  myevent：自定义监听事件  触发父组件定义的函数
+                console.log(this.itemdata);
+                bus.$emit("myevent",this.itemdata.name);
+            },
+           
+           },
+       });
+       Vue.component("item-detail",{
+           data(){
+               return {
+                   info:"",
+               }
+           },
+           mounted(){//当前组件上树后触发
+                console.log("当前组件上树后触发");
+                bus.$on("myevent",(data)=>{
+                    this.info=data;
+                })
+           },
+           template:`<div style="backgroun-color:yellow;float:right;" >
+                {{info}}
+              </div>`,
+           
+       });
+        new Vue({
+            el:"#box",//根组件
+            data:{
+                dataList:[],
+            },
+            methods:{
+                handleFetch(){
+                    axios.get("./json/data.json").then(
+                        res=>{
+                            console.log(res);//响应请求所有数据:包含请求头等信息
+                            console.log(res.data);//响应数据
+                            this.dataList=res.data;
+                        }
+                    );
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+```
+
+## ref组件通信
+
+> - `ref`绑定是dom节点，获取是dom原生对象；
+> - `ref`绑定的是组件，获取的就是组件对象；
+>
+> **优点**：
+> 通过ref,父子间通信变动十分简单；
+> `ref`的本质是定义一个全局变量，然后通过`vueObject.$refs.myattributeName`可以在任意组件中获得对应的dom对象或者子组件对象，然后就可以对不同组件的状态进行操作。
+>
+> **缺点**：
+>
+> 使用`ref`进行通信，组件的状态变得不再私有，而是完全对外公开，容易导致组件状态被其他组件更改，不方便管理。
+
+- **范例**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+        <div id="box">
+            <input type="text" ref="mytext" v-model="p_text"/>
+            <button @click="showInput">显示input</button>
+
+            <child ref="childItem"></child>
+        </div>
+    <script>
+       Vue.component("child",{
+           data(){
+               return {
+                  childText:""  
+               }
+           },
+           template:`
+           <div>
+              <input type="text" v-model="childText"/>
+              <button @click='handleClick'>child显示input</button>
+           <div>
+           `,
+           methods:{
+            handleClick(){
+                //获取父组件input值
+                console.log(vm.$refs.mytext);
+                //修改父组件状态
+                vm.$refs.mytext.value="dasdsss";
+            },
+           }
+       });
+      
+       var vm= new Vue({
+            el:"#box",//根组件
+            data:{
+                p_text:""  
+            },
+            methods:{
+                showInput(){
+                    //绑定dom，获取的dom对象
+                    console.log(this.$refs.mytext);
+                    //获取input值
+                    console.log(this.$refs.mytext.value);
+                    //获取子组件对象
+                    console.log(this.$refs.childItem)
+                    //获取子组件状态
+                    console.log(this.$refs.childItem.childText)
+                    //修改子组件状态
+                    this.$refs.childItem.childText="ddddda";
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+```
+
+## 组件注意事项
+
+1. 属性：父组件传递给子组件的属性，只有父组件可以修改，不允许子组件随意修改；
+2. 状态：组件内部的状态，可以随意修改；
+3. `v-once`在组件上的作用：
+   渲染普通HTML元素在Vue中是非常快速的，但当一个组件包含大量静态内容，这种情况下，在组件的根元素上添加`v-once`属性，以确保这些内容只计算一次，然后缓存起来。
+
+## 动态组件
+
+> 1. `is`控制组件切换；
+> 2. `keep-alive`:使组件不失活；
+
+- **范例**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <script src="./plugins/axios/axios.min.js"></script>
+    <title>Document</title>
+    <style>
+        #box {
+            width:40%;
+            height: 80%;
+         }
+         footer ul{
+            display: flex;
+            position: fixed;
+            left: 0px;
+            bottom: 0px;
+            width: 40%;
+            height: 40%;
+         }
+        footer ul li{
+            flex:1;
+            text-align:center;
+            list-style:none;
+            height:40px;
+            line-height:40px;
+            background-color: aquamarine
+         }
+    </style>
+</head>
+<body>
+        <div id="box" >
+            <!-- 选项卡功能 -->
+             <!-- is属性控制不同 -->
+             <keep-alive>  <!-- keep-alive 可以让失活的组件缓存下来，当切换时另一个组件上的数据会被缓存下来，不会消失 -->
+               <component :is="which"></component>
+            </keep-alive>
+              <footer>
+                  <ul>
+                      <li @click="which='home'" >首页</li>
+                      <li @click="which='shopitem'" >列表</li>
+                      <li @click="which='shopcar'" >购物车</li>
+                  </ul>
+              </footer>
+        </div>
+    <script>
+       Vue.component("home",{
+          template:`
+          <div>
+            home:<input type="text"/>
+          </div>
+          `
+       });
+       Vue.component("shopcar",{
+           template:`<div style="backgroun-color:yellow" >
+                shopcar
+              </div>`,
+           
+       });
+       Vue.component("shopitem",{
+        template:`<div style="backgroun-color:yellow" >
+                shopitem
+              </div>`,
+        });
+        new Vue({
+            el:"#box",//根组件
+            data:{
+                which:"home"
+            }
+           
+        });
+    </script>
+</body>
+</html>
+```
+
+## `slot`
+
+### `slot 老写法`
+
+> `slot`插槽：可以将在组件标签里的dom元素里的内容，放入插槽定义的地方显示
+>
+> - 单个插槽：简单的定义`<slot></slot>`;会将包含在组件标签里所有dom元素内容插入到<slot>定义位置处。当定义多个`slot`,dom元素内容会重复显示多次；
+> - 具名插槽：`<slot name="a"></slot>`给插槽定义一个`name`属性，进行区别。`name`属性值与组件标签内`dom`元素定义的`slot`属性值一致；会将相同属性值的`dom`元素内容插入到对应`slot`处；
+>
+> **插槽的意义**：扩展组件的能力，提高组件的复用性；
+>
+> - 混合父组件的内容与子组件自己的模板--> 内容分发；
+> - 父组件模板的内容在父组件作用域内编译；子组件模板的内容在子组件作用域内编译
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+        <div id="box">
+            <child>
+                <div slot="a">1111111</div>
+                <div slot="b">2222222</div>
+                <div slot="c">3333333</div>
+                <div>4444444</div>
+            </child> 
+            <!-- 使用插槽，实现不同形式元素定义 -->
+            <narvbar>
+                <button slot="left">left</button>
+                <i slot="right" style="background-color:aqua">right 文字图标</i>
+            </narvbar>
+        </div>
+    <script>
+    // 单个插槽 <slot></slot>，会将组件标签中包含的所有dom内容，插入slot定义处 
+       Vue.component("child",{
+           template:`
+           <div>
+            child
+            <slot name="a"></slot> 
+            <slot name="b"></slot> 
+            <slot name="c"></slot> 
+            <slot></slot> 
+           <div>
+           `,
+       });
+       //使用插槽，让组件dom元素定义更丰富
+       Vue.component("narvbar",{
+           template:`
+           <div>
+            <slot name="left"></slot> 
+            <span>narvbar</span>
+            <slot name="right"></slot> 
+           <div>
+           `,
+       });
+        new Vue({
+            el:"#box",//根组件
+        });
+    </script>
+</body>
+</html>
+```
+
+### ` slot 新写法`
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+        <div id="box">
+            <child>
+                <!-- vue3 使用template，以及指令的形式定义插槽slot -->
+                <template v-slot:a>
+                    <div>1111111</div>
+                </template>
+                <!-- 使用 # 定义slot属性值 -->
+                <template #b>
+                    <div>2222222</div>
+                </template>
+                <template #c>
+                    <div>3333333</div>
+                </template>
+                <template>
+                    <div>4444444</div>
+                </template>
+            </child> 
+            <!-- 使用插槽，实现不同形式元素定义 -->
+            <narvbar>
+                <template  #left>
+                    <button>left</button>
+                </template>
+                <template #right>
+                    <i style="background-color:aqua">right 文字图标</i>
+                </template>
+            </narvbar>
+        </div>
+    <script>
+    // 单个插槽 <slot></slot>，会将组件标签中包含的所有dom内容，插入slot定义处 
+       Vue.component("child",{
+           template:`
+           <div>
+            child
+            <slot name="a"></slot> 
+            <slot name="b"></slot> 
+            <slot name="c"></slot> 
+            <slot></slot> 
+           <div>
+           `,
+       });
+       //使用插槽，让组件dom元素定义更丰富
+       Vue.component("narvbar",{
+           template:`
+           <div>
+            <slot name="left"></slot> 
+            <span>narvbar</span>
+            <slot name="right"></slot> 
+           <div>
+           `,
+       });
+        new Vue({
+           el:"#box"
+        })
+    </script>
+</body>
+</html>
+```
+
+### **范例**：插槽版抽屉
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <script src="./plugins/axios/axios.min.js"></script>
+    <title>Document</title>
+    <style>
+     /* 进场动画 */
+      .aaa-enter-active {
+            animation: aaa 1.5s
+        }
+        /* 出场动画 */
+        .aaa-leave-active {
+            animation: aaa 1.5s reverse
+        }
+       
+        /* keyframes 定义移动范围 */
+        @keyframes aaa{ 
+            0%{
+                opacity: 0;
+                transform: translateX(-100px);/*相对于自己往x轴负方向消失*/
+            }
+            100%{
+                opacity: 1;
+                transform: translateX(0px);
+            }
+        }
+    </style>
+</head>
+<body>
+        <div id="box">
+              <navbar>
+                  <button @click="isShow=!isShow">显示/隐藏</button>
+              </navbar>
+             
+              <sidebar v-show="isShow" mode="aaa"></sidebar>
+            
+              
+        </div>
+    <script>
+       Vue.component("navbar",{
+           data(){
+               return {
+                   myText:"aaa",
+               }
+           },
+           
+           template:`<div  >
+            <slot></slot>
+            </div>
+           `,
+           
+       });
+       Vue.component("sidebar",{
+           props:["mode"],
+           template:`
+           <transition :name="mode">
+             <div style='background-color:red;width:40%;hight:80%'>
+                <ul>
+                    <li>dddd</li>
+                    <li>dddd</li>
+                    <li>dddd</li>
+                </ul>
+              </div>
+            </transition>`,
+           
+       });
+        new Vue({
+            el:"#box",//根组件
+            data:{
+                isShow:true
+            }
+           
+        });
+    </script>
+</body>
+</html>
+```
+
+
+
+## 过渡 & 动画
+
+> - `transition`实现过渡：其具有多个属性&事件，详细参见[官网文档](https://cn.vuejs.org/v2/api/#transition)
+>   `transition`标签内只能包含一个dom元素
+>
+> - Dom&Virtual domvirtual 
+>   DOM是将真实的DOM的数据抽取出来，以对象的形式模拟树形结构。比如dom是这样的：
+>
+>   ```
+>   <div>
+>       <p>123</p>
+>   </div>
+>   ```
+>
+>   对应的virtual DOM（伪代码）：
+>
+>   ```
+>   var Vnode = {
+>       tag: 'div',
+>       children: [
+>           { tag: 'p', text: '123' }
+>       ]
+>   };
+>   ```
+>
+> - `diff`算法
+>
+>   1. 在采取diff算法比较新旧节点的时候，比较只会**在同层级进行, 不会跨层级比较**。
+>      ![img](images/998023-20180519212338609-1617459354.png)
+>
+>   2. **同key值进行对比**:当定义dom的key值时，只会比较同key值；当没有key值时，会按照索引进行对比；在按照索引进行比对，遇到`dom`节点类型发生改变的情况，vue会默认节点发生了巨大改变，会减少对比，删除老节点，创建新节点。
+>
+>      <img src="images/image-20220314125141470.png" alt="image-20220314125141470" style="zoom:50%;" />
+>
+>   3. **同组件对比**
+>      组件相同进行对比，组件不同删除老组件，创建新组件
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+    <style>
+        /* 进场动画 */
+        .aaa-enter-active {
+            animation: aaa 1.5s
+        }
+        /* 出场动画 */
+        .aaa-leave-active {
+            animation: aaa 1.5s reverse
+        }
+
+        /* keyframes 定义移动范围 */
+        @keyframes aaa{ 
+            0%{
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            100%{
+                opacity: 1;
+                transform: translateX(0px);
+            }
+        }
+     
+    </style>
+</head>
+<body>
+        <div id="box">
+            <button @click="isShow=!isShow">点击</button>
+            <!-- transition 过渡元素 实现元素动画消失与显示-->
+            <transition enter-active-class="aaa-enter-active" leave-active-class="aaa-leave-active">
+                <div v-show="isShow">1111111111</div>
+            </transition>
+            <!-- 简写方式实现元素动画消失&显示 -->
+            <transition name="aaa">
+                <div v-show="isShow">222222222</div>
+            </transition>
+
+             <!-- 使元素一出现就具有动画效果,添加 appear属性 -->
+             <transition name="aaa" appear>
+                    <div v-show="isShow">333333333</div>
+            </transition>
+
+            <!-- 交替显示实现 ：多个元素过渡，transition标签只能包含一个dom元素，实现切换时，需定义切换dom元素key值   -->
+            <button @click="isShow2=!isShow2">点击</button>
+            <transition name="aaa" appear>
+              <div v-if="isShow2" key="1">aaaaaaaaaa</div>
+              <div v-else key="2">bbbbbbbbbb</div>
+            </transition>
+        </div>
+    <script>
+        new Vue({
+           el:"#box",
+           data:{
+            isShow:true,
+            isShow2:true
+           }
+        })
+    </script>
+</body>
+</html>
+```
+
+## 多个列表
+
+> `transition-group`:多个元素/组件的过渡效果。
+>
+> - 和`transition`不同的是可以实例化多个标签。它会以一个真实的元素呈现：默认为一个`<span>`,可以通过`tag`特性更换为其他元素；
+> - 
+>   提供唯一的`key`属性值
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+    <style>
+     /* 进场动画 */
+     .aaa-enter-active {
+            animation: aaa 1.5s
+        }
+        /* 出场动画 */
+        .aaa-leave-active {
+            animation: aaa 1.5s reverse
+        }
+
+        /* keyframes 定义移动范围 */
+        @keyframes aaa{ 
+            0%{
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            100%{
+                opacity: 1;
+                transform: translateX(0px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="box">
+       
+        <input type="text" v-model="myText">
+        <button @click="handleAdd()">add</button>
+        <div v-show="!dataList.length">代办事项为空</div>
+        <ul>
+            <transition-group name="aaa" tag="ul">
+                <li  v-for="(item,index) in dataList" :key="item.id" @click="handleColor(index)">
+                    {{item}}--{{index}}
+                    <button @click="handleDel(index)">del</button>
+                </li>
+            </transition-group>
+        </ul>
+    </div>
+
+    <script>
+        new Vue({
+            el:"#box",
+            data:{
+                myText:"",
+                dataList:[],
+                contentColor:0,
+            },
+            methods:{
+                handleAdd(){
+                    console.log("add"+this.myText);
+                    this.dataList.push(this.myText);
+                    this.myText="";
+                },
+                handleDel(index){
+                    this.dataList.splice(index,1);
+                },
+                handleColor(index){
+                    this.contentColor=index;
+                }
+            }
+
+        })
+    </script>
+</body>
+</html>
+```
+
+## 可复用过渡
+
+> 将过渡元素封装在组件中
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <script src="./plugins/axios/axios.min.js"></script>
+    <title>Document</title>
+    <style>
+     /* 进场动画 */
+      .aaa-enter-active {
+            animation: aaa 1.5s
+        }
+        /* 出场动画 */
+        .aaa-leave-active {
+            animation: aaa 1.5s reverse
+        }
+       
+        /* keyframes 定义移动范围 */
+        @keyframes aaa{ 
+            0%{
+                opacity: 0;
+                transform: translateX(-100px);/*相对于自己往x轴负方向消失*/
+            }
+            100%{
+                opacity: 1;
+                transform: translateX(0px);
+            }
+        }
+    </style>
+</head>
+<body>
+        <div id="box">
+              <navbar @myevent="handleEvent"></navbar>
+             
+              <sidebar v-show="isShow" mode="aaa"></sidebar>
+            
+              
+        </div>
+    <script>
+       Vue.component("navbar",{
+           data(){
+               return {
+                   myText:"aaa",
+               }
+           },
+           
+           template:`<div  >
+           <button @click='handleClick'>点击显示/隐藏</button>`,
+           methods:{
+            handleClick(){
+                console.log("告诉父组件，改变isShow的值");
+                //emit 触发事件  myevent：自定义监听事件  触发父组件定义的函数
+                this.$emit("myevent");
+            },
+           
+           },
+       });
+       Vue.component("sidebar",{
+           props:["mode"],
+           template:`
+           <transition :name="mode">
+             <div style='background-color:red;width:40%;hight:80%'>
+                <ul>
+                    <li>dddd</li>
+                    <li>dddd</li>
+                    <li>dddd</li>
+                </ul>
+              </div>
+            </transition>`,
+           
+       });
+        new Vue({
+            el:"#box",//根组件
+            data:{
+                isShow:true
+            },
+            methods:{
+                handleEvent(){
+                   this.isShow=!this.isShow;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+```
+
+# 生命周期
+
+> `Vue.nextTick()`: 在下次 DOM 更新循环结束之后执行延迟回调。在修改数据之后立即使用这个方法，获取更新后的 DOM。只执行一次，在dom更新后执行一次，当状态再次改变，不再执行。
+
+<img src="images/lifecycle.png" alt="lifecycle" style="zoom:50%;" />
+
+- **范例**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="box">
+        {{myText}}
+        <button @click="changeHandle">change</button>
+
+        <ul>
+            <li v-for="item in dataList">{{item}}</li>
+        </ul>
+
+        <child v-if="isCreated" @myevent="changeState">
+
+        </child>
+    </div>
+<script>
+Vue.component("child",{
+    props:["isCreated"],
+    data(){
+        return {
+            time:10,
+        }
+    },
+    mounted(){
+        //临时使用id标识定时函数
+       this.id= setInterval(() => {
+            this.time--;
+            if(this.time===0){
+                this.$emit("myevent");
+            }
+            console.log("倒计时");
+            
+            this.$nextTick(()=>{
+                  console.log("比update执行的都晚，且只执行一次");
+              });
+        }, 1000);
+    },
+    template:`
+      <div>抢购倒计时{{time}}</div>
+    `,
+    beforeDestroy(){
+        console.log("清除定时器，事件解绑");
+        if(!this.isCreated){//当isCreated为false时进行销毁绑定事件
+            clearInterval(this.id);
+            window.onresize=null;//清除window对象绑定的onresize函数
+        }
+    },
+    destroyed(){
+        console.log("清除定时器，事件解绑");
+    }
+});
+new Vue({
+        data:{
+            myText:"aaa",
+            dataList:[],
+            isCreated:true,
+        },
+        el:"#box",
+        beforeCreate(){//创建vue实例前
+            console.log(this.myText);//此时结果为undefined，因为此时数据还未注入，只初始化了事件和生命周期
+        },
+        created(){//创建vue实例后
+            console.log(this.myText+"===created==初始化状态或者挂载到当前实例的一些属性");//可以打印myText的值，以创建
+            this.myText=this.myText+"1111";//被拦截的状态
+            this.globalName="adddd"; //可以在此阶段函数中定义全局属性，可以使用this访问的属性值
+        },
+        beforeMount(){//在将vue实例挂载到dom节点前
+            console.log("在挂载到dom节点前");
+            console.log("beforeMounted"+this.$el)
+           // console.log(document.getElementById("#box").innerHTML());//可以用作模板解析之前最后一次修改模板节点
+        },
+        mounted(){//将vue实例挂载到dom节点后
+            console.log("mounted拿到真实的dom==="+this.$el.innerHTML);
+            /**
+             * 作用：
+             * 1. 依赖于dom创建之后，才进行初始化工作的插件；
+             * 2. 订阅bus.$on；
+             * 3. ajax
+             * */
+
+             //虚拟dom创建，diff对比；状态立即更新，dom异步更新
+            setTimeout(() => {
+               this.dataList=["111","222","333"]; 
+                //此时无法获取真实的dom节点 
+              // console.log(document.getElementsByTagName("li").length);
+            }, 2000);
+        },
+        beforeUpdate(){
+            console.log("beforeUpdate","虚拟Dom重新渲染与更新之前；可以用来记录老的dom的某些状态，比如滚动条的位置记录");
+        },
+        updated(){
+            console.log("updated","虚拟Dom，更新完成。获取更新后的dom节点,才进行swiper工作的插件");
+        },
+        //销毁一般应用在子组件中，在根组件中应用较少
+        beforeDestroy(){
+
+        },
+        destroyed(){
+
+        },
+        methods:{
+            changeHandle(){
+                this.myText="aaaa";
+            },
+            changeState(){
+                this.isCreated=false;
+            }
+        }
+    })
+
+</script>
+    
+</body>
+</html>
+```
+
+# `swiper改造为Vue组件`
+
+# 指令写法&应用
+
+## 自定义指令
+
+> 除了核心功能默认内置的指令 (例如 `v-model` 和 `v-show`)，Vue 也允许注册自定义指令.
+>
+> `directive`——对普通DOM元素进行底层操作
+>
+> - 实际应用——可以通过指令知道什么时候dom创建完成，从而进行依赖dom的库的初始化工作
+
+### 指令钩子函数 (均为可选)：
+
+> - `bind`：只调用一次，指令第一次绑定到元素时调用。在这里可以进行一次性的初始化设置。
+> - `inserted`：被绑定元素插入父节点时调用 (仅保证父节点存在，但不一定已被插入文档中)。
+> - `update`：所在组件的 VNode 更新时调用，**但是可能发生在其子 VNode 更新之前**。指令的值可能发生了改变，也可能没有。但是你可以通过比较更新前后的值来忽略不必要的模板更新 (详细的钩子函数参数见下)。
+> - `componentUpdated`：指令所在组件的 VNode **及其子 VNode** 全部更新后调用。
+> - `unbind`：只调用一次，指令与元素解绑时调用。
+
+### 指令钩子函数参数
+
+> - `el`：指令所绑定的元素，可以用来直接操作 DOM。
+>
+> - ```
+>   binding
+>   ```
+>
+>   ：一个对象，包含以下 property：
+>
+>   - `name`：指令名，不包括 `v-` 前缀。
+>   - `value`：指令的绑定值，例如：`v-my-directive="1 + 1"` 中，绑定值为 `2`。
+>   - `oldValue`：指令绑定的前一个值，仅在 `update` 和 `componentUpdated` 钩子中可用。无论值是否改变都可用。
+>   - `expression`：字符串形式的指令表达式。例如 `v-my-directive="1 + 1"` 中，表达式为 `"1 + 1"`。
+>   - `arg`：传给指令的参数，可选。例如 `v-my-directive:foo` 中，参数为 `"foo"`。
+>   - `modifiers`：一个包含修饰符的对象。例如：`v-my-directive.foo.bar` 中，修饰符对象为 `{ foo: true, bar: true }`。
+>
+> - `vnode`：Vue 编译生成的虚拟节点。
+>
+> - `oldVnode`：上一个虚拟节点，仅在 `update` 和 `componentUpdated` 钩子中可用。
+>
+> **注意**：除了 `el` 之外，其它参数都应该是只读的，切勿进行修改。如果需要在钩子之间共享数据，建议通过元素的 [`dataset`](https://developer.mozilla.org/zh-CN/docs/Web/API/HTMLElement/dataset) 来进行。
+
+- **范例**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="box">
+       <div v-hello="'yellow'">111111</div>
+       <div v-hello="'red'">222222</div>
+       <div v-hello="whichColor">333333</div>
+       <div>
+           <!-- 指令指令只能传输一个参数，当需要传递多个参数时，可以用json对象/数组传递多个参数;当然也可以使用数组，只要为一个对象即可 -->
+           <div v-for="(item,index) in dataList" :key="item" v-multi-args="{index:index,length:dataList.length}">
+                {{item}}
+           </div>
+       </div>
+    </div>
+    
+    <script>
+    //注册一个全局自定义指令
+   Vue.directive("hello",{
+       //bind 只调用一次，指令第一次绑定到元素时调用。在这里可以进行一次性的初始化设置。
+       bind(){
+           console.log("bind");
+       },
+        //指令的生命周期函数inserted：当被绑定的元素插入到 DOM(父节点) 中时，立即执行；
+        //被绑定元素插入父节点时调用 (仅保证父节点存在，但不一定已被插入文档中)。
+        inserted(el,binding){//el,binding为可选参数，el为指令绑定的元素对象,binding指定属性值
+            console.log("inserted"+el);
+            el.style.background=binding.value;
+        },
+        update(){//所在组件的 VNode 更新时调用，但是可能发生在其子 VNode 更新之前。
+            console.log("update");
+        }
+    });
+
+    //操作列表数据，以及指令传多个参数范例
+    Vue.directive("multi-args",{
+        inserted(el,binding){
+            console.log(binding.value);
+            let {index,length}=binding.value;//
+            console.log(index+"==="+length);
+        },
+    });
+
+    var vm= new Vue({
+         el:"#box",
+         data:{
+            whichColor:"blue",
+            dataList:["111","222"]
+         }
+     });
+    </script>
+</body>
+</html>
+```
+
+## 指令函数简写
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="box">
+       <div v-hello="'yellow'">111111</div>
+       <div v-hello="'red'">222222</div>
+       <div v-hello="whichColor">333333</div>
+       
+    </div>
+    
+    <script>
+    //注册一个全局自定义指令：使用以下写法，创建或者更新时会执行
+   Vue.directive("hello",(el,binding)=>{
+       console.log("创建或者更新时执行");
+       el.style.background=binding.value;//测试时：使用浏览器检查工具，在console页面输入vm.whichColor改变状态
+   }
+      
+    );
+
+    var vm= new Vue({
+         el:"#box",
+         data:{
+            whichColor:"blue",
+         }
+     });
+    </script>
+</body>
+</html>
+```
+
+
+
+# Vue3
+
+## 组件写法&生命周期
+
+> Vue3可包含Vue2大部分语法，使用Vue3实例化，以及组件创建&配置如下
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.global.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="box">
+        {{myText}}
+        <navbar myName="bbbbb">
+            <div>1111111111</div>
+        </navbar>
+
+        <sidebar></sidebar>
+    </div>
+    
+    <script>
+       var obj={
+           data(){
+               return {
+                   myText:"aaaa",
+               }
+           },
+           methods:{
+
+           },
+           computed:{
+
+           },
+           created(){
+               console.log("created");
+           },
+           mounted(){
+               console.log("mounted");
+           },
+           beforeUnmount(){
+                console.log("beforeUnmount");
+           },
+           unmounted(){
+                console.log("unmounted");
+           },
+           //Vue2中的beforeDestroy,destroyed 改为 beforeUnmount，unmounted
+        //    beforeDestroy(){
+        //     console.log("beforeDestroy");
+        //    },
+        //    destroyed(){
+        //        console.log("destroyed");
+        //    },
+       }
+
+//创建Vue实例方式1
+    //    Vue.createApp(obj)
+    //    .component("navbar",{
+    //        props:["myName "],
+    //        template:`<div>
+    //         navbar
+    //         <slot></slot>
+    //         <div>`,
+    //    })
+    //    .mount("#box");
+
+       //Vue初始化方式2：使用实例方式
+       var vm=Vue.createApp(obj);
+       vm.component("navbar",{
+           props:["myName "],
+           template:`<div>
+            navbar
+            <slot></slot>
+            </div>`,
+       });
+       vm.component("sidebar",{
+           template:`<div>
+            sidebar
+            </div>`,
+       });
+       vm.mount("#box");
+    </script>
+</body>
+</html>
+```
+
+## 指令写法
+
+### 钩子函数
+
+> - `created`：在绑定元素的 attribute 或事件监听器被应用之前调用。在指令需要附加在普通的 `v-on` 事件监听器调用前的事件监听器中时，这很有用。
+> - `beforeMount`：当指令第一次绑定到元素并且在挂载父组件之前调用。
+> - `mounted`：在绑定元素的父组件被挂载前调用。
+> - `beforeUpdate`：在更新包含组件的 VNode 之前调用。
+> - `updated`：在包含组件的 VNode **及其子组件的 VNode** 更新后调用。
+> - `beforeUnmount`：在卸载绑定元素的父组件之前调用
+> - `unmounted`：当指令与元素解除绑定且父组件已卸载时，只调用一次。
+
+### 钩子函数参数
+
+> - `el`:指令绑定到的元素。这可用于直接操作 DOM。
+> - `binding`:包含以下 property 的对象。
+>   - `instance`：使用指令的组件实例。
+>   - `value`：传递给指令的值。例如，在 `v-my-directive="1 + 1"` 中，该值为 `2`。
+>   - `oldValue`：先前的值，仅在 `beforeUpdate` 和 `updated` 中可用。无论值是否有更改都可用。
+>   - `arg`：传递给指令的参数(如果有的话)。例如在 `v-my-directive:foo` 中，arg 为 `"foo"`。
+>   - `modifiers`：包含修饰符(如果有的话) 的对象。例如在 `v-my-directive.foo.bar` 中，修饰符对象为 `{foo: true，bar: true}`。
+>   - `dir`：一个对象，在注册指令时作为参数传递。例如，在以下指令中
+> - `vnode` :一个真实 DOM 元素的蓝图，对应上面收到的 el 参数。
+> - `prevVnode`:上一个虚拟节点，仅在 `beforeUpdate` 和 `updated` 钩子中可用。
+
+- **范例**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./plugins/vue.global.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="box">
+       <div v-hello="'yellow'">111111</div>
+       <div v-hello="'red'">222222</div>
+       <div v-hello="whichColor">333333</div>
+    </div>
+    
+    <script>
+   var obj={
+       data(){
+           return {
+            whichColor:"" 
+           }
+       },
+       methods:{
+
+       }
+   }
+  
+    var app =Vue.createApp(obj);
+     app.directive("hello",{
+        mounted(el,binding){
+            console.log("创建或者更新时执行");
+            el.style.background=binding.value;//测试时：使用浏览器检查工具，在console页面输入vm.whichColor改变状态
+         }
+     })
+    app.mount("#box");
+    </script>
+</body>
+</html>
+```
+
+
 
 # 参考资料
 
 1. https://www.bilibili.com/video/av254249324?p=4&spm_id_from=pageDriver
 2. https://cn.vuejs.org/v2/guide/reactivity.html
 3. https://v3.cn.vuejs.org/guide/reactivity-fundamentals.html#%E5%88%9B%E5%BB%BA%E7%8B%AC%E7%AB%8B%E7%9A%84%E5%93%8D%E5%BA%94%E5%BC%8F%E5%80%BC%E4%BD%9C%E4%B8%BA-refs
+

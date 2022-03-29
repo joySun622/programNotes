@@ -1,5 +1,19 @@
 [Toc]
 
+# 配置SVN
+
+1. 在vscode扩展中下载svn插件，如下图
+
+<img src="images/pic_router.php" alt="vscode配置svn" style="zoom:50%;" />
+
+2. 在vscode下方设置中搜索svn,打开setting.json文件
+
+<img src="images/pic_router.php" alt="vscode配置svn" style="zoom:50%;" />
+
+3. 将svn.path修改成自己本地地址即可，（svn.exe文件）
+
+<img src="images/pic_router.php" alt="vscode配置svn" style="zoom:50%;" />
+
 # 插件安装推荐
 
 ## 图标插件(vscode-icons）

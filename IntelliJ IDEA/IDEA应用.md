@@ -1,5 +1,42 @@
 [Toc]
 
+# SVN
+
+# IDEA 配置SVN
+
+1. 在idea中配置svn,首先要在电脑上安装svn （进入官网下载安装即可）；
+   svn官网下载 地址：https://tortoisesvn.net/downloads.html
+
+2. 打开idea，选择file->settings->Version Control -> Subversion ,OK 完成；
+
+<img src="images/20190519162638657.png" alt="img" style="zoom:67%;" />
+
+3. 如果发现找不到svn.exe?   如果发现找不到svn.exe?  
+
+   ​     之所以没有，是因为安装[TortoiseSVN](https://so.csdn.net/so/search?q=TortoiseSVN&spm=1001.2101.3001.7020)的时候没有勾选指定安装项。找到安装包重新运行，选择modify，然后勾选command line client tools项就行了,next,安装好后，就有了。
+
+![img](images/2019051916301538.png)
+
+
+
+# Maven项目
+
+## 导入Maven项目，Pom配置文件
+
+1. 点击【File】,选中【Open】选择需要打开的文件夹
+
+   ![image-20220310103423866](images/image-20220310103423866.png)
+
+2. 配置好Maven库，相关设置
+   <img src="images/image-20220310103618967.png" alt="image-20220310103618967" style="zoom:67%;" />
+
+3. Pom文件失效
+   ![image-20220310103926546](images/image-20220310103926546.png)
+
+   将pom.xml添加到Maven项目中，即可生效
+
+![image-20220310104113619](images/image-20220310104113619.png)
+
 # 创建Web项目
 
 ## 1. 创建
@@ -146,6 +183,70 @@
 
 ![image-20220301094824339](images/image-20220301094824339.png)
 
+## 导入WEB项目后，注解爆红
+
+- **场景描述**
+  导入WEB项目后，发现有注解参数爆红，但运行正常
+  ![image-20220322160025310](images/image-20220322160025310.png)
+
+  ```
+  报错信息：
+  Incorrect MIME Type declaration 
+   Inspection info:Incorrect MIME Type declarations in JAX-RS annotations
+  ```
+
+  
+
+- **可能原因**
+
+  1. JDK版本问题；
+  2. 有关联的jar包没有成功导入；
+
+- **解决方案**
+
+  1. **更换JDK版本**:点击【File】=>[Project Structure],添加别的版本的JDK ；修改项目JDK版本
+     ![image-20220322160320973](images/image-20220322160320973.png)
+
+     ![image-20220322160455086](images/image-20220322160455086.png)
+
+  2. 将没有扫描到的jar包手动导入
+
+  ![image-20220322160913295](images/image-20220322160913295.png)
+
+## 禁用Kotlin插件
+
+- **场景描述**
+
+> 运行java Application时，报错：提示Kotlin-jvm incompitable.
+
+- **原因探索&解决方案**
+
+  >  **原因**：查了下KOTLIN是Android项目编程工具，目前项目是java项目，和它无关。
+  >
+  > **解决方案**：禁用Kotlin插件，禁用后，重启IDEA
+
+<img src="images/image-20220322162609999.png" alt="image-20220322162609999" style="zoom:67%;" />
+
+## bytecode version与实际JDK版本不符
+
+- **场景描述**
+
+> 因为一个注解`@procedure`报错，所以点进去看了下该注解的源码，发现提示`bytecode version:50.0(java6)`,有些奇怪，项目使用的jdk是1.8，怎么会出现`java6`这个版本。
+
+![image-20220322164704113](images/image-20220322164704113.png)
+
+- **原因探索**
+
+> 该提示出现原因是查看第三方jar包的源代码时出现的。没有找到该类的源码 `.java`文件，而是反编译`.class`文件后呈现出来。字节码版本是(java 6)
+>
+> 1. 尝试使用源码页面的`Choose Source`，引入jdk 1.8版本的源码，操作后，没有解决问题
+
+- **解决方案**
+
+> 1. 找到导入的jar包源码，如：java源码包，找到`src`结尾的源代码文件，导入到IDEA中
+>    ![image-20220322165653228](images/image-20220322165653228.png)
+
 # 参考资料
 
 1. https://www.jetbrains.com/help/idea/2016.2/working-with-artifacts.html#artifact_def
+2. https://blog.csdn.net/u011699755/article/details/90343951

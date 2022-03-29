@@ -479,3 +479,7 @@ String arr3[][] = new String[3][];// 动态初始化2
 - 方法=成员方法=函数=method
 
 >  创建类的对象=类的实例化=实例化类。
+
+# Kotlin
+
+> Kotlin在java虚拟机上运行的静态类型编程语言，可以编译成Java字节码，也可以编译成JavaScript,方便在没有JVM的设备上运行

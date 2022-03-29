@@ -1,5 +1,210 @@
 [Toc]
 
+# 运行Vue项目
+
+## 1. 配置Vue运行环境
+
+1. node.js环境（npm包管理器）
+
+   ```
+   ### 查看nodejs版本
+   node -v
+   ### 若未安装node先安装node;从网上下载后直接安装
+   ```
+
+2. vue-cli 脚手架构建工具
+
+   ```
+   cnpm install -g vue-cli
+   ```
+
+3. 进入项目目录下，安装依赖
+
+```
+npm install
+```
+
+ 4. 运行项目
+
+    - **查看项目运行脚本配置**：客户端服务运行名
+
+    ![image-20220309161848456](images/image-20220309161848456.png)
+
+    - **运行项目**
+
+    ```
+    npm run serve
+    ```
+
+    运行结束后：可以看到本地访问地址，直接以该地址访问
+    ![image-20220309162050283](images/image-20220309162050283.png)
+
+
+
+# 跨域问题
+
+- **场景描述**
+
+> 使用`axios`请求数据时，报错信息如下：
+>
+> ```
+> Access to XMLHttpRequest at 'http://127.0.0.1:3000/' from origin 'http://localhost:63342' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource
+> ```
+>
+> 无法正常获取到数据。使用Postman可以正常获取数据，浏览器无法正常获取数据。	
+
+- **问题探索**
+
+1. 同样是使用axios请求数据，为什么有的会产生跨域问题，有的不会？
+   如：本地访问网址:http://localhost:5001/#/
+
+   | 请求数据接口                                                 | 有无存在跨域问题 | 请求响应头比对                                               |
+   | ------------------------------------------------------------ | ---------------- | ------------------------------------------------------------ |
+   | [互联网上请求ali测试API接口](http://rap2api.taobao.org/app/mock/223607) | 无               | Access-Control-Allow-Origin: *<br/>Access-Control-Allow-Methods: POST, GET, PUT, DELETE, OPTIONS<br/>Access-Control-Allow-Credentials: true |
+   | [内网请求数据API接口1](http://120.160.20.248:8090/maildatav/) | 无               | Access-Control-Allow-Credentials: true                       |
+   | [内网请求API数据接口3](http://110.11.36.143:7090/Mobile)     | 有               | 无                                                           |
+
+   - http://rap2api.taobao.org/app/mock/223607 请求&响应信息如下(使用Chrome检查工具)
+
+   ```
+   - General
+   Request URL: http://rap2api.taobao.org/app/mock/223607/index/map
+   Request Method: GET
+   Status Code: 200 OK
+   Remote Address: 203.107.44.46:80
+   Referrer Policy: strict-origin-when-cross-origin
+   
+   - Reponse Headers
+   HTTP/1.1 200 OK
+   Date: Fri, 18 Mar 2022 02:46:31 GMT
+   Content-Type: application/json; charset=utf-8
+   Content-Length: 1617
+   Connection: keep-alive
+   Server: nginx/1.16.1
+   Access-Control-Allow-Origin: *
+   Access-Control-Allow-Methods: POST, GET, PUT, DELETE, OPTIONS
+   Access-Control-Allow-Credentials: true
+   Vary: Origin
+   Set-Cookie: koa.sid=C7z-5FD7A4RgBf4w-OOUsjWm7Fv6aXEm; path=/; expires=Sat, 19 Mar 2022 02:17:26 GMT; httponly
+   Set-Cookie: koa.sid.sig=P1PydaIt4zpMMVIt6SWK6S4oInE; path=/; expires=Sat, 19 Mar 2022 02:17:26 GMT; httponly
+   
+   - Request Headers
+   GET /app/mock/223607/index/map HTTP/1.1
+   Host: rap2api.taobao.org
+   Connection: keep-alive
+   Cache-Control: max-age=0
+   Upgrade-Insecure-Requests: 1
+   User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36
+   Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+   Accept-Encoding: gzip, deflate
+   Accept-Language: zh-CN,zh;q=0.9
+   Cookie: aliyungf_tc=8bd63cd691946412b3d6546db9cbac27c759179c7f7f669d7bcc91e15498889b; koa.sid=C7z-5FD7A4RgBf4w-OOUsjWm7Fv6aXEm; koa.sid.sig=P1PydaIt4zpMMVIt6SWK6S4oInE
+   ```
+
+   - http://121.160.20.248:8090/maildatav/  请求&响应信息如下(使用Chrome检查工具)
+
+   ```
+   - General
+   Request URL: http://121.160.20.248:8090/maildatav/mail/send/bb05?starttime=2019-08-01&endtime=2019-08-07
+   Request Method: GET
+   Status Code: 200 
+   Remote Address: 111.160.20.248:8090
+   Referrer Policy: strict-origin-when-cross-origin
+   
+   
+   - Reponse Headers
+   HTTP/1.1 200
+   Server: nginx/1.20.0
+   Date: Fri, 18 Mar 2022 03:09:55 GMT
+   Content-Type: application/json;charset=UTF-8
+   Transfer-Encoding: chunked
+   Connection: keep-alive
+   Access-Control-Allow-Credentials: true
+   Expires: Wed, 23 Mar 2022 03:09:55 GMT
+   Cache-Control: max-age=432000
+   X-Frame-Options: SAMEORIGIN
+   
+   - Request Headers
+   GET /maildatav/mail/send/bb05?starttime=2019-08-01&endtime=2019-08-07 HTTP/1.1
+   Host: 121.160.20.248:8090
+   Connection: keep-alive
+   Cache-Control: max-age=0
+   Upgrade-Insecure-Requests: 1
+   User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36
+   Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+   Accept-Encoding: gzip, deflate
+   Accept-Language: zh-CN,zh;q=0.9
+   Cookie: JSESSIONID=2628BD57460AC152D836B8EFD1CF0FFA; _ga=GA1.1.1128314729.1647572385; _gid=GA1.1.725497467.1647572385
+   ```
+
+   - http://110.11.36.143:7090/Mobile 请求&响应信息如下(使用Chrome检查工具) 存在跨域
+
+   ```
+   - General
+   Request URL: http://111.160.20.248:8090//Mobile/ywljc/ywljc!getTjLclJson.action?{%22startdate%22:%222021-12-13%22,%22enddate%22:%222021-12-13%22,%22type%22:%220%22}
+   Request Method: GET
+   Status Code: 200 
+   Referrer Policy: strict-origin-when-cross-origin
+   
+   
+   - Reponse Headers
+   HTTP/1.1 200 OK
+   Server: nginx/1.20.0
+   Date: Fri, 18 Mar 2022 03:20:55 GMT
+   Content-Type: text/html; charset=utf-8
+   Content-Length: 2167
+   Last-Modified: Fri, 22 Oct 2021 09:47:01 GMT
+   Connection: keep-alive
+   ETag: "61728895-877"
+   X-Frame-Options: SAMEORIGIN
+   Accept-Ranges: bytes
+   
+   - Request Headers
+   GET /Mobile/ywljc/ywljc!getTjLclJson.action?{%22startdate%22:%222021-12-13%22,%22enddate%22:%222021-12-13%22,%22type%22:%220%22} HTTP/1.1
+   Host: 111.160.20.248:8090
+   Connection: keep-alive
+   Accept: application/json, text/plain, */*
+   User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36
+   Origin: http://localhost:5001
+   Referer: http://localhost:5001/
+   Accept-Encoding: gzip, deflate
+   Accept-Language: zh-CN,zh;q=0.9
+   ```
+
+   **问题原因**：前端的跨域问题产生是因为浏览器的安全策略导致。
+
+- **解决方案**
+
+  - 方案1：使用`nginx`代理，将web请求&接口请求放在同一域中，真正的请求服务端口由nginx去请求。
+
+  - 方案2：在Vue配置文件中配置代理
+
+    ```
+    - 修改vue.config.js配置，在配置中配置代理
+    
+    module.exports = {
+        productionSourceMap: false,
+        devServer: {
+            port: 5001,
+            proxy: {
+                '/ywljc': {
+                  target: 'http://10.11.36.143:7090', //API服务器的地址
+                  ws: true, //代理websockets
+                  changeOrigin: true, // 是否跨域，虚拟的站点需要更管origin
+                  pathRewrite: {
+                    // '^/api'是一个正则表达式，表示要匹配请求的url中，全部'http://localhost:8081/api' 转接为 http://localhost:8081/
+                    '^/ajapi': '/',
+                  }
+                }
+            },
+        },
+    
+        publicPath: './'
+    }
+    ```
+
+    - 页面请求网址：`/ajapi/Mobile/ywljc/ywljc!`
+
 # 动态下拉选实现
 
 - **场景描述**
@@ -118,3 +323,109 @@ beforeCreate(){
         }
 ```
 
+# 知识点集
+
+## 什么是跨域
+
+> - **跨域**：浏览器对于javascript的同源策略的限制,例如a.cn下面的js不能调用b.cn中的js,对象或数据(因为a.cn和b.cn是不同域),所以跨域就出现了.
+>   **注意**：跨域限制访问，其实是**浏览器的限制**;
+>   - 跨域问题一般在B-S结构项目中出现，在`C-S`结构项目中少有；
+>   - postman 没有跨域限制，相当于客户端请求服务端，然后结构化数据后展现在postman客户端上；
+>   - 前端的跨域问题产生是因为浏览器的安全策略导致。
+>
+> - **同源策略**：是指协议，域名，端口都要相同，其中有一个不同都会产生跨域。比如:我在本地上的域名是study.cn,请求另外一个域名一段数据
+>
+>   ![img](images/825922-20151028230107904-1333387603.png)
+>
+>   这个时候在浏览器上会报错:
+>
+>   ![img](images/825922-20151028230247091-934044692.png)
+>
+>   这个就是同源策略的保护,如果浏览器对javascript没有同源策略的保护,那么一些重要的机密网站将会很危险~
+>
+>   | study.cn/json/jsonp/jsonp.html             |                       |      |
+>   | ------------------------------------------ | --------------------- | ---- |
+>   | 请求地址                                   | 形式                  | 结果 |
+>   | http://study.cn/test/a.html                | 同一域名,不同文件夹   | 成功 |
+>   | http://study.cn/json/jsonp/jsonp.html      | 同一域名,统一文件夹   | 成功 |
+>   | http://a.study.cn/json/jsonp/jsonp.html    | 不同域名,文件路径相同 | 失败 |
+>   | http://study.cn:8080/json/jsonp/jsonp.html | 同一域名,不同端口     | 失败 |
+>   | https://study.cn/json/jsonp/jsonp.html     | 同一域名,不同协议     | 失败 |
+
+- **前端跨域情况**
+
+> 1. AJAX直接请求普通文件存在跨域无权限访问的问题,不管是静态页面也好.
+>
+> 2. 不过我们在调用js文件的时候又不受跨域影响,比如引入jquery框架的,或者是调用相片的时候
+>
+> 3. 凡是拥有scr这个属性的标签都可以跨域例如<script><img><iframe>
+>
+> 4. 如果想通过纯web端跨域访问数据只有一种可能,那就是把远程服务器上的数据装进js格式的文件里.
+>
+> 5. 而json又是一个轻量级的数据格式,还被js原生支持
+
+### Access-Control-Allow-Credentials
+
+`Access-Control-Allow-Credentials`:`response`头部字段：
+
+- 表示当请求的认证模式`Request.credentials=include`是否可以将对请求的响应暴露给前端`JS`页面(代码)。
+  返回true表示可以，其他值均表示不可以。
+  `credentials`可以是`cookies`,`authorization headers`或`TLS client centificates`
+
+- 当作为对预检请求的响应的一部分时，能表示是否真正的请求可以使用`credentials`,如果这个响应头没有随资源返回，响应就会被浏览器忽视，不会返回到web内容。
+  注意：简单的`GET`请求没有预检
+
+这个配置的唯一有效值为`true`,当不需要证书验证时，省略此配置
+
+```
+### 当服务端设置
+Access-Control-Allow-Credentials=true
+
+### 方式1：XHR使用证书
+var xhr = new XMLHttpRequest();
+xhr.open('GET','http://example.com/',true);
+xhr.withCredentials = true;
+xhr.send(null);
+
+###方式2：  Fetch with credentials
+fetch(url,{
+  credentials:'include'
+});
+```
+
+### Access-Control-Allow-Origin
+
+> 响应头指定了该响应的资源是否被允许与给定的[origin](https://developer.mozilla.org/zh-CN/docs/Glossary/Origin)共享
+> origin:Web内容的源由用于访问它的[URL](https://developer.mozilla.org/zh-CN/docs/Glossary/URL) 的方案(协议)，主机(域名)和端口定义。只有当方案，主机和端口都匹配时，两个对象具有相同的起源。
+> 服务器默认是不被允许跨域的。给Nginx服务器配置`Access-Control-Allow-Origin *`后，表示服务器可以接受所有的请求源（Origin）,即接受所有跨域的请求。
+
+```
+Access-Control-Allow-Origin: *    //允许所有域访问资源权限
+Access-Control-Allow-Origin: <origin>   //指定一个可以访问资源的URI
+
+### 范例
+### 如需允许所有资源都可以访问您的资源，您可以如此设置：
+Access-Control-Allow-Origin: *
+### 如需允许https://developer.mozilla.org访问您的资源，您可以设置：
+Access-Control-Allow-Origin: https://developer.mozilla.org
+
+### 如果服务器未使用“*”，而是指定了一个域，那么为了向客户端表明服务器的返回会根据Origin请求头而有所不同，必须在Vary响应头中包含Origin。
+Access-Control-Allow-Origin: https://developer.mozilla.org
+Vary: Origin
+```
+
+- 设置接口资源可被所有域访问
+
+```
+Access-Control-Allow-Credentials=true  //需要证书验证
+Access-Control-Allow-Origin: *   //允许所有域访问资源权限
+
+### 当不需要证书验证&允许特定的URI访问资源
+Access-Control-Allow-Origin: https://developer.mozilla.org
+```
+
+
+
+# 参考资料
+
+1. https://www.cnblogs.com/chenshishuo/p/4919224.html
