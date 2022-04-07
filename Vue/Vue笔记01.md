@@ -3342,6 +3342,246 @@ new Vue({
 </html>
 ```
 
+# vue-cli创建项目
+
+- `vue-cli`:vue开发脚手架工具
+
+## 安装
+
+```
+npm install -g @vue/cli  若比较慢，可以使用：cnpm install -g @vue/cli
+# OR
+yarn global add @vue/cli
+
+
+
+### 查看版本
+vue --version
+@vue/cli 5.0.1
+```
+
+## 创建一个项目
+
+```
+vue create my-project
+# OR
+vue ui
+```
+
+- **范例**
+
+```
+### 创建项目myApp
+D:\huadi_workspace\tjyz_workspace\old_tjyz_project\tjyz> vue create myApp
+#### 显示如下，可以选择默认配置或者手动配置进行创建项目。默认配置是一次性安装好vue2或vue3所需要的各种组件，手动配置可以自定义需要安装的组件
+Vue CLI v5.0.1
+┌─────────────────────────────────────────┐
+│                                         │
+│   New version available 5.0.1 → 5.0.4   │
+│    Run npm i -g @vue/cli to update!     │
+│                                         │
+└─────────────────────────────────────────┘
+
+? Please pick a preset: (Use arrow keys)
+> Default ([Vue 3] babel, eslint)  //默认配置
+  Default ([Vue 2] babel, eslint)  //默认配置
+  Manually select features  //手动配置
+  
+#### 选择手动配置(enter回车)后进行操作;空格键可以控制是否选中。(*)表示选中，()表示未选中
+? Please pick a preset: Manually select features
+? Check the features needed for your project: (Press <space> to select, <a> to toggle all, <i> to invert selection, and <enter> to proceed)
+ (*) Babel //可以将ES5自动转为ES6
+ ( ) TypeScript
+ ( ) Progressive Web App (PWA) Support
+ (*) Router //路由
+ (*) Vuex  //vue状态管理组件
+>(*) CSS Pre-processors  //css预处理器
+ (*) Linter / Formatter  //vue 代码修复和格式化
+ ( ) Unit Testing
+ ( ) E2E Testing
+ 
+ #### 选择完需要安装的组件后，回车(enter键)，进入需要安装的组件版本选择页面
+? Please pick a preset: Manually select features
+? Check the features needed for your project: Babel, Linter
+? Choose a version of Vue.js that you want to start the project with
+  3.x
+> 2.x
+? Use history mode for router? (Requires proper server setup for index fallback in production) Yes
+? Pick a CSS pre-processor (PostCSS, Autoprefixer and CSS Modules are supported by default): (Use arrow keys)
+##### 选择css预处理工具
+> Sass/SCSS (with dart-sass) //效率更高
+##### 1）linter组件，选中ESLint + Standard config 标准配置，回车
+? Pick a linter / formatter config:
+  ESLint with error prevention only
+  ESLint + Airbnb config
+> ESLint + Standard config
+  ESLint + Prettier
+##### 2）enter后，选择作用场景，回车
+ (*) Lint on save  //在保存的时候修复
+>(*) Lint and fix on commit (requires Git)//在提交的时候进行lint
+##### 选择组件配置文件方式：1.每个组件都有单独的配置文件；2.所有组件的配置都放在package.json文件中
+Where do you prefer placing config for Babel, ESLint, etc.? (Use arrow keys)
+> In dedicated config files
+  In package.json
+  
+##### 是否将以上配置保存为一个预设文件，以便以后创建项目使用
+? Save this as a preset for future projects? (y/N) y //输入y,enter
+Save preset as: joysun //输入文件名
+```
+
+- **项目目录**
+
+![image-20220329145222187](images/image-20220329145222187.png)
+
+### 项目目录结构说明
+
+```
+.
+├── build/                      # webpack 配置文件；
+│   └── ...
+├── config/                     # 与项目构建相关的常用的配置选项；
+│   ├── index.js                # 主配置文件
+│   ├── dev.env.js              # 开发环境变量
+│   ├── prod.env.js             # 生产环境变量
+│   └── test.env.js             # 测试环境变量
+│
+├── src/
+│   ├── main.js                 # webpack 的入口文件；
+│   ├── common/                 # 存放项目共用的资源，如：常用的图片、图标，共用的组件、模块、样式，常量文件等等；
+│   │   ├── assets/             # 存放项目共用的代码以外的资源，如：图片、图标、视频 等；
+│   │   ├── components/         # 存放项目共用的组件，如：封装的导航条、选项卡等等； 备注：这里的存放的组件应该都是展示组件；
+│   │   ├── network/            # 存放项目的网络模块，如：接口；
+│   │   ├── compatible/         # 存放项目的兼容模块，如：适合App和微信各种接口的模块；
+│   │   ├── extension/          # 存放已有类的扩展模块，如：对 Array 类型进行扩展的模块；
+│   │   ├── libraries/          # 存放自己封装的或者引用的库；
+│   │   ├── tools/              # 自己封装的一些工具
+│   │   ├── constant.js         # 存放js的常量；
+│   │   ├── constant.scss       # 存放scss的常量；
+│   │   └── ...
+│   └── app/                    # 存放项目业务代码；
+│       ├── App.vue             # app 的根组件；
+│       └── ...
+│
+├── static/                     # 纯静态资源，该目录下的文件不会被webpack处理，该目录会被拷贝到输出目录下；
+├── test/                       # 测试
+│   ├── unit/                   # 单元测试
+│   │   ├── specs/              # test spec files
+│   │   ├── eslintrc            # 专为单元测试配置的eslint配置文件
+│   │   ├── index.js            # 测试编译的入口文件
+│   │   ├── jest.conf.js        # Jest的配置文件
+│   │   └── karma.conf.js       # Karma的配置文件
+│   │   └── setup.js            # 在Jest之前运行的启动文件；
+│   └── e2e/                    # e2e 测试
+│       ├── specs/              # test spec files
+│       ├── custom-assertions/  # 自定义的断言
+│       ├── runner.js           # test runner 脚本
+│       └── nightwatch.conf.js  # test runner 的配置文件
+├── .babelrc                    # babel 的配置文件
+├── .editorconfig               # 编辑器的配置文件；可配置如缩进、空格、制表类似的参数；
+├── .eslintrc.js                # eslint 的配置文件
+├── .eslintignore               # eslint 的忽略规则
+├── .gitignore                  # git的忽略配置文件
+├── .postcssrc.js               # postcss 的配置文件
+├── index.html                  # HTML模板
+├── package.json                # npm包配置文件，里面定义了项目的npm脚本，依赖包等信息
+└── README.md
+```
+
+### 资源路径编译规则
+
+默认情况下，vue-loader 使用 css-loader 和 Vue 模版编译器自动处理样式和模版文件。在编译过程中，所有的资源路径例如 `<img src="...">` 、`background: url(...)` 和 `@import` 会作为模块依赖。
+
+路径的编译规则如下：
+
+- 如果路径是绝对路径，会原样保留；
+- 如果路径以 . 开头，将会被看作相对的模块依赖，并按照你的本地文件系统上的目录结构进行解析；
+- 如果路径以 ~ 开头，其后的部分将会被看作模块依赖。这意味着你可以用该特性来引用一个 node 依赖中的资源： `<img src="~some-npm-package/foo.png">`；
+- 如果路径以 @ 开头，也会被看作模块依赖。如果你的 webpack 配置中给 @ 配置了 alias，这就很有用了。所有 vue-cli 创建的项目都默认配置了将 @ 指向 `/src`；
+
+## 运行项目
+
+```
+npm run serve 开发环境构建
+npm run build  生产环境构建
+npm run lint 代码监测工具
+```
+
+## 配置说明
+
+### package.json
+
+> package.json：在创建vue项目后生成，该配置文件中包含所有安装模块配置信息，脚本信息
+
+```
+{
+  "name": "tianjin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve", //编译并热启动脚本，运行脚本，npm run serve启动后，修改vue会自动刷新页面
+    "build": "vue-cli-service build" //编译项目，将项目编译打包,压缩，当需要发布项目时使用
+    "lint":  "vue-cli-service lint " //修复所有vue项目中的格式错误
+  },
+  "dependencies": {
+    "axios": "^0.19.0",
+    "core-js": "^2.6.5",
+    "echarts": "^4.2.1",
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.9.0",
+    "@vue/cli-service": "^3.9.0",
+    "http-proxy-middleware": "^2.0.4",
+    "vue-template-compiler": "^2.6.10"
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ],
+  "rules": {
+    "generator-star-spacing": "off",
+    "no-tabs": "off",
+    "no-unused-vars": "off",
+    "no-console": "off",
+    "no-irregular-whitespace": "off",
+    "no-debugger": "off"
+  }
+}
+
+```
+
+### main.js
+
+> 入口'js'
+
+```
+import Vue from 'vue' //ES6引入模块写法，引入vue组件，别名为Vue
+import App from './App.vue'
+import router from './router'
+Vue.config.productionTip = false //是否打印vue logger日志
+
+import axios from 'axios'
+Vue.prototype.$axios = axios
+
+import echarts from 'echarts'
+Vue.prototype.$echarts = echarts
+Vue.prototype.AJ_API_HOST='/ajapi'
+
+// import CountUp from "vue-countupjs";
+
+import china from 'echarts/map/json/china.json'
+echarts.registerMap('china', china)
+
+new Vue({
+    router,
+    render: h => h(App)
+}).$mount('#app') //实例化组件，并绑定
+```
+
 
 
 # Vue3
@@ -3504,11 +3744,12 @@ new Vue({
 </html>
 ```
 
-
-
 # 参考资料
 
 1. https://www.bilibili.com/video/av254249324?p=4&spm_id_from=pageDriver
 2. https://cn.vuejs.org/v2/guide/reactivity.html
 3. https://v3.cn.vuejs.org/guide/reactivity-fundamentals.html#%E5%88%9B%E5%BB%BA%E7%8B%AC%E7%AB%8B%E7%9A%84%E5%93%8D%E5%BA%94%E5%BC%8F%E5%80%BC%E4%BD%9C%E4%B8%BA-refs
+4. https://blog.51cto.com/shouke/2839278
+5. https://www.jianshu.com/p/75cf57e53451
+6. https://www.jianshu.com/p/a48594fb3a74
 

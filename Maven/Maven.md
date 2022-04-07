@@ -243,23 +243,23 @@ Maven 是一个项目管理工具，它包含了一个项目对象模型 (POM：
 ### Ubuntu
 
 　　1. 阿里云：http://mirrors.aliyun.com/ubuntu-releases/
-  　　2. 网易：http://mirrors.163.com/ubuntu-releases/
-  　　3. 搜狐：http://mirrors.sohu.com/ubuntu-releases/
-  　　4. 首都在线科技股份有限公司：http://mirrors.yun-idc.com/ubuntu-releases/
+        　　2. 网易：http://mirrors.163.com/ubuntu-releases/
+            　　3. 搜狐：http://mirrors.sohu.com/ubuntu-releases/
+        　　4. 首都在线科技股份有限公司：http://mirrors.yun-idc.com/ubuntu-releases/
 
 ### CentOS
 
 　　1. 网易：http://mirrors.163.com/centos/
-  　　2. 搜狐：http://mirrors.sohu.com/centos/
-  　　3. 阿里云：http://mirrors.aliyun.com/centos/
+        　　2. 搜狐：http://mirrors.sohu.com/centos/
+            　　3. 阿里云：http://mirrors.aliyun.com/centos/
 
 ### Apache
 
 1. 中国互联网络信息中心：http://mirrors.cnnic.cn/apache/
 
 　　2. 华中科技大学：http://mirrors.hust.edu.cn/apache/
-  　　3. 北京理工大学：http://mirror.bit.edu.cn/apache/
-  　　4. TOMCAT全版本：https://archive.apache.org/dist/tomcat/
+        　　3. 北京理工大学：http://mirror.bit.edu.cn/apache/
+            　　4. TOMCAT全版本：https://archive.apache.org/dist/tomcat/
 
 ### MySQL
 
@@ -341,9 +341,36 @@ Maven 是一个项目管理工具，它包含了一个项目对象模型 (POM：
 
 # POM配置
 
+## 内置变量
+
+```
+${basedir}  表示项目根目录,即包含pom.xml文件的目录;
+${version}  表示项目版本;
+${project.basedir}  同${basedir};
+${project.baseUri}  表示项目文件地址;
+${maven.build.timestamp}  表示项目构件开始时间;
+${maven.build.timestamp.format}  表示属性${maven.build.timestamp}的展示格式,默认值为yyyyMMdd-HHmm,可自定义其格式,其类型可参考java.text.SimpleDateFormat。
+${project.build.directory}  表示主源码路径;
+${project.build.sourceEncoding}  表示主源码的编码格式;
+${project.build.sourceDirectory}  表示主源码路径;
+${project.build.finalName}  表示输出文件名称;
+${project.version}  表示项目版本,与${version}相同;
+${project.xxx} 当前pom文件的任意节点的内容
+${env.xxx} 获取系统环境变量。
+${settings.xxx} 指代了settings.xml中对应元素的值。
+```
+
+
+
 ## `dependencyManagement`
 
 ## `build`
+
+# 常用插件
+
+## ` maven-antrun-plugin`
+
+> 我们将 maven-antrun-plugin:run 目标添加到测试阶段中。这样我们可以在不同的 profile 中输出文本信息
 
 # Maven常用命令
 
@@ -401,7 +428,290 @@ package 是 maven 工程的打包命令
       （2）对于 web 工程打成 war包。
 ```
 
-## 安装
+### 打包工具
+
+#### `maven-assembly-plugin`
+
+> maven针对打包任务提供的标准插件。允许用户将项目输出与它的依赖项，模块，站点文档，和其他文件一起组装成一个可分发的归档文件
+
+```
+#### 打包后会在target目录下生成一个xxx-jar-with-dependencies.jar文件，这个文件不但包含了自己项目中的代码和资源，还包含了所有依赖包的内容。所以可以直接通过java -jar来运行。直接通过mvn package来打包，无需assembly:single
+<build>
+  <plugins>
+           <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.0</version>
+                <!--增加一下配置，可以实现mvn package时直接生成可执行jar包-->
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <archive>
+                        <manifest>
+                        	<!--需要运行的主类（这个类中有需要运行的main函数）-->
+                            <mainClass>com.tod.base.server.exec.Application</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+     </plugins>
+ </build>
+ 
+ 
+ #### 效果同上，但打包命令为：mvn package assembly:single 或者：mvn assembly:assembly
+ <build>
+   <plugins>
+      <!--打成jar包且把pom依赖包打入进来-->
+      <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-assembly-plugin</artifactId>
+         <version>2.5.5</version>
+         <configuration>
+            <archive>
+               <manifest>
+                  <!--需要运行的主类（这个类中有需要运行的main函数）-->
+                  <mainClass>com.ytinfo.zach.work.mergeVideo</mainClass>
+               </manifest>
+            </archive>
+            <descriptorRefs>
+               <descriptorRef>jar-with-dependencies</descriptorRef>
+            </descriptorRefs>
+         </configuration>
+      </plugin>
+      <!--编译java代码-->
+      <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-compiler-plugin</artifactId>
+         <version>3.8.0</version>
+         <configuration>
+            <source>1.8</source>
+            <target>1.8</target>
+            <encoding>UTF-8</encoding>
+         </configuration>
+      </plugin>
+   </plugins>
+</build>
+```
+
+#### `maven-jar-plugin`
+
+> 如果没有依赖第三方包，可以用maven-jar-plugin插件，只是修改META-INFO下的MANIFEST.MF信息，指定运行jar包的main入口。
+>
+> 1. pom.xml的build>plugins中添加如下配置。
+> 2. 点击maven project（右边栏）->选择Lifecycle->点击package打包
+>    **注意**：如果想将打包好的JAR包通过命令直接运行，如java -jar xx.jar。需要制定manifest配置的classpathPrefix与上面配置的相对应。如上面把依赖JAR包输出到了lib，则这里的classpathPrefix也应指定为lib/；同时，并指定出程序的入口类，在配置mainClass节点中配好入口类的全类名。
+>
+
+```
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-jar-plugin</artifactId>
+    <version>2.4</version>
+    <configuration>
+        <archive>
+            <manifest>
+            	 <!--运行jar包时运行的主类，要求类全名-->
+                 <mainClass>com.lpf.system.SystemMonitor</mainClass>
+                 <!-- 是否指定项目classpath下的依赖 -->
+                 <addClasspath>true</addClasspath>
+                 <!-- 指定依赖的时候声明前缀 -->
+                 <classpathPrefix>./lib/</classpathPrefix>
+                 <!--依赖是否使用带有时间戳的唯一版本号,如:xxx-1.3.0-20121225.012733.jar-->
+                 <useUniqueVersions>false</useUniqueVersions>
+        	</manifest>
+        </archive>
+    </configuration>
+</plugin>
+### **把第三方包下载到lib目录**
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-dependency-plugin</artifactId>
+    <executions>
+        <execution>
+            <id>copy</id>
+            <phase>package</phase>
+            <goals>
+            	<goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+            	 <!-- 拷贝项目依赖包到lib/目录下 -->
+            	<outputDirectory>${project.build.directory}/lib</outputDirectory>
+            	<!-- 间接依赖也拷贝 -->
+                <excludeTransitive>false</excludeTransitive>
+                <!-- 带上版本号 -->
+                <stripVersion>false</stripVersion>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+```
+
+#### `maven-shade-plugin`
+
+> 用来打可执行包.使用`mvn package`后，直接使用`java -jar APIServer-1.0-shaded.jar`运行
+
+```
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-shade-plugin</artifactId>            
+    <version>3.2.4</version>
+    <configuration>
+    <createDependencyReducedPom>false</createDependencyReducedPom>
+    </configuration>
+    <executions>
+        <execution>
+            <phase>package</phase>
+            <goals>
+                <goal>shade</goal>
+            </goals>
+            <configuration>
+                <transformers>
+                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                    <mainClass>org.example.demo8.Hello</mainClass>
+                    </transformer>
+            </transformers>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+
+```
+
+### 运行jar文件报错
+
+- **场景描述**
+
+  > 打包没有问题，运行jar时报错
+
+```
+E:\>java -jar APIServer-1.0-shaded.jar
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: 0
+        at com.tod.base.server.exec.Application.main(Application.java:39)
+        
+log4j:WARN No appenders could be found for logger (com.tod.base.server.exec.Application).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+```
+
+- **解决方案**
+
+1. **log4j警告信息提示解决方案**
+
+```
+### log4j警告信息提示解决方案
+log4j:WARN No appenders could be found for logger (com.tod.base.server.exec.Application).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+
+解决方案：在项目src目录下，新建 log4j.properties 文件，输入以下内容
+# Configure logging for testing: optionally with log file
+log4j.rootLogger=WARN, stdout
+# log4j.rootLogger=WARN, stdout, logfile
+
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=%d %p [%c] - %m%n
+
+log4j.appender.logfile=org.apache.log4j.FileAppender
+log4j.appender.logfile.File=target/spring.log
+log4j.appender.logfile.layout=org.apache.log4j.PatternLayout
+log4j.appender.logfile.layout.ConversionPattern=%d %p [%c] - %m%n
+```
+
+2. **SLF4J报错解决方案**
+
+```
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+```
+
+
+
+> 报错原因：没有绑定具体实现的logger，slf4j-api定义了日记操作的api，需要用户绑定具体的日志实现框架，如log4j。对应依赖包没有导入。查看maven本地库中是否有对应版本的jar包，如果没有则导入对应依赖包。
+
+```
+		<dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.29</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.5</version>
+        </dependency>
+```
+
+3. **列表异常**
+
+   ```
+   Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: 0
+           at com.tod.base.server.exec.Application.main(Application.java:39)
+           
+   查看main函数参数中是否存在列表操作，查看异常所在
+   public static void main(String[] args) throws Exception {
+           logger.info("启动项目=================");
+           String packages = "com.tod.base.server";
+           init();
+          runner = AppServer.startServer(Integer.parseInt(args[0]), packages);
+       }
+   
+   ```
+
+   
+
+### 引入另一个项目jar包
+
+```
+### 1. 在当前项目pom.xml配置
+ <dependency>
+            <groupId>com.tod.product.base</groupId>
+            <artifactId>APIBase</artifactId>
+            <version>4.0.0</version>
+            <scope>compile</scope> <!--可省略-->
+        </dependency>
+
+### 2.手动导入另一项目jar包
+mvn install:install-file 
+          -DgroupId=com.tod.product.base
+          -DartifactId=APIBase
+          -Dversion=4.0.0
+          -Dpackaging=jar 
+          -Dfile=E:\APIBase-4.0.0.jar
+
+```
+
+### 运行已打包好的jar包
+
+- **情景描述**
+
+  > 在win上运行打包好的jar包，发现返回到前台的数据是乱码
+
+- **解决方案**
+
+> 原因: 运行VM的编码集可能是GBK,win上cmd运行的log可能会乱码，建议log输出文件编码格式问题在运行jar包设定编码
+>
+> ```
+> E:\>java -Dfile.encoding=utf-8 -jar APIServer-1.0-jar-with-dependencies.jar
+> ```
+
+
+
+## 下载依赖包到本地
 
 ```
 mvn install
@@ -413,7 +723,7 @@ install 是 maven 工程的安装命令
 当后面的命令执行时，前面的操作过程也都会自动执行！
 ```
 
-## 本地仓库手工打入jar包
+## 本地仓库手工导入jar包
 
 ```
 防止当前使用jar包在中心仓库没有;手工导入自己创建的jar包：
@@ -478,3 +788,5 @@ pause
 2. https://www.cnblogs.com/ringbug/p/15184590.html
 3. http://www.voycn.com/article/shishangzuixiangxidemavenshiyongbijijianyishoucang
 4. http://k.sina.com.cn/article_2547637062_97d9db4600100eh5e.html
+5. https://blog.csdn.net/Hugh_Guan/article/details/110224621
+6. https://blog.csdn.net/wang740209668/article/details/119981084

@@ -424,6 +424,55 @@ Access-Control-Allow-Origin: *   //允许所有域访问资源权限
 Access-Control-Allow-Origin: https://developer.mozilla.org
 ```
 
+# 部署
+
+## 1. vue项目打包
+
+```
+npm run build
+```
+
+## 2. 将dist文件夹拷贝到nginx项目目录下
+
+```
+修改dist文件夹为tjapp_2022,然后目录如下
+/etc/nginx/tjapp_2022;
+```
+
+
+
+## 3. 配置nginx.conf
+
+```
+server {
+    listen 5002;
+    fastcgi_connect_timeout  300s;
+    fastcgi_send_timeout  300s;
+    fastcgi_read_timeout  300s;
+    location / {
+      root /etc/nginx/tjapp_2022;
+	  try_files $uri $uri/ /index.html index.htm index.html.gz;
+    }
+    location /api/ { //配置api 代理
+	proxy_pass  http://10.11.156.17:8082/;
+	proxy_set_header Accept application/json,text/javascript,*/*;
+	proxy_set_header Content-Type application/json;
+      #proxy_set_header Host $host:$proxy_port;
+      #proxy_set_header  X-Real-IP        $remote_addr;
+      #proxy_set_header  X-Forwarded-For  $proxy_add_x_forwarded_for;
+      #proxy_set_header X-NginX-Proxy true;
+        proxy_connect_timeout    300s;
+        proxy_read_timeout   300s;
+        proxy_send_timeout   300s;
+     # proxy_buffer_size          4k;
+     # proxy_buffers              4 32k;
+     # proxy_busy_buffers_size    64k;
+     # proxy_temp_file_write_size 64k;
+    }
+
+   }
+```
+
 
 
 # 参考资料

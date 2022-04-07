@@ -1312,7 +1312,7 @@ db.<Collection>.aggregate(
 
   | 步骤            | 作用     | SQL等价运算符   |
   | --------------- | -------- | --------------- |
-  | $matcn          | 过滤     | WHERE           |
+  | $match          | 过滤     | WHERE           |
   | $project        | 投影     | AS              |
   | $sort           | 排序     | ORDER BY        |
   | $group          | 分组     | GROUP BY        |
@@ -1396,7 +1396,101 @@ db.emp.aggregate([
 {"$limit":2},
 {"$skip":1}
 ])
+
+### 多个分组字段：按照prov_out，biz_date
+db.getCollection('LLLX_ONE_DAY').aggregate([
+{"$match":{"prov_in":"120000","biz_date":"20220401"}}, 
+{"$group":{"_id":{"pro_out":"$prov_out","biz_date":"$biz_date"},"amount":{"$sum":"$volume_business"}}}
+])
+
+--- 结果：
+{
+    "_id" : {
+        "pro_out" : "KR0000",
+        "biz_date" : "20220401"
+    },
+    "amount" : 20220401
+}
 ```
+
+#### 合并俩个结果集
+
+> 使用`facet`合并俩个结果集
+
+```
+//范例1
+db.getCollection('LLLX_ONE_DAY').aggregate(
+{
+"$facet":{   
+ "flow_out_amount": 
+ [
+{"$match":{"biz_date":"20220401","prov_out":"120000"}},
+{"$group":{"_id":{"biz_date":"$biz_date"},"amount":{"$sum":"$volume_business"}}}
+],
+"flow_in_amount":[
+{"$match":{"biz_date":"20220401","prov_in":"120000"}},
+{"$group":{"_id":{"biz_date":"$biz_date"},"amount":{"$sum":"$volume_business"}}}
+]
+    }
+ },
+ { "$project": { "data": { "$concatArrays": ["$flow_out_amount", "$flow_in_amount"] }}},
+{ "$unwind": "$data" },
+{ "$replaceRoot": { "newRoot": "$data" }}
+
+)
+
+//范例2
+db.getCollection('LLLX_ONE_DAY').aggregate(
+{
+"$facet":{   
+ "tmp_out_amount":[
+{"$match":{"biz_date":"20220401","prov_out":"120000"}},
+{"$group":{"_id":{"biz_date":"$biz_date"},"amount":{"$sum":"$volume_business"}}}
+],
+"tmp_in_amount":[
+{"$match":{"biz_date":"20220401","prov_in":"120000"}},
+{"$group":{"_id":{"biz_date":"$biz_date"},"amount":{"$sum":"$volume_business"}}}
+]
+    }
+ },
+ { "$project":{"flow_out_amount":"$tmp_out_amount.amount","flow_in_amount":"$tmp_in_amount.amount"}}
+)
+
+
+//结果集展示
+[
+    {
+        "_id" : {
+            "biz_date" : "20220401"
+        },
+        "amount" : NumberLong(2491941)
+    },
+    {
+        "_id" : {
+            "biz_date" : "20220401"
+        },
+        "amount" : NumberLong(2686320)
+    }
+]
+```
+
+#### `unwind`
+
+```
+### 原始数据插入
+db.inventory.insertOne({ "_id" : 1, "item" : "ABC1", sizes: [ "S", "M", "L"] })
+
+### 使用unwind展开结果
+db.inventory.aggregate( [ { $unwind : "$sizes" } ] )
+
+The operation returns the following results:
+
+{ "_id" : 1, "item" : "ABC1", "sizes" : "S" }
+{ "_id" : 1, "item" : "ABC1", "sizes" : "M" }
+{ "_id" : 1, "item" : "ABC1", "sizes" : "L" }
+```
+
+
 
 ### 5.3.4 索引
 
@@ -1435,12 +1529,22 @@ db.user.dropIndex("name_1")
 
 # 6. MongoDB常用命令
 
+## 进入MongoDB操作界面
+
 ```
 命令操作前提：进入MongoDB操作界面
 [root@mysql bin]# mongo
 ### 清屏
 > cls
 ```
+
+## 查看Mongo版本
+
+```
+db.version()
+```
+
+
 
 # 7. Python&MongoDB
 
