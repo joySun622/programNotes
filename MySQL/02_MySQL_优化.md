@@ -207,6 +207,23 @@ mysql> EXPLAIN SELECT * FROM EMP E JOIN DEPT D ON E.DEPTNO=D.DEPTNO JOIN SALGRAD
 
 > - **特点**
 
+# 优化
+
+## count(*) & count(1) & count(字段)区别
+
+> `count(*)`、`count(主键id)` 和 `count(1)` 都表示返回满足条件的结果集的总行数；而`count(字段)`则表示返回满足条件的数据行里面，参数`“字段”`不为 `NULL` 的总个数
+>
+> 效率排序，`count(字段)` < `count(主键id)`< `count(1)` ≈ `count(*)`;尽量使用 `count(*)`
+
+| 函数名          | 说明                                                         |
+| --------------- | ------------------------------------------------------------ |
+| `count(*)`      | `count(*)` 是例外，优化器专门对其做了优化，并不会把全部字段取出来，而是直接按行累加 |
+| `count(1)`      | 对于 `count(1)` 来说，`InnoDB` 引擎遍历整张表，但不取值。`server` 层对于返回的每一行，<br />放一个数字 `“1”` 进去，判断是不可能为空的，按行累加 |
+| `count(主键id)` | 对于 `count(主键id)` 来说，`InnoDB` 引擎会遍历整张表，把每一行的 `id` 值都取出来，<br />返回给 `server` 层。`server` 层拿到 `id` 后，判断 `id` 不为 `NULL` 的，就按行累加 |
+| `count(字段)`   | 如果这个 `“字段”` 定义为 `not null`，一行行地从记录里面读出这个字段，<br />判断不可能为 `null`，按行累加 如果这个 `“字段”` 定义为 `null`，那么执行的时候，<br />判断到有可能是 `null`，还要把值取出来再判断一下，不是 `null` 才累加 |
+
+
+
 # 参考资料
 
 1. https://dev.mysql.com/doc/refman/5.7/en/using-explain.html

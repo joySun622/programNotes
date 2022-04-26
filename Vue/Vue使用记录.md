@@ -39,7 +39,55 @@ npm install
     运行结束后：可以看到本地访问地址，直接以该地址访问
     ![image-20220309162050283](images/image-20220309162050283.png)
 
+## 2. 运行项目报错问题
 
+- **场景描述**
+
+> 运行项目时，提示无法识别某个模块，或者命令，或者找不到依赖的模块等
+>
+> 如下报错信息
+>
+> ```
+> Error: Cannot find module './lib/spinner'
+> Require stack:
+> ```
+
+- **解决方案**
+
+1. 删除`node_modules` 整个文件夹和 package-lock.json 文件(这个文件不一定有)，注意不是 `package.json`
+2. 清除缓存`npm cache clear --force`;
+3. 重新安装依赖： `npm install`
+4. 重新运行项目： `npm run serve` 
+
+## 3. 编译vue项目报错
+
+- **场景描述**
+
+> 运行vue项目时，无法正常引入模块，报错信息如下：
+
+```
+ error  in ./src/views/Box.vue
+
+Module Error (from ./node_modules/@vue/cli-service/node_modules/vue-loader/lib/index.js):
+
+
+Vue packages version mismatch:
+
+- vue@2.6.14 (D:\huadi_workspace\tjyz_workspace\old_tjyz_project\tjyz\TJYZ-v1.0\node_modules\vue\dist\vue.runtime.common.js)
+- vue-template-compiler@2.6.10 (D:\huadi_workspace\tjyz_workspace\old_tjyz_project\tjyz\TJYZ-v1.0\node_modules\vue-template-compiler\package.json)
+```
+
+- **问题原因**
+
+> vue-template-compiler和vue版本需要一致
+
+- **解决方案**
+
+> 安装vue对应版本的`vue-template-compiler`版本
+
+```
+npm i vue-template-compiler@2.6.14(你的vue版本号)
+```
 
 # 跨域问题
 
@@ -473,8 +521,42 @@ server {
    }
 ```
 
+# 问题集
+
+## Cannot read properties of null (reading ‘pickAlgorithm‘)
+
+- **场景描述**
+
+> 新导入项目，重新安装依赖，提示报错信息如下：
+>
+> ```
+> npm ERR! Cannot read properties of null (reading 'pickAlgorithm')
+> 
+> npm ERR! A complete log of this run can be found in:
+> npm ERR!     C:\Users\12613\AppData\Local\npm-cache\_logs\2022-04-21T03_30_54_505Z-debug-0.log
+> ```
+
+- **解决方案**:清除缓存`npm cache clear --force`之后再重新安装依赖`npm install`
+  ![在这里插入图片描述](images/bfff3d5f507343ea80da85277e48d3c1.png)
+
+## 运行项目报错
+
+- **报错信息**
+
+```
+Error: Cannot find module './lib/spinner'
+Require stack:
+```
+
+- **解决方案**
+
+> 1. 删除 node_modules 整个文件夹和 package-lock.json 文件(这个文件不一定有)，注意不是 package.json
+> 2. 在项目下运行 `npm install`
+> 3. 继续运行 `npm start`
+
 
 
 # 参考资料
 
 1. https://www.cnblogs.com/chenshishuo/p/4919224.html
+2. https://blog.csdn.net/qq_29483485/article/details/123711261

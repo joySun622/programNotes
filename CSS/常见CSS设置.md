@@ -234,6 +234,28 @@ list-style-type 其他样式
 >
 > [CSS2英文说明文档](https://www.w3.org/TR/CSS21/visuren.html#)
 
+# 字符
+
+## 转换元素文本 text-transform
+
+```
+h1 {text-transform:uppercase;}  定义仅有大写字母。
+h2 {text-transform:capitalize;}  文本中的每个单词以大写字母开头。
+p {text-transform:lowercase;}  定义无大写字母，仅有小写字母。
+
+
+none	默认。定义带有小写字母和大写字母的标准的文本。
+inherit	规定应该从父元素继承 text-transform 属性的值。
+```
+
+## 空格符
+
+```
+&nbsp; 半角的不断行的空白格（推荐使用）
+&ensp; 半角的空格
+&emsp; 全角的空格
+```
+
 
 
 # 参考资料
