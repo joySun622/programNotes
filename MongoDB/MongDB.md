@@ -2,6 +2,8 @@
 
 # 1. 简介
 
+> [官方说明文档](https://www.mongodb.com/docs/guides/)
+
 > MongDB一个以JSON为数据模型的文档数据库。文档的概率来源于“JSON Document”,并非我们一般理解的PDF，WORD文档。
 > MongDB俩个发布版本：
 > 1）社区版：基于SSPL,一种和AGPL基本类似的开源协议；
@@ -1542,6 +1544,321 @@ db.user.dropIndex("name_1")
 
 ```
 db.version()
+```
+
+## 查看配置信息
+
+```
+use admin
+// 获取全部配置信息
+db.runCommand( { getParameter : '*' } );
+// 获取指定配置参数信息
+db.adminCommand({getParameter:1, replWriterThreadCount:true})
+```
+
+## 查看当前数据库的名称
+
+```
+db
+```
+
+## 查看数据库信息
+
+```
+db.stats()
+
+{
+    "db" : "admin",
+    "collections" : 3,
+    "views" : 0,
+    "objects" : 8,
+    "avgObjSize" : 245.875,
+    "dataSize" : 1967.0,
+    "storageSize" : 61440.0,
+    "indexes" : 4,
+    "indexSize" : 81920.0,
+    "totalSize" : 143360.0,
+    "scaleFactor" : 1.0,
+    "fsUsedSize" : 1044635627520.0,
+    "fsTotalSize" : 1915682824192.0,
+    "ok" : 1.0,
+    "$clusterTime" : {
+        "clusterTime" : Timestamp(1651213823, 13713),
+        "signature" : {
+            "hash" : { "$binary" : "heFKCabO7lIArsB+h6gmmxejQ5M=", "$type" : "00" },
+            "keyId" : NumberLong(7051925804237717505)
+        }
+    },
+    "operationTime" : Timestamp(1651213823, 13418)
+}
+```
+
+## 查看集群配置信息
+
+```
+rs.conf()
+
+{
+    "_id" : "configs",
+    "version" : 1,
+    "term" : 49,
+    "protocolVersion" : NumberLong(1),
+    "writeConcernMajorityJournalDefault" : true,
+    "members" : [ //所有成员：包括主从
+        {
+            "_id" : 0,
+            "host" : "10.11.11.111:27017",
+            "arbiterOnly" : false,
+            "buildIndexes" : true,
+            "hidden" : false,
+            "priority" : 1.0,
+            "tags" : {},
+            "slaveDelay" : NumberLong(0),
+            "votes" : 1
+        }, 
+        {
+            "_id" : 1,
+            "host" : "10.11.11.112:27017",
+            "arbiterOnly" : false,
+            "buildIndexes" : true,
+            "hidden" : false,
+            "priority" : 1.0,
+            "tags" : {},
+            "slaveDelay" : NumberLong(0),
+            "votes" : 1
+        }, 
+        {
+            "_id" : 2,
+            "host" : "10.11.11.112:27017",
+            "arbiterOnly" : false,
+            "buildIndexes" : true,
+            "hidden" : false,
+            "priority" : 1.0,
+            "tags" : {},
+            "slaveDelay" : NumberLong(0),
+            "votes" : 1
+        }
+    ],
+    "settings" : {
+        "chainingAllowed" : true,
+        "heartbeatIntervalMillis" : 2000,
+        "heartbeatTimeoutSecs" : 10,
+        "electionTimeoutMillis" : 10000,
+        "catchUpTimeoutMillis" : -1,
+        "catchUpTakeoverDelayMillis" : 30000,
+        "getLastErrorModes" : {},
+        "getLastErrorDefaults" : {
+            "w" : 1,
+            "wtimeout" : 0
+        },
+        "replicaSetId" : ObjectId("61665ac33ef1148af2044a10")
+    }
+}
+```
+
+
+
+## 查看集群状态
+
+```
+rs.status()
+
+{
+    "set" : "configs",
+    "date" : ISODate("2022-04-29T06:30:23.409Z"),
+    "myState" : 2,
+    "term" : NumberLong(49),
+    "syncSourceHost" : "10.11.11.111:27017", //同步源端口
+    "syncSourceId" : 0,
+    "heartbeatIntervalMillis" : NumberLong(2000),
+    "majorityVoteCount" : 2,
+    "writeMajorityCount" : 2,
+    "votingMembersCount" : 3,
+    "writableVotingMembersCount" : 3,
+    "optimes" : {
+        "lastCommittedOpTime" : {
+            "ts" : Timestamp(1651213823, 13316),
+            "t" : NumberLong(49)
+        },
+        "lastCommittedWallTime" : ISODate("2022-04-29T06:30:23.395Z"),
+        "readConcernMajorityOpTime" : {
+            "ts" : Timestamp(1651213823, 13316),
+            "t" : NumberLong(49)
+        },
+        "readConcernMajorityWallTime" : ISODate("2022-04-29T06:30:23.395Z"),
+        "appliedOpTime" : {
+            "ts" : Timestamp(1651213823, 13423),
+            "t" : NumberLong(49)
+        },
+        "durableOpTime" : {
+            "ts" : Timestamp(1651213823, 13423),
+            "t" : NumberLong(49)
+        },
+        "lastAppliedWallTime" : ISODate("2022-04-29T06:30:23.397Z"),
+        "lastDurableWallTime" : ISODate("2022-04-29T06:30:23.397Z")
+    },
+    "lastStableRecoveryTimestamp" : Timestamp(1651213731, 25942),
+    "electionParticipantMetrics" : {
+        "votedForCandidate" : true,
+        "electionTerm" : NumberLong(49),
+        "lastVoteDate" : ISODate("2022-04-01T22:59:58.819Z"),
+        "electionCandidateMemberId" : 0,
+        "voteReason" : "",
+        "lastAppliedOpTimeAtElection" : {
+            "ts" : Timestamp(1648835938, 14),
+            "t" : NumberLong(48)
+        },
+        "maxAppliedOpTimeInSet" : {
+            "ts" : Timestamp(1648835938, 14),
+            "t" : NumberLong(48)
+        },
+        "priorityAtElection" : 1.0,
+        "newTermStartDate" : ISODate("2022-04-01T22:59:58.823Z"),
+        "newTermAppliedDate" : ISODate("2022-04-01T22:59:59.964Z")
+    },
+    "members" : [ 
+        {
+            "_id" : 0,
+            "name" : "10.11.11.111:27017",
+            "health" : 1.0,
+            "state" : 1,
+            "stateStr" : "PRIMARY", //主库
+            "uptime" : 2359835,
+            "optime" : {
+                "ts" : Timestamp(1651213821, 17321),
+                "t" : NumberLong(49)
+            },
+            "optimeDurable" : {
+                "ts" : Timestamp(1651213821, 17104),
+                "t" : NumberLong(49)
+            },
+            "optimeDate" : ISODate("2022-04-29T06:30:21.000Z"),
+            "optimeDurableDate" : ISODate("2022-04-29T06:30:21.000Z"),
+            "lastHeartbeat" : ISODate("2022-04-29T06:30:21.622Z"),
+            "lastHeartbeatRecv" : ISODate("2022-04-29T06:30:22.457Z"),
+            "pingMs" : NumberLong(0),
+            "lastHeartbeatMessage" : "",
+            "syncSourceHost" : "",
+            "syncSourceId" : -1,
+            "infoMessage" : "",
+            "electionTime" : Timestamp(1648853998, 1),
+            "electionDate" : ISODate("2022-04-01T22:59:58.000Z"),
+            "configVersion" : 1,
+            "configTerm" : 49
+        }, 
+        {
+            "_id" : 1,
+            "name" : "10.11.111.112:27017",
+            "health" : 1.0,
+            "state" : 2,
+            "stateStr" : "SECONDARY", //从库
+            "uptime" : 2359794,
+            "optime" : {
+                "ts" : Timestamp(1651213822, 20542),
+                "t" : NumberLong(49)
+            },
+            "optimeDurable" : {
+                "ts" : Timestamp(1651213822, 20542),
+                "t" : NumberLong(49)
+            },
+            "optimeDate" : ISODate("2022-04-29T06:30:22.000Z"),
+            "optimeDurableDate" : ISODate("2022-04-29T06:30:22.000Z"),
+            "lastHeartbeat" : ISODate("2022-04-29T06:30:22.598Z"),
+            "lastHeartbeatRecv" : ISODate("2022-04-29T06:30:23.178Z"),
+            "pingMs" : NumberLong(0),
+            "lastHeartbeatMessage" : "",
+            "syncSourceHost" : "10.11.111.112:27017",//同步源端口
+            "syncSourceId" : 2,
+            "infoMessage" : "",
+            "configVersion" : 1,
+            "configTerm" : 49
+        }, 
+        {
+            "_id" : 2,
+            "name" : "10.11.111.113:27017",
+            "health" : 1.0,
+            "state" : 2,
+            "stateStr" : "SECONDARY",
+            "uptime" : 2670277,
+            "optime" : {
+                "ts" : Timestamp(1651213823, 13423),
+                "t" : NumberLong(49)
+            },
+            "optimeDate" : ISODate("2022-04-29T06:30:23.000Z"),
+            "syncSourceHost" : "10.11.111.111:27017",//同步源端口
+            "syncSourceId" : 0,
+            "infoMessage" : "",
+            "configVersion" : 1,
+            "configTerm" : 49,
+            "self" : true,
+            "lastHeartbeatMessage" : ""
+        }
+    ],
+    "ok" : 1.0,
+    "$clusterTime" : {
+        "clusterTime" : Timestamp(1651213823, 13833),
+        "signature" : {
+            "hash" : { "$binary" : "heFKCabO7lIArsB+h6gmmxejQ5M=", "$type" : "00" },
+            "keyId" : NumberLong(7051925804237717505)
+        }
+    },
+    "operationTime" : Timestamp(1651213823, 13423)
+}
+```
+
+## 查看当前服务是否为主节点
+
+```
+db.isMaster()
+
+{
+    "topologyVersion" : {
+        "processId" : ObjectId("624783de3a34b138ba3bfa3c"),
+        "counter" : NumberLong(6)
+    },
+    "hosts" : [ //端口集：包括主从所有端口
+        "10.11.11.111:27017", 
+        "10.11.11.112:27017", 
+        "10.11.11.113:27017"
+    ],
+    "setName" : "configs",
+    "setVersion" : 1,
+    "ismaster" : true, //是否为主节点，如果为主节点则为true
+    "secondary" : false,//是否为从节点，如果为主节点则为true
+    "primary" : "10.11.11.111:27017",//主节点端口
+    "me" : "10.11.11.111:27017",//当前解决端口
+    "electionId" : ObjectId("7fffffff0000000000000031"),
+    "lastWrite" : {
+        "opTime" : {
+            "ts" : Timestamp(1651214672, 4638),
+            "t" : NumberLong(49)
+        },
+        "lastWriteDate" : ISODate("2022-04-29T06:44:32.000Z"),
+        "majorityOpTime" : {
+            "ts" : Timestamp(1651214672, 4328),
+            "t" : NumberLong(49)
+        },
+        "majorityWriteDate" : ISODate("2022-04-29T06:44:32.000Z")
+    },
+    "maxBsonObjectSize" : 16777216,
+    "maxMessageSizeBytes" : 48000000,
+    "maxWriteBatchSize" : 100000,
+    "localTime" : ISODate("2022-04-29T06:44:32.224Z"),
+    "logicalSessionTimeoutMinutes" : 30,
+    "connectionId" : 1450551,
+    "minWireVersion" : 0,
+    "maxWireVersion" : 9,
+    "readOnly" : false,
+    "ok" : 1.0,
+    "$clusterTime" : {
+        "clusterTime" : Timestamp(1651214672, 4644),
+        "signature" : {
+            "hash" : { "$binary" : "eBczI1GAGQxfJoU2ju0LDDnmmD4=", "$type" : "00" },
+            "keyId" : NumberLong(7051925804237717505)
+        }
+    },
+    "operationTime" : Timestamp(1651214672, 4638)
+}
 ```
 
 

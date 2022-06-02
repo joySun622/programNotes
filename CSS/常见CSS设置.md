@@ -256,9 +256,56 @@ inherit	规定应该从父元素继承 text-transform 属性的值。
 &emsp; 全角的空格
 ```
 
+# 元素内空白处理
+
+> `white-space` 属性设置如何处理元素内的空白
+
+| 值       | 描述                                                         |
+| :------- | :----------------------------------------------------------- |
+| normal   | 默认。空白会被浏览器忽略。                                   |
+| pre      | 空白会被浏览器保留。其行为方式类似 HTML 中的 <pre> 标签。    |
+| nowrap   | 文本不会换行，文本会在在同一行上继续，直到遇到 <br> 标签为止。 |
+| pre-wrap | 保留空白符序列，但是正常地进行换行。                         |
+| pre-line | 合并空白符序列，但是保留换行符。                             |
+| inherit  | 规定应该从父元素继承 white-space 属性的值。                  |
+
+- **范例：规定段落不进行换行**
+
+```
+p
+  {
+  white-space: nowrap;
+  }
+```
+
+# 运算
+
+## `calc()`
+
+> `calc()`可使用`+,-,*,/`运算
+
+- **3栏等宽布局**
+
+```
+.box{
+    margin-left:20px;
+    width:calc(100%/3 - 20px);
+}
+```
+
+- **使用范例**
+
+```
+width: calc(10px + 100px);
+width: calc(100% - 30px);
+width: calc(2em * 5);
+width: calc(var(--variable-width) + 20px);
+```
+
 
 
 # 参考资料
 
 1. https://www.runoob.com/css/css-positioning.html
 2. https://www.zhihu.com/question/21911352
+3. https://developer.mozilla.org/en-US/docs/Web/CSS/calc

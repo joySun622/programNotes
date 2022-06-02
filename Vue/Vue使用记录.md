@@ -554,9 +554,306 @@ Require stack:
 > 2. 在项目下运行 `npm install`
 > 3. 继续运行 `npm start`
 
+## vue 项目疯狂请求/sockjs-node/info?t=****
 
+- **问题描述**
+
+> 使用Vue，发现页面一直有请求`sockjs`
+> ![image-20220510180522640](images/image-20220510180522640.png)
+
+- **原因**
+
+```mipsasm
+1.首先看看sockjs的定义：是一个JavaScript库，提供跨浏览器JavaScript的API，创建了一个低延迟、全双工的浏览器和web服务器之间通信通道。在项目运行以后，network会一直调用这个接口。如果没有使用，那么就一直会报这个异常。
+2.SockJS是一个JavaScript库（用于浏览器），提供类似于WebSocket的对象。其作用就是开发环境下，保证我们在改完代码重新编译之后，能够通知浏览器重新加载变更结果
+3.可以理解为，这个库是用来让本地与浏览器之间的热模块更新通信的，但是现在这两个地址对接不上了，所以报了这个错。
+```
+
+- **解决方案**
+
+**方案1**：（推荐）在项目根目录找到/package-lock.json文件，修改如下：
+
+![img](images/c4c6e62d98954ae99dde9a7a2226ba94.png)
+
+**方案2**：(没试过，只做记录)
+
+```
+config.devServer.host("localhost");
+
+或者
+
+devServe:{
+  host:'localhost'
+}
+```
+
+**方案3：**
+
+```
+在 node_modules/sockjs-client/dist/sockjs.js找到1609行
+
+try {
+  //  self.xhr.send(payload); 把这里注掉
+} catch (e) {
+  self.emit('finish',0,'');
+  self.\_cleanup(false);
+}
+```
+
+# Vue 百度地图离线版
+
+## 1. 下载百度api的`js`
+
+- **访问地址**
+
+```
+### 3.0版本
+http://api.map.baidu.com/getscript?v=3.0&ak= 你的百度地图ak密钥 &services=&t=20210201100830
+
+### 2.0版本
+http://api.map.baidu.com/getscript?v=2.0&ak= 你的百度地图ak密钥 &services=&t=20210201100830
+```
+
+> 打开后看到堆压缩代码，复制代码，找一个工具格式化一下，变成容易编辑的代码格式；
+> 工具地址：http://www.bejson.com/
+> 格式化后全部复制，另存为js文件到本地，比如baidu-api.js，用nginx代理；
+> 测试访问代理地址，比如 http://127.0.0.1:9800/baidu-api.js ，看是否能查看到此文件内容
+
+## 2. 创建并引入baidu-init.js文件
+
+> 添加一个js文件，和baidu-api.js保存在同一文件夹，可以将文件命名为baidu-init.js,代码如下：
+> 测试访问代理地址，比如 http://127.0.0.1:9800/baidu-init.js ，看是否能查看到此文件内容.
+>
+> 修改`baidu-init.js`文件， 替换成`baidu-api.js`的代理地址
+
+```
+(function() {
+	window.HOST_TYPE = "2";
+	window.BMap_loadScriptTime = (new Date).getTime();
+	window.BMap = window.BMap || {};
+	window.BMap.apiLoad = function() {
+		delete window.BMap.apiLoad;
+		if (typeof _initBaiduMap == "function") {
+			_initBaiduMap()
+		}
+	};
+	var s = document.createElement('script');
+	s.src = './baidu-api.js';  //此地址为步骤1下载的baidu-api.js存储地址
+	document.body.appendChild(s);
+})();
+```
+
+## 3. 修改依赖包下文件中远程访问api地址
+
+> 在vue依赖包 node_modules文件找到，vue-baidu-map
+
+![在这里插入图片描述](images/20210409151412243.png)
+
+- 找到根目录的 index.js文件，可以看到是压缩的js代码，查找 `https://api.map.baidu.com/api?v`
+  ![在这里插入图片描述](images/20210409151729836.png)
+
+- 将地址改为你代理本地文件baidu-init.js的地址，比如：
+
+`http://127.0.0.1:9080/baidu-init.js`
+
+## 4. 下载百度地图瓦片
+
+- 网上下载资源和资料很多，都可以试一下能不能下载，最好下载到16、17级试一下，17、18、19级瓦片会很大，下载过程比较慢。
+
+![在这里插入图片描述](images/20210409152201460.png)
+
+- 下载好以后，同样将瓦片资源代理到本地。
+
+![在这里插入图片描述](images/20210409152341863.png)然后测试，比如我代理的地址为：
+
+- 按照上图下载的文件，测试 http://127.0.0.1:9900/13/1546/310.png 看是否能访问本地图片；
+  
+
+## 5. 修改baidu-api.js
+
+> 用 url.domain.main_domain_cdn多找几次，定位到下面代码：
+> 我修改后的代码（注意有些变量不同）：
+> 可以打印一下变量看看代表的是目录的哪一级，修改自己代理的瓦片资源路径；
+
+```
+	bu: function(a) {
+		var b = this.map.ya();
+		if (!this.map.Vd() && (a ? this.map.M.c0 = a : a = this.map.M.c0, a))
+			for (var c = q, c = "2" == D.Au ? [D.url.proto + D.url.domain.main_domain_cdn.other[0] + "/"] : [D.url.proto + D.url.domain.main_domain_cdn.baidu[0] + "/", D.url.proto + D.url.domain.main_domain_cdn.baidu[1] + "/", D.url.proto + D.url.domain.main_domain_cdn.baidu[2] + "/"], e = 0, f; f = this.Cj[e]; e++)
+				if (f.P_ == p) {
+					b.m.qc = 18;
+					f.getTilesUrl = function(b, e) {
+						var f = b.x,
+							f = this.map.ef.Hw(f, e).nm,
+							m = b.y,
+							n = Vb("normal"),
+							o = 1;
+						this.map.Ix() && (o = 2);
+						n = "customimage/tile?&x=" + f + "&y=" + m + "&z=" + e + "&udt=" + n + "&scale=" + o + "&ak=" + ra;
+						n = a.styleStr ? n + ("&styles=" + encodeURIComponent(a.styleStr)) : n + ("&customid=" + a.style);
+						return c[Math.abs(f + m) % c.length] + n
+					};
+					break
+				}
+			}
+
+```
+
+- 修改为：
+
+```
+	bu: function(a) {
+		var b = this.map.ya();
+		if (!this.map.Vd() && (a ? this.map.M.c0 = a : a = this.map.M.c0, a))
+			for (var c = q, c = "2" == D.Au ? [D.url.proto + D.url.domain.main_domain_cdn.other[0] + "/"] : [D.url.proto + D.url.domain.main_domain_cdn.baidu[0] + "/", D.url.proto + D.url.domain.main_domain_cdn.baidu[1] + "/", D.url.proto + D.url.domain.main_domain_cdn.baidu[2] + "/"], e = 0, f; f = this.Cj[e]; e++)
+				if (f.P_ == p) {
+					b.m.qc = 18;
+					f.getTilesUrl = function(b, e) {
+						var f = b.x,
+							f = this.map.ef.Hw(f, e).nm,
+							m = b.y,
+							n = Vb("normal"),
+							o = 1;
+						this.map.Ix() && (o = 2);
+						n = "customimage/tile?&x=" + f + "&y=" + m + "&z=" + e + "&udt=" + n + "&scale=" + o + "&ak=" + ra;
+						n = a.styleStr ? n + ("&styles=" + a.styleStr) : n + ("&customid=" + a.style);
+						// return c[Math.abs(f + m) % c.length] + n
+						//e：一级目录 f：二级目录 m：文件名
+						return "http://127.0.0.1:9900/" + e + "/" + f + "/" + m + ".png"
+					};
+					break
+				}
+	}
+
+```
+
+> 同理，换成自己代理的瓦片地址。
+>
+> 最后根据自己的需求按照vue-baidu-map的官方文档正常编写就可以了
+
+## 6. demo实例
+
+```
+<template>
+  <el-row :gutter="15">
+    <el-col :span="18">
+      <div class="map marginBottom" style="border-radius: 4px;overflow: hidden;">
+        <!-- 给地图加点击事件getLocationPoint，点击地图获取位置相关的信息，经纬度啥的 -->
+        <!-- scroll-wheel-zoom：是否可以用鼠标滚轮控制地图缩放，zoom是视图比例 -->
+        <baidu-map :mapStyle="mapStyle" :mapClick="false" :scroll-wheel-zoom="false" :center="center" :zoom="zoom" @click="getLocationPoint">
+          <bm-view style="width: 100%; height:600px; flex: 1"></bm-view>
+          <bm-local-search :keyword="addressKeyword" :auto-viewport="true" style="display: none"></bm-local-search>
+          <map-overlay :position="{lng: 114.075673,lat: 22.521582}" text="福田口岸" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.072825,lat: 22.529861}" text="福民" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.074473, lat: 22.540912}" text="岗厦" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.07425, lat: 22.555351}" text="莲花村" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.074174, lat: 22.565942}" text="冬瓜岭" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.074156, lat: 22.574152}" text="孖岭" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.066938, lat: 22.609605}" text="雅宝" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.067005, lat: 22.616831}" text="南坑" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.067396, lat: 22.622319}" text="光雅园" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.067286, lat: 22.632149}" text="五和" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.069952, lat: 22.640902}" text="坂田北" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.072948, lat: 22.647426}" text="贝尔路" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.073885, lat: 22.656419}" text="华为" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.078323, lat: 22.663063}" text="岗头" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.086368, lat: 22.662458}" text="雪象" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.112471, lat: 22.654079}" text="甘坑" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.125145, lat: 22.653388}" text="凉帽山" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.133661, lat: 22.660692}" text="上李朗" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.128775, lat: 22.676866}" text="木古" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.128631, lat: 22.683068}" text="华南城" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.127484, lat: 22.692649}" text="禾花" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.132394, lat: 22.700272}" text="平湖" @changeZoom="changeZoom"></map-overlay>
+          <map-overlay :position="{lng: 114.139279, lat: 22.705197}" text="双拥街" @changeZoom="changeZoom"></map-overlay>
+          <bm-polyline :path="path" v-for="path of polyline.paths"></bm-polyline>
+          <bm-control>
+            <el-button style="margin-top: 10px;margin-left: 10px;" @click="changeZoom(13,{lng: 114.143455, lat: 22.609943})" size="mini" icon="el-icon-c-scale-to-original">还原</el-button>
+          </bm-control>
+        </baidu-map>
+      </div>
+</template>
+
+<script>
+  import MapOverlay from "@/components/MapOverlay"
+  export default {
+    components:{MapOverlay},
+    data(){
+      return {
+        addressKeyword:"",
+        center: {lng: 114.143455, lat: 22.609943},
+        zoom: 13,
+        text:"",
+        mapType:"BMAP_NORMAL_MAP",
+        mapStyle:{
+          styleJson:[
+            {"featureType": "land", "elementType": "all", "stylers": {"color": "#111424ff" }},
+            {"featureType": "road", "elementType": "all", "stylers": {"color": "#293142ff"}},
+            {"featureType": "water", "elementType": "all", "stylers": { "color": "#1b2638ff" }},
+            {"featureType": "green", "elementType": "all", "stylers": { "color": "#111424ff"}},
+            {"featureType": "manmade", "elementType": "all", "stylers": { "color": "#111424ff" }},
+            {"featureType": "building", "elementType": "all", "stylers": {"color": "#f1c232ff"}},
+            {"featureType": "all", "elementType": "labels", "stylers": { "visibility": "off"}}
+          ]
+        },
+        polyline: {
+          paths:[
+            [
+              {lng: 114.075673,lat: 22.521582},
+              {lng: 114.072825,lat: 22.529861},
+              {lng: 114.074473, lat: 22.540912},
+              {lng: 114.07425, lat: 22.555351},
+              {lng: 114.074174, lat: 22.565942},
+              {lng: 114.074156, lat: 22.574152},
+              {lng: 114.066938, lat: 22.609605},
+              {lng: 114.067005, lat: 22.616831},
+              {lng: 114.067396, lat: 22.622319},
+              {lng: 114.067286, lat: 22.632149},
+              {lng: 114.069952, lat: 22.640902},
+              {lng: 114.072948, lat: 22.647426},
+              {lng: 114.073885, lat: 22.656419},
+              {lng: 114.078323, lat: 22.663063},
+              {lng: 114.086368, lat: 22.662458},
+              {lng: 114.112471, lat: 22.654079},
+              {lng: 114.125145, lat: 22.653388},
+              {lng: 114.133661, lat: 22.660692},
+              {lng: 114.128775, lat: 22.676866},
+              {lng: 114.128631, lat: 22.683068},
+              {lng: 114.127484, lat: 22.692649},
+              {lng: 114.132394, lat: 22.700272},
+              {lng: 114.139279, lat: 22.705197},
+            ],
+            []
+          ]
+        },
+      }
+    },
+    created(){
+      
+    },
+    methods: {
+      
+    }
+  }
+</script>
+```
+
+![在这里插入图片描述](images/20210409162223582.png)
+
+![在这里插入图片描述](images/20210409162436807.png)
+
+> 拖动或缩放会自动加载本地资源瓦片，如果下载的瓦片不全，就会出现上图的白板情况，根据自己的需要下载相应的区域瓦片即可。
 
 # 参考资料
 
 1. https://www.cnblogs.com/chenshishuo/p/4919224.html
 2. https://blog.csdn.net/qq_29483485/article/details/123711261
+3. https://www.jianshu.com/p/8fd1e4fc6b91
+
+- **百度离线地图**
+
+1. https://blog.csdn.net/Zwain_M/article/details/115548665?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2~default~CTRLIST~default-2.no_search_link&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2~default~CTRLIST~default-2.no_search_link
+2. https://blog.csdn.net/nihaokangzheng/article/details/120987362
+3. https://blog.csdn.net/weixin_44000275/article/details/110482508
+4. https://www.csdn.net/tags/NtzaggysODI3MTEtYmxvZwO0O0OO0O0O.html
+5. https://ask.csdn.net/questions/7572399

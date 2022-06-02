@@ -264,6 +264,26 @@
 > 1. 找到导入的jar包源码，如：java源码包，找到`src`结尾的源代码文件，导入到IDEA中
 >    ![image-20220322165653228](images/image-20220322165653228.png)
 
+# Debug失效
+
+- **场景描述**
+
+> 使用Debug启动项目，发现无法进入Debug模式
+
+- **解决方案**
+
+1. 查看断点显示是否正常
+
+2. 查看是否禁用了debug模式
+
+   ![img](images/20200526105139325.png)
+
+
+
+
+
+
+
 # 参考资料
 
 1. https://www.jetbrains.com/help/idea/2016.2/working-with-artifacts.html#artifact_def

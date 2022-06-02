@@ -107,8 +107,73 @@ fire函数并不会因为它被定义在obj对象的内部和外部而有任何�
 
 
 
+# 字符串拼接
+
+## 1. 使用加号运算符
+
+```
+  let result = ""; //定义一个空字符串
+  let fruits = ["Banana", "Orange", "Apple", "Mango"];  //定义一个数组
+  for (i = 0; i < fruits.length; i++) {  //使用for循环遍历数组中的元素
+      if (fruits[i] === "Apple"){
+          result = "Apple元素在数组中的索引号为：" + i; //使用加号运算符连接字符串
+      };
+  } 
+  alert(result);  //输出结果为：Apple元素在数组中的索引号为：2
+
+```
+
+## 2. 使用${}配合反引号
+
+**注意**：一定是用反引号啊！不要写成单引号了！！
+
+```
+  let result = ""; //定义一个空字符串
+  let fruits = ["Banana", "Orange", "Apple", "Mango"];  //定义一个数组
+  for (i = 0; i < fruits.length; i++) {  //使用for循环遍历数组中的元素
+      if (fruits[i] === "Apple"){
+          result = `Apple元素在数组中的索引号为：${i}`; //使用反引号和${}连接字符串
+      };
+  } 
+  alert(result);  //输出结果为：Apple元素在数组中的索引号为：2
+
+```
+
+## 3. 使用[concat](https://so.csdn.net/so/search?q=concat&spm=1001.2101.3001.7020)()函数
+
+```
+  let result = ""; //定义一个空字符串
+  let fruits = ["Banana", "Orange", "Apple", "Mango"];  //定义一个数组
+  for (i = 0; i < fruits.length; i++) {  //使用for循环遍历数组中的元素
+      if (fruits[i] === "Apple"){
+          result = "Apple元素在数组中的索引号为："; 
+          result = result.concat(i);  //使用concat()连接字符串
+      };
+  } 
+  alert(result);  //输出结果为：Apple元素在数组中的索引号为：2
+
+```
+
+## 4. 使用join()函数（针对数组中的字符连接）
+
+```
+  let result = ""; //定义一个空字符串
+  let Array = []; //定义一个空数组
+  let fruits = ["Banana", "Orange", "Apple", "Mango"];  //定义一个数组
+  for (i = 0; i < fruits.length; i++) {  //使用for循环遍历数组中的元素
+      if (fruits[i] === "Apple"){
+          Array.push("Apple元素在数组中的索引号为：", i);  //使用push()函数将元素添加到空数组Array中
+          result = Array.join('');  //使用join()连接数组中的字符串
+          //join()括号中要使用引号（单引号/双引号），否则会把数组元素之间的逗号也加进来
+      };
+  } 
+  alert(result);  //输出结果为：Apple元素在数组中的索引号为：2
+
+```
+
 
 
 # 参考资料来源
 
 1. https://www.jb51.net/article/121164.htm
+2. https://blog.csdn.net/Colbyzn/article/details/107743059

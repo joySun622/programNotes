@@ -97,6 +97,49 @@ ps:/go.microsoft.com/fwlink/?LinkID=135170 中的 about_Execution_Policies。
 
 ![img](images/1881711-20200129122600590-1509977033.png)
 
+# 运行React项目报错
+
+- **问题描述**
+
+> 已安装好node,用`npm install`安装好项目依赖，`npm start`运行项目报错，报错信息如下：
+>
+> ```
+> 'cross-env' 不是内部或外部命令，也不是可运行的程序
+> ```
+>
+> 使用`npm install  cross-env --save`安装时，报错，报错信息如下
+
+```
+npm ERR! code ERESOLVE
+npm ERR! ERESOLVE unable to resolve dependency tree
+npm ERR! 
+npm ERR! While resolving: ant-design-pro@4.5.0
+npm ERR! Found: react@16.14.0
+npm ERR! node_modules/react
+npm ERR!   react@"^16.14.0" from the root project
+npm ERR!   peer react@">=16.9.0" from @ant-design/pro-descriptions@1.7.5
+npm ERR!   node_modules/@ant-design/pro-descriptions
+npm ERR!     @ant-design/pro-descriptions@"^1.2.0" from the root project
+npm ERR!   1 more (antd)
+```
+
+- **问题原因**
+
+> npm 版本问题导致，需要对npm进行降级
+> `npm i --legacy-peer-deps`
+> 运行完后会生成`package-lock.json`的文件，该文件主要作用就是锁定安装包的版本号，以确保项目其他成员`npm install`时大家的依赖一致
+
+- **解决方案**
+
+```
+### 在安装时忽略所有 peerDependencies，采用 npm 版本 4 到版本 6 的样式。 
+npm i --legacy-peer-deps
+### 然后再运行
+npm install
+```
+
+
+
 # 参考资料
 
 1. https://www.bilibili.com/video/BV1wy4y1D7JT?spm_id_from=333.337.search-card.all.click

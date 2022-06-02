@@ -3353,8 +3353,6 @@ npm install -g @vue/cli  若比较慢，可以使用：cnpm install -g @vue/cli
 # OR
 yarn global add @vue/cli
 
-
-
 ### 查看版本
 vue --version
 @vue/cli 5.0.1
@@ -3435,56 +3433,31 @@ Save preset as: joysun //输入文件名
 
 ### 项目目录结构说明
 
+![vue项目结构](images/1621925534797542.png)
+
 ```
-.
-├── build/                      # webpack 配置文件；
-│   └── ...
-├── config/                     # 与项目构建相关的常用的配置选项；
-│   ├── index.js                # 主配置文件
-│   ├── dev.env.js              # 开发环境变量
-│   ├── prod.env.js             # 生产环境变量
-│   └── test.env.js             # 测试环境变量
-│
-├── src/
-│   ├── main.js                 # webpack 的入口文件；
-│   ├── common/                 # 存放项目共用的资源，如：常用的图片、图标，共用的组件、模块、样式，常量文件等等；
-│   │   ├── assets/             # 存放项目共用的代码以外的资源，如：图片、图标、视频 等；
-│   │   ├── components/         # 存放项目共用的组件，如：封装的导航条、选项卡等等； 备注：这里的存放的组件应该都是展示组件；
-│   │   ├── network/            # 存放项目的网络模块，如：接口；
-│   │   ├── compatible/         # 存放项目的兼容模块，如：适合App和微信各种接口的模块；
-│   │   ├── extension/          # 存放已有类的扩展模块，如：对 Array 类型进行扩展的模块；
-│   │   ├── libraries/          # 存放自己封装的或者引用的库；
-│   │   ├── tools/              # 自己封装的一些工具
-│   │   ├── constant.js         # 存放js的常量；
-│   │   ├── constant.scss       # 存放scss的常量；
-│   │   └── ...
-│   └── app/                    # 存放项目业务代码；
-│       ├── App.vue             # app 的根组件；
-│       └── ...
-│
-├── static/                     # 纯静态资源，该目录下的文件不会被webpack处理，该目录会被拷贝到输出目录下；
-├── test/                       # 测试
-│   ├── unit/                   # 单元测试
-│   │   ├── specs/              # test spec files
-│   │   ├── eslintrc            # 专为单元测试配置的eslint配置文件
-│   │   ├── index.js            # 测试编译的入口文件
-│   │   ├── jest.conf.js        # Jest的配置文件
-│   │   └── karma.conf.js       # Karma的配置文件
-│   │   └── setup.js            # 在Jest之前运行的启动文件；
-│   └── e2e/                    # e2e 测试
-│       ├── specs/              # test spec files
-│       ├── custom-assertions/  # 自定义的断言
-│       ├── runner.js           # test runner 脚本
-│       └── nightwatch.conf.js  # test runner 的配置文件
-├── .babelrc                    # babel 的配置文件
-├── .editorconfig               # 编辑器的配置文件；可配置如缩进、空格、制表类似的参数；
-├── .eslintrc.js                # eslint 的配置文件
-├── .eslintignore               # eslint 的忽略规则
-├── .gitignore                  # git的忽略配置文件
-├── .postcssrc.js               # postcss 的配置文件
-├── index.html                  # HTML模板
-├── package.json                # npm包配置文件，里面定义了项目的npm脚本，依赖包等信息
-└── README.md
+node_modules  vue 项目的文件依赖存放在这个文件夹。
+
+public  存放页面图标和不支持 JavaScript 情况时的页面。此目录下文件，在访问时路径为：http://localhost:8080/文件；可直接通过		   项目根目录下访问该文件
+
+package.json   存放项目的依赖配置（比如 vuex，element-UI）。
+
+babel.config.js  babel 转码器的配置文件。
+
+vue.config.js   vue 的配置文件。
+
+yarn.lock	用来构建依赖关系树。
+
+.gitignore	git 忽略文件
+
+src		存放 vue 项目的源代码。其文件夹下的各个文件（文件夹）分别为：
+	​assets​：资源文件，比如存放 css，图片等资源。
+	​component​：组件文件夹，用来存放 vue 的公共组件（注册于全局，在整个项目中通过关键词便可直接输出）。
+	​router​:用来存放 ​index.js​，这个 js 用来配置路由
+	​tool​：用来存放工具类 js，将 js 代码封装好放入这个文件夹可以全局调用（比如常见的​ api.js​，​http.js​ 是对 http 方法和 			   api 方法的封装）。
+	​views​：用来放主体页面，虽然和组件文件夹都是 vue 文件，但 views 下的 vue 文件是可以用来充当路由 view 的。
+ 	​main.js​:是项目的入口文件，作用是初始化 vue 实例，并引入所需要的插件。
+	​app.vue​:是项目的主组件，所有页面都是在该组件下进行切换的。
 ```
 
 ### 资源路径编译规则
@@ -3518,16 +3491,16 @@ npm run lint 代码监测工具
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve", //编译并热启动脚本，运行脚本，npm run serve启动后，修改vue会自动刷新页面
-    "build": "vue-cli-service build" //编译项目，将项目编译打包,压缩，当需要发布项目时使用
+    "serve": "vue-cli-service serve", //编译并热启动脚本，运行脚本，npm run serve启动后，修改vue会自动刷新页面.server名字可以进行修改。仅仅只在开发阶段使用。
+    "build": "vue-cli-service build" //编译项目，将项目编译打包,压缩，当需要发布项目时使用。默认会将代码打包压缩到dist目录下。需要将项目部署到生产服务器上使用
     "lint":  "vue-cli-service lint " //修复所有vue项目中的格式错误
   },
-  "dependencies": {
+  "dependencies": { // npm -i --save axios 表示在上线环境中使用
     "axios": "^0.19.0",
     "core-js": "^2.6.5",
     "echarts": "^4.2.1",
   },
-  "devDependencies": {
+  "devDependencies": { // npm -i --save-dev axios 表示在开发环境中使用
     "@vue/cli-plugin-babel": "^3.9.0",
     "@vue/cli-service": "^3.9.0",
     "http-proxy-middleware": "^2.0.4",
@@ -3554,9 +3527,9 @@ npm run lint 代码监测工具
 
 ```
 
-### main.js
+### Vue核心main.js
 
-> 入口'js'
+> 入口'js'，Vue实例化
 
 ```
 import Vue from 'vue' //ES6引入模块写法，引入vue组件，别名为Vue
@@ -3578,8 +3551,459 @@ echarts.registerMap('china', china)
 
 new Vue({
     router,
-    render: h => h(App)
+    render: h => h(App)   // ES6箭头函数写法 <==> render: function (createElement) {return 	                                               createElement(App);}
 }).$mount('#app') //实例化组件，并绑定
+```
+
+### 入口`index.html`
+
+> vue项目启动后首页
+
+![image-20220524092513360](images/image-20220524092513360.png)
+
+# ESLint
+
+> ESLint 插件会自动提示需要修复格式错误，如变量定义赋值等号间需要有空格等，当使用时，因为个人的习惯原因，可能会导致启动项目时，因为各种格式不符合eslint规定，eslint自动检测后，项目会报错，导致项目无法正常启动
+>
+> 如：![image-20220524094505436](images/image-20220524094505436.png)
+
+- **解决方案**
+
+**方案1：****使用`ESLint`自动修复**
+
+> 在项目终端运行`ESLint`自动修复:此方案比较费时，没编辑文件后需运行一次
+>
+> ```
+> PS D:\huadi_workspace\tjyz_workspace\old_tjyz_project\tjyz\joy-test> npm run lint
+> 
+> > joy-test@0.1.0 lint 
+> > vue-cli-service lint
+> 
+> The following files have been auto-fixed:
+> 
+>   src\main.js
+> ```
+
+**方案2**：**vscode自动修复eslint**
+
+> 安装eslint插件，并启用。此方案有可能因为vscode版本不同，导致配置无效
+> 【文件】=>【首选项】=>【设置】=>【用户】，找到setting.json,加上以下配置
+>
+> ```
+> "editor.codeActionsOnSave":{
+>       "source.fixAll":true
+> }
+> ```
+
+**方案3：关闭eslint**
+
+- **方式1**：在`vue.config.js` 文件中，设置`lintOnSave:false`
+
+> `vue.config.js`此文件在vue项目根目录下，若没有则手动创建。该配置文件&默认配置文件是合并的关系，当该配置&默认配置文件有重复配置，会以该文件为主
+>
+> ```
+> module.exports = defineConfig({
+>   lintOnSave: false  //暂时关闭代码格式检测
+> })
+> ```
+>
+> 修改`vue.config.js`配置文件后需`npm run lint`重启lint项目才会生效。这样，在保存文件的时候就不会再因为lint格式检测而报错
+
+- **方式2**：`.eslintrc` 删除`@vue/standard` (对于某个规则关闭，no-new:"off");
+
+
+# 单文件组件
+
+- **Vue文件高亮显示插件**
+
+  > Vetur:可以让vue文件内容高亮显示的插件；可以在vscode商场找到该插件，然后安装启用
+  >
+  > ![image-20220525100438099](images/image-20220525100438099.png)
+
+## 组件之间引用问题
+
+> 在一个组件中引入另一个组件，需要进行组件注册，组件注册有俩种方式：
+>
+> 1. 全局注册；
+> 2. 局部注册
+>
+> - **全局注册**
+>
+>   ```
+>   import navbar from './components/Navbar'  // navbar为变量名，可变；相当于原始组件定义中	                                                              Vue.component('navbar',{})的{}对象
+>   import Vue from 'vue'  // 在哪用在哪引用原则
+>   
+>   // 引入其他组件，需全局注册或局部注册
+>   Vue.component('navbar',navbar);//前一个为组件名，后一个为组件定义的配置信息，来源于另一个组件
+>   ```
+>
+> - **局部注册**
+>
+> 在当前组件js文件组件配置中，使用`components`
+>
+> ```
+> import navbar from './components/Navbar' 
+> components:{
+>   navbar
+> }
+> ```
+>
+> 
+
+- **范例**：组件`App.vue`文件中中引入另一个组件`Navbar`
+
+- `Navbar.vue`
+
+```
+<template>
+  <div>
+    narvbar
+  </div>
+</template>
+```
+
+- `App.vue`
+
+```
+<template>
+  <div id="app">
+    hello {{myName}}
+    <!-- 引入另一个组件 -->
+    <navbar></navbar>
+  </div>
+</template>
+<script>
+import navbar from './components/Navbar'
+import Vue from 'vue'  // 在哪用在哪引用原则
+
+// 引入其他组件，需全局注册或局部注册
+Vue.component('navbar',navbar);
+
+// Babel会自动将ES6结构转为ES5
+export default ({  // ES6 导出规范
+  data(){
+    myName:"ddddd"
+  },
+  components:{
+    navbar  // 此为 navbar:navbar简写，因为navbar实例本质就是一个template，所以简略写法为该方式
+  },// 局部注册方案,全局注册方案&局部注册方案选择一种
+  methods:{},
+  watch:{}
+})
+</script>
+// 定义css
+<style>
+
+</style>
+
+```
+
+## 组件间的通信&CSS样式冲突
+
+- **从父组件向子组件传递数据**
+
+> 1. **父组件传递数据**
+>
+> ```
+> <navbar myname="home" :myright="false">
+>       <div>插槽显示</div>
+>     </navbar>
+> ```
+>
+> 2. **子组件接收父组件传递的数据**
+>
+> ```
+> export default({
+>   // props:['myname','myright']
+>   props:{
+>     myname:{
+>       type:String,
+>       default:''
+>     },
+>     myright:{ //当需要接收父组件传来的布尔值时，如此定义
+>       type:Boolean,
+>       default:true
+>     }
+>   },
+>   data(){
+>     return {
+> 
+>     }
+>   }
+> })
+> ```
+
+- **父子组件CSS冲突**
+
+> 当父子组件中有对同一元素标签的CSS定义时，若未进行处理，父组件的CSS会覆盖子组件的CSS定义。解决方案：`scoped`使用区域css类型，控制子组件样式的独立性。
+>
+> ```
+> style加上lang=“scss”  表示支持scss·
+> 
+> style加上 scoped 属性，使css局部生效
+> ```
+>
+> - 子组件css定义中使用`scoped`,会使得子组件元素自动生成独立唯一的元素css样式
+>
+>   ![image-20220525111610570](images/image-20220525111610570.png)
+>
+> ```
+> <style lang="scss" scoped>
+>   ul li{
+>       background-color: red;
+>   }
+> </style>
+> ```
+
+- **范例**
+
+> 1. 子组件&父组件间的通信；
+> 2. 父子组件的css冲突问题
+>
+> - 父组件`App.vue`
+>
+> ```
+> <template>
+>   <div id="app">
+>     hello {{myName}}
+>     <input type="text" value="" v-model="mytext">
+>     <button @click="handleClick">add</button>
+> 
+>     <ul v-for="data in dataList" :key="data">
+>       <li>{{data}}</li>
+>     </ul>
+>     <!-- 引入另一个组件 -->
+>     <navbar myname="home" :myright="false" @event="handEvent">
+>       <div>插槽显示</div>
+>     </navbar>
+>    <!-- 引入sidebar-->
+>    <sidebar v-show="isShow"></sidebar>
+>   </div>
+> </template>
+> <script>
+> import navbar from './components/Navbar'
+> import Vue from 'vue'  // 在哪用在哪引用原则
+> import sidebar from './components/Sidebar'
+> 
+> // 引入其他组件，需全局注册或局部注册
+> Vue.component('navbar',navbar);
+> 
+> // Babel会自动将ES6结构转为ES5
+> export default ({  // ES6 导出规范
+>   data(){
+>    return {
+>       myName :'ddddd',
+>       mytext : "",
+>       dataList:[],
+>       isShow:true
+>    }
+>   },
+>   components:{
+>     navbar  // 此为 navbar:navbar简写，因为navbar实例本质就是一个template，所以简略写法为该方式
+>     ,sidebar
+>   },// 局部注册方案,全局注册方案&局部注册方案选择一种
+>   methods:{
+>     handleClick:function(){
+>       this.dataList.push(this.mytext);
+>     },
+>     handEvent:function(){
+>       this.isShow=!this.isShow
+>     }
+>   },
+>   watch:{}
+> })
+> </script>
+> <style>
+> ul li {
+>   background-color: yellow;
+> }
+> </style>
+> 
+> ```
+>
+> - `子组件navbar`
+>
+> ```
+> <template>
+>   <div>
+>     <button @click="handleLeft">left</button>
+>     narvbar {{myName}}
+>     <button v-show="myright">right</button>
+>     <!--定义一个插槽-->
+>     <slot></slot>
+>   </div>
+> </template>
+> 
+> <script>
+> 
+> export default({
+>   // props:['myname','myright']
+>   props:{
+>     myname:{
+>       type:String,
+>       default:''
+>     },
+>     myright:{ //当需要接收父组件传来的布尔值时，如此定义
+>       type:Boolean,
+>       default:true
+>     }
+>   },
+>   data(){
+>     return {
+> 
+>     }
+>   },
+>   methods:{
+>     handleLeft: function(){//控制另一个组件sidebar的显示&消失，子传父
+>       this.$emit('event');
+>     }
+>   }
+> })
+> </script>
+> ```
+>
+> - 子组件`sidebar`
+>
+> ```
+> <template>
+>     <ul>
+>         <li>1111111</li>
+>         <li>1111111</li>
+>         <li>1111111</li>
+>         <li>1111111</li>
+>         <li>1111111</li>
+>     </ul>
+> </template>
+> 
+> <style lang="scss" scoped>
+>   ul li{
+>       background-color: red;
+>   }
+> </style>
+> ```
+
+## 生命周期
+
+> 每个组件的生命周期是独立的，由自己控制&定义
+
+- **范例**：挂载时加载数据
+
+```
+<template>
+    <div>
+        <ul v-for = "data in datalist" :key = "data.id">
+            <li>{{data.name}}</li>
+        </ul>
+   </div>
+</template>
+
+<script>
+import axios from 'axios'
+
+export default ({
+  data () {
+    return {
+      datalist: []
+    }
+  },
+  mounted () { // 挂载
+    axios.get('/data.json').then(res => {
+      console.log(res.data);
+      this.datalist = res.data
+    })
+  }
+})
+</script>
+
+<style lang="scss" scoped>
+  
+  ul li{
+      background-color: red;
+      width:200px;
+  }
+</style>
+
+```
+
+## 指令&过滤器
+
+> 指令&过滤器在单文件组件中的应用
+
+- **范例**：自定义指令&过滤器
+
+```
+<template>
+  <div id="app">
+    hello {{myName}}
+    <input type="text" value="" v-model="mytext">
+    <button @click="handleClick">add</button>
+
+    <ul v-for="data in dataList" :key="data">
+      <li>{{data}}</li>
+    </ul>
+    <!-- 引入另一个组件 -->
+    <navbar myname="home" :myright="false" @event="handEvent">
+      <div>插槽显示</div>
+    </navbar>
+   <!-- 引入sidebar-->
+   <sidebar v-show="isShow"></sidebar>
+   <!--自定义指令v-hello-->
+   <div v-hello>111111</div>
+   <!--过滤器定义-->
+   <img :src="imgUrl | imgFilter">
+
+  </div>
+</template>
+<script>
+import navbar from './components/NavBar'
+import Vue from 'vue' // 在哪用在哪引用原则
+import sidebar from './components/SideBar'
+// 自定义指令
+Vue.directive('hello',{
+  inserted(el,binding){
+    console.log(el);//当前绑定的dom元素
+    el.style.border = '1px solid red';//设置元素css
+  }
+})
+//定义过滤器
+Vue.filter('imgFilter',(path)=>{
+  return path.replace('/aaa','')+'a.jpg';
+})
+// 引入其他组件，需全局注册或局部注册
+// Vue.component('navbar', navbar)
+
+// Babel会自动将ES6结构转为ES5
+export default ({ // ES6 导出规范
+  data () {
+    return {
+      myName: 'ddddd',
+      mytext: '',
+      dataList: [],
+      isShow: true,
+      imgUrl:"aaa.jpg"
+    }
+  },
+  components: {
+    navbar, // 此为 navbar:navbar简写，因为navbar实例本质就是一个template，所以简略写法为该方式
+    sidebar
+  }, // 局部注册方案,全局注册方案&局部注册方案选择一种
+  methods: {
+    handleClick: function () {
+      this.dataList.push(this.mytext)
+    },
+    handEvent: function () {
+      this.isShow = !this.isShow
+    }
+  },
+  watch: {}
+})
+</script>
+<style>
+ul li {
+  background-color: yellow;
+}
+</style>
+
 ```
 
 

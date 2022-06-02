@@ -99,6 +99,23 @@ SVN Server版本：VisualSVN-Server-4.3.6-x64
 >
 > FSFS与VDFS的使用区别在于FSFS是本地仓库，VDFS是分布式仓库，实现在同一个局域网内多台仓库进行同步；因为BDB方式在服务器中断时，有可能锁住数据，所以还是FSFS方式更安全一点。
 
+# TortoiseSVN
+
+## TortoiseSVN更改服务器地址
+
+> svn服务器地址更改后，客户端需要重新定位到新地址，如果使用TortoiseSVN工具，可以使用Relocate功能重新定位。
+
+1. 在本地的svn目录下，鼠标右键点击文件夹，弹出菜单，依次选择【TortoiseSVN】->【Relocate】。
+
+   ![TortoiseSVN更改服务器地址](images/739bc049610f8b5697a727df9ce951e10ff8d339.jpg)
+
+2. 输入新的服务器地址，然后点击【OK】
+   ![image-20220429101332792](images/image-20220429101332792.png)
+
+3. 在提示窗口中，选择Relocate项。
+
+   ![TortoiseSVN更改服务器地址](images/fab31cb375d7997b8f3fd3eff9dade49600fd961.jpg)
+
 # 问题
 
 ## 无法提交文件到SVN
