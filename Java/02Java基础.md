@@ -253,7 +253,11 @@ d:\java>rd temp2 //此时temp2目录下为空，可删除成功
 ​         1） 数据对象：xxxDO，xxx 即为数据表名。
 ​         2） 数据传输对象：xxxDTO，xxx 为业务领域相关的名称。
 ​         3） 展示对象：xxxVO，xxx 一般为网页名称。
-​         4） POJO 是 DO/DTO/BO/VO 的统称，禁止命名成 xxxPOJO。 
+​         4） POJO 是 DO/DTO/BO/VO 的统称，禁止命名成 xxxPOJO。
+
+17.  项目名命名规范
+    - Maven项目
+      项目名均为小写，若有多个单词，则用`-`连接
 
 - **遵循规则**
 

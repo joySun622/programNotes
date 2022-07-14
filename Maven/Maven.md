@@ -244,14 +244,14 @@ Maven 是一个项目管理工具，它包含了一个项目对象模型 (POM：
 
 　　1. 阿里云：http://mirrors.aliyun.com/ubuntu-releases/
         　　2. 网易：http://mirrors.163.com/ubuntu-releases/
-            　　3. 搜狐：http://mirrors.sohu.com/ubuntu-releases/
+                　　3. 搜狐：http://mirrors.sohu.com/ubuntu-releases/
         　　4. 首都在线科技股份有限公司：http://mirrors.yun-idc.com/ubuntu-releases/
 
 ### CentOS
 
 　　1. 网易：http://mirrors.163.com/centos/
         　　2. 搜狐：http://mirrors.sohu.com/centos/
-            　　3. 阿里云：http://mirrors.aliyun.com/centos/
+                　　3. 阿里云：http://mirrors.aliyun.com/centos/
 
 ### Apache
 
@@ -259,7 +259,7 @@ Maven 是一个项目管理工具，它包含了一个项目对象模型 (POM：
 
 　　2. 华中科技大学：http://mirrors.hust.edu.cn/apache/
         　　3. 北京理工大学：http://mirror.bit.edu.cn/apache/
-            　　4. TOMCAT全版本：https://archive.apache.org/dist/tomcat/
+                　　4. TOMCAT全版本：https://archive.apache.org/dist/tomcat/
 
 ### MySQL
 
@@ -365,6 +365,103 @@ ${settings.xxx} 指代了settings.xml中对应元素的值。
 ## `dependencyManagement`
 
 ## `build`
+
+## `dependency`
+
+### `scope`
+
+- maven中的`scope`主要有以下6中
+
+> 1. **compile**
+>
+>    不声明scope元素的情况下的**默认值**；compile表示被依赖包需要参与当前项目的编译，包括后续的测试，运行周期也参与其中，是一个比较强的依赖；打包的时候通常需要包含进去。
+>
+> 2. **provided**
+>    `provided` 类型的scope只会在项目的`编译`、`测试`阶段起作用；可以认为在目标容器中已经提供了这个依赖，无需在提供，但是在编写代码或者编译时可能会用到这个依赖；`依赖不会被打入到项目jar包中`。
+>
+> ```
+> 说到provided，这里就要说到<dependency>下的子标签<optional> ，如果一个依赖的<optional> 设置为true，则该依赖在打包的时候不会被打进jar包，同时不会通过依赖传递传递到依赖该项目的工程；例如：x依赖B，B由依赖于A（x->B->A），则A中设置<optional> 为true的依赖不会被传递到x中。
+> 
+> 这两者的区别在于：
+> 1、<optional>为true 表示某个依赖可选，该依赖是否使用都不会影响服务运行；
+> 2、provided的<scope>在目标容器中已经提供了这个依赖，无需在提供
+> ```
+>
+> 3. **runtime**
+>    `runtime`与`compile`比较相似，区别在于`runtime` 跳过了`编译`阶段，打包的时候通常需要包含进去。
+>
+> 4. **test**
+>    在一般的编译和运行时都不需要，它们只有在测试编译和测试运行阶段可用，`不会被打包到项目jar包中`，同时如果项目A依赖于项目B，项目B中的`test`作用域下的依赖不会被继承。
+>
+> 5. **system**
+>    表示使用本地系统路径下的jar包，需要和一个systemPath一起使用，如下：
+>
+>    ```
+>    <!--引用-->
+>    		<dependency>
+>    			<groupId>xxxx</groupId>
+>    			<artifactId>xxx</artifactId>
+>    			<systemPath>${basedir}/lib/xxxxx.jar</systemPath>
+>    			<scope>system</scope>
+>    			<version>1.4.12</version>
+>    		</dependency>
+>    
+>    ```
+>
+> 6. **import**
+>    import 只能在pom文件的<dependencyManagement>中使用，从而引入其他的pom文件中引入依赖，如：在Spring boot 项目的POM文件中，我们可以通过在POM文件中继承 Spring-boot-starter-parent来引用Srping boot默认依赖的jar包，如下：
+>
+>    ```
+>    <!-- Inherit defaults from Spring Boot -->
+>    <parent>
+>    	<groupId>org.springframework.boot</groupId>
+>    	<artifactId>spring-boot-starter-parent</artifactId>
+>    	<version>2.0.1.BUILD-SNAPSHOT</version>
+>    </parent>
+>    ```
+>
+>    但是，通过上面的parent继承的方法，只能继承一个 spring-boot-start-parent。实际开发中，用户很可能需要继承自己公司的标准parent配置，这个时候可以使用 scope=import 来实现多继承。代码如下：
+>
+>    ```
+>    	 <dependencyManagement>
+>    	     <dependencies>
+>    	         <dependency>
+>    	             <!-- Import dependency management from Spring Boot -->
+>    	             <groupId>org.springframework.boot</groupId>
+>    	             <artifactId>spring-boot-dependencies</artifactId>
+>    	             <version>2.0.1.BUILD-SNAPSHOT</version>
+>    	             <type>pom</type>
+>    	             <scope>import</scope>
+>    	        </dependency>
+>    	    </dependencies>
+>    	</dependencyManagement>
+>    ```
+>
+>    通过上面方式，就可以获取spring-boot-dependencies.2.0.1.BUILD-SNAPSHOT.pom文件中dependencyManagement配置的jar包依赖。如果要继承多个，可以在dependencyManagement中添加，如：
+>
+>    ```
+>    	 <dependencyManagement>
+>    	     <dependencies>
+>    	         <!-- Override Spring Data release train provided by Spring Boot -->
+>    	         <dependency>
+>    	             <groupId>org.springframework.data</groupId>
+>    	             <artifactId>spring-data-releasetrain</artifactId>
+>    	             <version>Fowler-SR2</version>
+>    	             <type>pom</type>
+>    	             <scope>import</scope>
+>    	        </dependency>
+>    	        <dependency>
+>    	            <groupId>org.springframework.boot</groupId>
+>    	            <artifactId>spring-boot-dependencies</artifactId>
+>    	            <version>2.0.1.BUILD-SNAPSHOT</version>
+>    	            <type>pom</type>
+>    	            <scope>import</scope>
+>    	        </dependency>
+>    	    </dependencies>
+>    	</dependencyManagement>
+>    ```
+>
+>    
 
 # 常用插件
 
@@ -790,3 +887,4 @@ pause
 4. http://k.sina.com.cn/article_2547637062_97d9db4600100eh5e.html
 5. https://blog.csdn.net/Hugh_Guan/article/details/110224621
 6. https://blog.csdn.net/wang740209668/article/details/119981084
+7. https://blog.csdn.net/qgnczmnmn/article/details/118050472

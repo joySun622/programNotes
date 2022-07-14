@@ -371,7 +371,236 @@ beforeCreate(){
         }
 ```
 
+# 动态加载img
+
+- **场景描述**
+
+> 从后台服务获取到img路径后，然后在页面上显示。但是设置好图片路径后一直无法显示，以为是路径问题，但是不使用动态加载`<img src="../assets/icon/index.png" slot="icon">`图片是能正常出来的。图片路径经过验证没有问题。
+>
+> ```
+> <mt-tabbar v-model="selected" fixed class="border-1px-top">
+> <p>
+>   <img :src="imgs.img1" slot="icon">首页
+> </p>
+> ```
+>
+> - vue数据
+>
+> ```
+> imgs:{
+>     'img1': "../assets/icon/index.png",
+>     'img2': "../assets/icon/brand.png",
+>     'img3': "../assets/icon/cart.png",
+>     'img4': "../assets/icon/me.png
+> },
+> ```
+
+- **解决方案**
+
+> 原因：vue中动态加载图片需要使用require引用资源的，修改代码如下
+>
+> ```
+> imgs:{
+>     'img1': require("../assets/icon/index.png"),
+>     'img2': require('../assets/icon/brand.png'),
+>     'img3': require("../assets/icon/cart.png"),
+>     'img4': require("../assets/icon/me.png")
+> },
+> ```
+
+# webpack和Vue.config.js中配置url-loader
+
+> **url-loader**:一个用于将文件转换为 [base64](https://so.csdn.net/so/search?q=base64&spm=1001.2101.3001.7020) URI 的 webpack 加载器。
+> **作用**：项目打包时，可以将符合条件的图片打包成base64 URL，减少http资源请求。
+>
+> **注意**：在使用url-loader时，需要下载file-loader，因为url-loader的使用依赖于file-loader。
+
+- **webpack配置(webpack.config.js)**：
+
+```
+const {resolve} = require("path")
+module.exports =  {
+  mode:"development",
+  entry:"./index.js", //resolve(__dirname,"src","index.js")
+  output:{
+    path: resolve(__dirname,"dist")
+  },
+  module:{
+    rules:[
+      {
+        test:/\.(png|jpg|jpeg)$/, //小于条件的图片采用base64。减少请求
+        exclude:"/node_modules/",//但是排除node_modules里面的图片
+        use:[
+          {
+            loader:"url-loader",
+            options:{
+              limit: 10*1024, //如果图片小于10k，就使用base64处理，
+              esModule:false, // url-loader默认采用ES6模块语法  html-loader使用commonJs  所以这里需要关闭es模块语法即可
+            }
+          }
+        ]
+
+      }
+    ]
+  }
+
+}
+
+```
+
+- **`vue.config.js`配置**
+
+> 除了在webpack中配置外，开发Vue项目时，会发现**vue.config.js**这个文件里面也可以去配置，但是发现语法跟webpack不太一样。
+
+```
+'use strict'
+const path = require('path')
+const defaultSettings = require('./src/settings.js')
+
+function resolve(dir) {
+  return path.join(__dirname, dir)
+}
+const name = defaultSettings.title
+const port = process.env.port || process.env.npm_config_port || 9527 // dev port
+module.exports = {
+
+   */
+  publicPath: '/',
+  outputDir: 'dist',
+  assetsDir: 'static',
+  lintOnSave: process.env.NODE_ENV === 'development',
+  productionSourceMap: false,
+  configureWebpack: {
+    name: name,
+    resolve: {
+      alias: {
+        '@': resolve('src')
+      }
+    }
+  },
+  chainWebpack(config) {
+      config.module.rule("images")
+      .test(/\.(png|jpeg|jpg)$/)
+      .use("url-loader")
+      .loader("url-loader").options({
+        limit: 1024*10,// 小于10k的图片采用baseurl，大于和等于8k的就正常打包成图片
+        name:"static/[name].[ext]"//图片大于等于10k时，设置打包后图片的存放位置 name是文件名   ext是文件后缀
+      })
+  }
+}
+
+```
+
+
+
 # 知识点集
+
+## vue.config.js配置解析
+
+```
+const path = require('path')
+module.exports = {
+    publicPath:  publicPath: process.env.NODE_ENV === 'production'? '/production-sub-path/': './'
+    outputDir: 'zjjc',    //输出文件目录
+    assetsDir: 'assets',    //放置生成的静态资源
+    indexPath: 'indx.html',  //指定生成的 index.html 的输出路径 (相对于 outputDir)
+    lintOnSave: false,   //eslint-loader 是否在保存的时候检查 安装@vue/cli-plugin-eslint有效
+    runtimeCompiler: true,    //是否使用包含运行时编译器的 Vue 构建版本。设置true后你就可以在使用template
+    productionSourceMap: false,   // 如果您不需要生产时的源映射，那么将此设置为false可以加速生产构建
+    devServer: {
+        https: false,
+        open: true, //配置自动启动浏览器
+        host: 'localhost',
+        port: 8080,
+        proxy: {
+            '/zj-server/': {
+                target:'http://172.6.4.11:8010',  //开发环境
+                changeOrigin: true, //是否开启代理,
+            },
+        }
+    },
+    configureWebpack: config => {  //webpack配置
+        const baseConfig = {
+            resolve: {
+                alias: {
+                    '@assets': resolve('src/assets') //别名
+                }
+            },
+        }
+        return { ...baseConfig }
+    },
+    filenameHashing:false //去掉文件名中的hash
+    //多页面应用
+    pages:{
+        //1对象模式（与字符串模式互斥）
+        index: {
+          // page 的入口
+          entry: 'src/index/main.js',
+          // 模板来源
+          template: 'public/index.html',
+          // 在 dist/index.html 的输出
+          filename: 'index.html',
+          // 当使用 title 选项时，
+          // template 中的 title 标签需要是 <title><%= htmlWebpackPlugin.options.title %></title>
+          title: 'Index Page',
+          //chunks 选项的作用主要是针对多入口(entry)文件。当你有多个入口文件的时候，对应就会生成多个编译后的 js 文件。那么 chunks 选项就可以决定是否都使用这些生成的 js 文件，也就是编译完后html中引入的js文件（webpack打包入口）
+          chunks: ['chunk-vendors', 'chunk-common', 'index']
+        },
+        //2字符串模式(与对象模式互斥)
+        // 当使用只有入口的字符串格式时，
+        // 模板会被推导为 `public/subpage.html`
+        // 并且如果找不到的话，就回退到 `public/index.html`。
+        // 输出文件名会被推导为 `subpage.html`。
+        subpage: 'src/subpage/main.js'
+    }
+    //vuecli的webpack配置项修改
+    //chaiwebpack对应api地址:https://github.com/Yatoo2018/webpack-chain/tree/zh-cmn-Hans
+    
+    chainWebpack: config => {
+        //不生成index.html(不推荐性能不好,且不能在现代浏览器运行)
+        config.plugins.delete('html')
+        config.plugins.delete('preload')
+        config.plugins.delete('prefetch')
+        //限制内联文件加载大小，减少http请求数量
+        config.module.rule('images').use('url-loader').loader('url-loader')
+        .top(option=>Object.assign(options,{limit:10240})
+        //css自动导入(oneOf唯一匹配 执行效率高)
+        const types = ['vue-modules','vue','normal-modules','normal']
+        types.forEach(type=>addStyleResource(config.module.rule('stylus').oneOf(type))
+        //替换loader规则
+        const svgRule = config.module.rule('svg')
+        svgRule.uses.clear()
+        svgRule.use('vue-svg-loader').loader('vue-svg-loader')
+        //cache-loader：缓存编译。文件会缓存在node/modules/.cache中 遇到解决不了的编译问题可以删除该目录试试
+        //thread-loader:多进程转换语法（主要用于资源过大打包使用-目前无使用场景占时只做了解）
+        //修改插件选项
+        //args[{
+            title:'package.js name属性',
+            templateParameters:[Function:templateParameters], //模板函数
+            template:'对应html文件本地地址'
+        }]
+        config.plugin('html').tap(args=>args)
+    },
+    //直接合并到最初的webpack配置
+    configureWebpack:{
+        plugins:[
+            new MyAwesomeWebpackPlugin()
+        ]
+    },
+    css: {
+        extract: process.env.NODE_ENV === 'production'
+    }
+};
+function addStyleResource(rule){
+    rule.use('style-resource').loader('style-resources-loader').option({
+        patterns:[
+            path.resolve(__dirname,'./src/style/imoirts.styl')
+        ]
+    })
+}
+```
+
+
 
 ## 什么是跨域
 
@@ -523,6 +752,112 @@ server {
 
 # 问题集
 
+##  ...ules\core-js\modules\es6.regexp.exec.jsBrowserslist: caniuse-lite is outdated. Please run next command `npm update`
+
+- **问题描述**
+
+> 运行项目时，提示信息如下：
+>
+> ```
+>  57% building 394/432 modules 38 active ...ules\core-js\modules\es6.regexp.exec.jsBrowserslist: caniuse-lite is outdated. Please run next command `npm update`
+> ```
+
+- **问题原因**
+
+> 相关组件过期导致需要的组件缺失，需要更新版本
+
+- **解决方案**
+
+> 更新组件；可选择全局更新或指定更新.`npm update`:会先到远程仓库查询最新版本，然后查询本地版本。如果本地版本不存在，或者远程版本较新，就会安装
+
+```
+### 更新已安装的模块
+npm update //
+
+### 指定更新组件
+npm update core-js@2
+```
+
+
+
+## 98%’ after emitting CopyPlugin 无法运行
+
+- **问题描述**
+
+> 跑项目中突然发现这个问题，卡在这里，也不报错，就是服务不运行
+
+- **解决方案**
+
+> **原因**：引入图片时，路径为空`require('')`或者`import`后未填充路径
+>
+> 填充图片路径：`require('/asserts/img/test.jpg')`
+
+## vue打包时时候报错asset size limit ：the following asset（s）exceed the recommended size limit （244kib）
+
+- **问题描述**
+
+> vue项目打包时报文件过大的问题，虽然不影响正常打包，但是看起来很不美观
+>
+> ![image-20220705181823966](images/image-20220705181823966.png)
+
+- **解决方案**
+
+```
+错误原因，资源(asset)和入口起点超过指定文件限制，需要在 vue.config.js 文件内做如下配置：
+
+module.exports = {
+    //webpack配置
+	configureWebpack: {
+	    //关闭 webpack 的性能提示
+	    performance: {
+		    hints:false
+	    }
+ 
+	    //或者
+ 
+	    //警告 webpack 的性能提示
+	    performance: {
+	    	hints:'warning',
+	    	//入口起点的最大体积
+	    	maxEntrypointSize: 50000000,
+	    	//生成文件的最大体积
+	    	maxAssetSize: 30000000,
+	    	//只给出 js 文件的性能提示
+	    	assetFilter: function(assetFilename) {
+	    		return assetFilename.endsWith('.js');
+	    	}
+	    }
+    }
+}
+```
+
+
+
+## 打包图片时报错
+
+- **问题描述**
+
+> 运行项目时，发现有警告信息，警告信息如下
+>
+> ```
+>  warning  in ./src/assets/village/1627439206821_9369.JPG
+> 
+> Module parse failed: Unexpected character '�' (1:0)
+> You may need an appropriate loader to handle this file type.
+> (Source code omitted for this binary file)
+> 
+>  @ ./src/assets/village sync ^\.\/.*$
+>  @ ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader/lib??vue-loader-options!./src/views/component/CircleMap.vue?vue&type=script&lang=js&        
+>  @ ./src/views/component/CircleMap.vue?vue&type=script&lang=js&
+>  @ ./src/views/component/CircleMap.vue
+>  @ ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader/lib??vue-loader-options!./src/views/ExpressVillage.vue?vue&type=script&lang=js&
+>  @ ./src/views/ExpressVillage.vue?vue&type=script&lang=js&
+>  @ ./src/views/ExpressVillage.vue
+>  @ ./src/router.js
+>  @ ./src/main.js
+>  @ multi (webpack)-dev-server/client?http://192.168.1.105:5002/sockjs-node (webpack)/hot/dev-server.js ./src/main.js
+> ```
+
 ## Cannot read properties of null (reading ‘pickAlgorithm‘)
 
 - **场景描述**
@@ -599,6 +934,42 @@ try {
   self.\_cleanup(false);
 }
 ```
+
+## vue项目一直`WebSocketClient`连接报错
+
+- **场景描述**
+
+> 运行vue项目后，发现页面可以显示正常，但在浏览器控制器上发现一直提示`WebSocketClient.js?5586:16 WebSocket connection to 'ws://192.168.0.100:8080/ws' failed`；而且在不断请求
+> ![image-20220620162252718](images/image-20220620162252718.png)
+
+- **原因**
+
+> 原理是在运行vue前端代码的时候，服务器还会运行一个websocketClient,与服务器通信。如果检查到代码有修改，就会刷新页面。 如果websocket通信有问题是不会正常进行热重载的。
+>  因为是直接在测试服务器上做修改，查看的。但是这里有一个问题，在服务器上，vue-cli-servece 不能正常检测到公网ip，而是直接使用了局域网的ip。这就导致ws的域名是内网ip,websocket通信失败。得到这样的错误提示：WebSocketClient.js?5586:16 WebSocket connection to 'ws://x.x.x.60:8080/ws' failed:
+> 在webpack-dev-server的代码，在node_moudles目录下。 其中lib/options.json 里写了各个配置项的详细信息。 在其中也找到了对应的文档链接地址： [DevServer | webpack webpack is a module bundler. Its main purpose is to bundle JavaScript files for usage in a browser, yet it is also capable of transforming, bundling, or packaging just about any resource or asset. https://webpack.js.org/configuration/dev-server/#devserverclient](https://www.233tw.com/outurl?goto=https%3A%2F%2Fwebpack.js.org%2Fconfiguration%2Fdev-server%2F%23devserverclient)
+
+- **解决方案**
+
+  > 关键的就是client配置项。修改后，websocketClient可以正常使用公网ip发起通信。
+
+> ```javascript
+> const { defineConfig } = require('@vue/cli-service')
+> module.exports = defineConfig({
+>   devServer: {
+>       host: '0.0.0.0',
+>     // https:true,
+>       port: 8080,
+>       client: {
+>         webSocketURL: 'ws://0.0.0.0:8080/ws', //设置为本地IP&端口端口
+>       },
+>       headers: {
+>         'Access-Control-Allow-Origin': '*',
+>       }
+>   },
+> 
+>   transpileDependencies: true
+> })
+> ```
 
 # Vue 百度地图离线版
 
@@ -849,6 +1220,7 @@ http://api.map.baidu.com/getscript?v=2.0&ak= 你的百度地图ak密钥 &service
 1. https://www.cnblogs.com/chenshishuo/p/4919224.html
 2. https://blog.csdn.net/qq_29483485/article/details/123711261
 3. https://www.jianshu.com/p/8fd1e4fc6b91
+4. https://www.233tw.com/php/113155
 
 - **百度离线地图**
 
@@ -857,3 +1229,4 @@ http://api.map.baidu.com/getscript?v=2.0&ak= 你的百度地图ak密钥 &service
 3. https://blog.csdn.net/weixin_44000275/article/details/110482508
 4. https://www.csdn.net/tags/NtzaggysODI3MTEtYmxvZwO0O0OO0O0O.html
 5. https://ask.csdn.net/questions/7572399
+6. https://www.csdn.net/tags/Mtjacg5sMDEzODctYmxvZwO0O0OO0O0O.html

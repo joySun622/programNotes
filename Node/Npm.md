@@ -40,8 +40,14 @@ npm install -g cnpm --registry=https://registry.npmmirror.com
 > npm 的包安装分为本地安装（local）、全局安装（global）两种
 
 ```
-### 语法格式
-$ npm install <Module Name>
+# 安装模块到项目目录下，(在package.json文件的dependencies节点也会写入依赖)
+npm install moduleName
+ 
+#-save 的意思是将模块安装到项目目录下，并在package.json文件的dependencies节点写入依赖。
+npm install moduleName -save
+ 
+#--save-dev 的意思是将模块安装到项目目录下，并在package.json文件的devDependencies节点写入依赖。
+npm install moduleName --save-dev
 ```
 
 - **范例**

@@ -89,7 +89,7 @@ ln -s /home/java/jdk1.8.0_131/bin/java /usr/bin/java 建一个/usr/bin/java的ja
 为什么要建这个超链接，因为一些自己注册的linux服务（如springboot的jar注册的服务），默认情况下从/usr/bin/java路径使用java，yum安装的时候，这个超链接会自动创建，如果你自己下载包安装的话，这个超链接就需要你手动创建了。
 ```
 
-## 
+
 
 
 

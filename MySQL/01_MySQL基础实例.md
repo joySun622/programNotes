@@ -1030,8 +1030,14 @@ mysql> SELECT * FROM EMP WHERE JOB=UPPER('manager');
 #### 字符截取
 
 ```
+1. substring(col_name, start, length)函数: col_name列名（必选），start从第几个开始（必选 为整数 从1开始），length截去长度（可选，为正整数）
 ### 查询姓名以 M 开头所有的员工
 mysql> SELECT * FROM EMP WHERE SUBSTR(ENAME,1,1)=UPPER('m');
+
+2.根据匹配的字符以及出现的位置开始截取字符串 SUBSTRING_INDEX(subStr, matchStr, index）
+subStr:    需要截取的字段
+matchStr:  匹配的字符
+index:     从第几个匹配的字符,为正数时从左边开始查找并向左截取，为负数时从右边开始查找并向右截取
 ```
 
 #### LENGTH
