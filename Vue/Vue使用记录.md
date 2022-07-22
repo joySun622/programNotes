@@ -731,7 +731,7 @@ server {
 	  try_files $uri $uri/ /index.html index.htm index.html.gz;
     }
     location /api/ { //配置api 代理
-	proxy_pass  http://10.11.156.17:8082/;
+	proxy_pass  http://11.11.11.11:8082/;
 	proxy_set_header Accept application/json,text/javascript,*/*;
 	proxy_set_header Content-Type application/json;
       #proxy_set_header Host $host:$proxy_port;

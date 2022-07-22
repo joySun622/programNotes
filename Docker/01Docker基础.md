@@ -193,8 +193,8 @@ docker search nginx
 > -p 8080:80： 端口进行映射，将本地8080端口映射到容器内部的80端口。
 > -d nginx： 设置容器在后台一直运行。
 > ```
->
-> 
+
+
 
 # JDK安装
 
@@ -257,7 +257,7 @@ docker run -di --name=jdk1.8 jdk1.8:0.1
 docker exec -it jdk1.8 /bin/bash java -version
 ```
 
-# 
+
 
 
 
