@@ -7,6 +7,8 @@
 ```
 ### 查找对应端口
 netstat -ano | findstr "LISTENING" | findstr ":8080"
+C:\Users\12613>netstat -ano | findstr "8082"
+  TCP    0.0.0.0:8082           0.0.0.0:0              LISTENING       26132
 ### 关闭指定pid程序
 C:\Users\12613>taskkill /f /pid 17024
 ```

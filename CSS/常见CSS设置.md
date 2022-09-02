@@ -302,6 +302,21 @@ width: calc(2em * 5);
 width: calc(var(--variable-width) + 20px);
 ```
 
+# 禁用事件
+
+> `pointer-events `更像是JavaScript，它能够：
+>
+> - 阻止用户的点击动作产生任何效果
+> - 阻止缺省鼠标指针的显示
+> - 阻止CSS里的 `hover `和 `active `状态的变化触发事件
+> - 阻止JavaScript点击动作触发的事件
+
+```
+a {
+  pointer-events:none
+}
+```
+
 
 
 # 参考资料

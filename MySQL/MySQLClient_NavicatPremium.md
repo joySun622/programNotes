@@ -1,10 +1,10 @@
 [Toc]
 
-## NavicatPremium简介
+# NavicatPremium简介
 
 > Navicat Premium 是MySQL，SQL Server，Oracle和PostgreSQL的一体化数据库管理工具，功能非常强大。
 
-## 下载地址
+# 下载地址
 
 [navicat-premium](https://www.navicat.com.cn/download/navicat-premium)
 
@@ -20,7 +20,7 @@
 3. 请选择对各个版本，Products那块；
 4. **安装完成后不要运行软件，然后打开注册机。**
 
-## 激活方法
+# 激活方法
 
 1. 运行注册机，勾选Backup、Host和Navicat v15，如图所示。**然后点击Patch按钮**，找到Navicat Premium 15安装路径下的navicat.exe，选中并点击打开，此时会提示：navicat.exe - x64 -> Cracked，提示已破解。
 
@@ -38,31 +38,48 @@
 
 若多次激活失败，请先卸载已安装的Navicat Premium并清理残留文件夹和注册表，重启电脑，再尝试激活；
 
-## 连接数据库问题集
+# 连接数据库问题集
 
-1. ### 连接数据库报错
+## 连接数据库报错
 
-   <img src="images/image-20210930175208721.png" alt="image-20210930175208721" style="zoom:50%;" />
+<img src="images/image-20210930175208721.png" alt="image-20210930175208721" style="zoom:50%;" />
 
-   - **原因探索**
+- **原因探索**
 
-     ```
-     1. 在服务端查看mysql用户表，看root用户端口是否允许可以在任意IP或指定IP下访问
-     mysql> select host,user from mysql.user ;
-     +-----------------+---------------+
-     | host            | user          |
-     +-----------------+---------------+    |
-     | localhost       | root          |
-     +-----------------+---------------+
-     2. 由上可知，root用户只允许本地IP访问，修改root用户IP访问权限
-     mysql> rename user 'root'@'localhost' to 'root'@'%';
-     Query OK, 0 rows affected (0.00 sec)
-     3. 刷新下权限
-     mysql> FLUSH PRIVILEGES;
-     4. 重新使用客户端连接，连接成功
-     ```
+  ```
+  1. 在服务端查看mysql用户表，看root用户端口是否允许可以在任意IP或指定IP下访问
+  mysql> select host,user from mysql.user ;
+  +-----------------+---------------+
+  | host            | user          |
+  +-----------------+---------------+    |
+  | localhost       | root          |
+  +-----------------+---------------+
+  2. 由上可知，root用户只允许本地IP访问，修改root用户IP访问权限
+  mysql> rename user 'root'@'localhost' to 'root'@'%';
+  Query OK, 0 rows affected (0.00 sec)
+  3. 刷新下权限
+  mysql> FLUSH PRIVILEGES;
+  4. 重新使用客户端连接，连接成功
+  ```
 
-     
+  ## 连接sqlserver数据库失败，提示缺少驱动
+  
+  ### Navicat15 无法连接解决方案
+  
+  > **1. 进入Navicat安装目录**
+  >
+  > 我的安装目录为 E:\Program Files\PremiumSoft\Navicat Premium 15
+  > ![在这里插入图片描述](images/20201023100515834.png)
+  >
+  > **2.双击安装msodbcsql_64.msi**
+  >
+  > ![在这里插入图片描述](images/20201023100620416.png)
+  >
+  > **再次连接数据库即可成功连接**
+  
+  ### Navicat12无法连接解决方案
+  
+  > ![img](images/1106091961864ecca9714d7b66e8ba1e.png)
 
 ## 参考来源
 

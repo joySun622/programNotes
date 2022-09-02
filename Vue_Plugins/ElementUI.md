@@ -78,7 +78,31 @@
 > </template>
 > ```
 
+# 图片加载
 
+- **问题描述**
+
+> 图片加载，当点击后才显示图片，但因为是写在另一个插件里中，图片会提前加载，因为没有路径，导致浏览器报错
+>
+> 报错信息如下：
+> ![image-20220825175500977](images/image-20220825175500977.png)
+
+- **解决方案**
+
+> - 方案1：
+>   添加懒加载设置`:lazy="true"`,但该解决方案适合有滚动的情况，没有滚动的场景无法正常展示图片
+>
+> - 方案2：设置`:src`默认值，置空也可以
+>
+>   ```
+>   <el-image 
+>       style="width: 100px; height: 100px"
+>       :src="processDetailInfo.express_img_url?processDetailInfo.express_img_url:''" 
+>       :preview-src-list="processDetailInfo.preImgUrls">
+>   </el-image>
+>   ```
+>
+>   
 
 # 参考资料
 

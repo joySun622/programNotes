@@ -4,6 +4,12 @@
 
 [官方文档](https://echarts.apache.org/zh/index.html)
 
+# Echart局部引入
+
+## 局部引入类型
+
+> 查找文件：`echarts.common.js`；在该JS文件中包含各模块映射&名称
+
 # GEO
 
 ## 设置区域颜色
@@ -279,9 +285,17 @@ tooltip: {
         },
 ```
 
+# 不同类型数据在同一柱状上展示
 
+- **场景描述**
 
+> 不同类型数据，在同一柱状上进行展示。如下：
+> ![image-20220818101606400](images/image-20220818101606400.png)
 
+- **实现**
+
+> 在echarts  series配置，type类型为bar,可以找到`stack`属性设置。数据堆叠，同个类目轴上系列配置相同的 `stack` 值可以堆叠放置。通过`stackStrategy`可以设置数据堆叠策略。
+> 注：目前 `stack` 只支持堆叠于 `'value'` 和 `'log'` 类型的类目轴上，不支持 `'time'` 和 `'category'` 类型的类目轴。
 
 # 参考资料
 

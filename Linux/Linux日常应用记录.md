@@ -1,5 +1,90 @@
 [Toc]
 
+# 系统时间错误
+
+**1. 查看系统时间**
+
+```
+# date
+```
+
+可以看到时区为EST（美国东部标准时间），正常显示应该是CST（中国标准时间）。
+
+![Linux系统时区不对解决方法](images/306b9a5feae1bff9edf4bb1e76336c4d.jpg)
+
+**2. 查看系统时区**
+
+```
+# date -R
+可以看到输出为
+Fri， 21 Nov 2014 00:54:08 -0500
+时区为-5
+正常时区应该显示为+8（东八区）
+```
+
+![Linux系统时区不对解决方法](images/039f35057e1e25b2702b87257a9127cc.jpg)
+
+ **3. 确保网络通畅，DNS正常解析，尝试同步互联网时间**
+
+```
+# ntpdate cn.pool.ntp.org
+```
+
+![Linux系统时区不对解决方法](images/a36cfae9d4fb5ef1ca187b3b1dbde060.jpg)
+
+ **4. 查看系统时区配置文件**
+
+```
+　# cat /etc/sysconfig/clock
+```
+
+![Linux系统时区不对解决方法](images/f49c9a7185c8d56aa8b27f33fd08e6d6.jpg)
+
+**5. 查看本地系统时区配置文件**
+
+```
+# strings /etc/localtime
+```
+
+![Linux系统时区不对解决方法](images/9ad854e76cc06352e7b230770ee4e649.jpg)
+
+ **6. 尝试修改系统时区**
+
+```
+# tzselect
+```
+
+根据系统提示选择正确的时区
+
+![Linux系统时区不对解决方法](images/c6cf41c21822725c1c6a64dcab716a11.jpg)
+
+ **7. 如果不能正常解决**
+
+```
+# cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+```
+
+![Linux系统时区不对解决方法](images/cadf8025d1002fec919d70a521cd9a63.jpg)
+
+ **8. 再次查看系统时区和系统时间，已经正常显示了**
+
+```
+# date
+# date -R
+```
+
+![Linux系统时区不对解决方法](images/494e3bb3235dcbecc02483ca9c7284b1.jpg)
+
+**9. 修改时间**
+
+```
+date -s 17:55:55  将系统时间设定成下午5点55分55秒的命令;此时只修改时间不修改日期
+## 修改日期，不修改时间
+date -s 2007-08-03 或者 date -s 11/03/2009
+```
+
+
+
 # 运行jar包
 
 - **前台运行**
@@ -22,13 +107,13 @@ nohup  java -Dfile.encoding=utf-8  -jar TJServer.jar > ./tmp.text &
 ## `curl`
 
 ```
-cur http://10.11.156.17:8082/car/list
+cur http://111.111.111.111:8082/car/list
 ```
 
 ## `wget`
 
 ```
-wget http://10.11.156.17:8082/car/list
+wget http://111.111.111.111:8082/car/list
 ```
 
 # 查找指定程序
@@ -205,6 +290,13 @@ export PATH=$PATH:${JAVA_PATH}
 java -version
 ```
 
+# Linux中Crontab（定时任务）
+
+
+
+
+
 # 参考资料
 
 1. https://blog.csdn.net/fuhanghang/article/details/83627359
+2. http://www.dnxtc.net/zixun/linux/2021-05-29/8470.html
