@@ -317,6 +317,95 @@ a {
 }
 ```
 
+# `has`CSS子元素选择父元素
+
+通常一个CSS[选择器](https://so.csdn.net/so/search?q=选择器&spm=1001.2101.3001.7020)都是从上往下选择的，通过父元素选择子元素，那么能不能通过子元素选择父元素呢？
+
+```
+<ul>
+    <li>
+        <a href="#" class="active">1</a>
+    </li>
+    <li>
+        <a href="#">2</a>
+    </li>
+</ul>
+```
+
+如果我想选择包含 a.active 的 li 该怎么实现呢？ 目前我们学到的CSS好像是没有办法的，不过今天要将的一个CSS伪类 :has() 就有这个功能，虽然还处于草案阶段，但是还是可以提前了解一下。
+
+```css
+li:has(> a.active){
+    color:red;
+}
+```
+
+除了表示包含，:has 还可以表示兄弟跟随关系
+
+```
+div:has(+ p){
+    color:red;
+}
+```
+
+表示选择 <div> 标签，前提是这个div标签必须是被一个<p>紧跟着的。此外还可以与:not 一起使用
+
+```
+article:not(:has(a)){
+    color:red;
+}
+```
+
+表示不包含 <a> 的 <article>标签。注意这里 :not 和 :has 的先后顺序，不同顺序代表不同的意思
+
+```
+article:has(:not(a)){
+    color:red;
+}
+```
+
+表示包含非 <a> 的 <article>标签
+
+其实我们前面讲过的 :focus-within 也是一个通过子元素选择父元素的伪类，只不过条件只能是子元素是否获取焦点， 而 :has 则更灵活和强大。
+
+```
+form:focus-within{
+    background-color:black;
+}
+```
+
+如果通过 :has 实现的话， 可以这样写
+
+```
+form:has(:focus){
+    background-color:black;
+}
+```
+
+# 用CSS实现设置网页文字为只读，不可复制的方法
+
+> 在css中，可以给body元素设置`user-select:none;`样式来设置文字不可复制，只可读功能。
+>
+> css设置不允许复制文本内容，方法很简单，通过设置CSS 的 user-select就可以达到目的：
+>
+> `-moz-user-select:none`    Firefox私有属性 
+>
+> `-webkit-user-select:none`    WebKit内核私有属性 
+>
+> `-ms-user-select:none`   IE私有属性(IE10及以后) 
+>
+> `-khtml-user-select:none`   KHTML内核私有属性 
+>
+> `-o-user-select:none`  	Opera私有属性 
+>
+> `user-select:none`  	CSS3属性 
+>
+> `user-select` 	属性设置或检索是否允许用户选中文本。
+>
+> `user-select`  	的默认值是 text：可以选择文本
+>
+> `none` 	文本不被选择
+
 
 
 # 参考资料
@@ -324,3 +413,5 @@ a {
 1. https://www.runoob.com/css/css-positioning.html
 2. https://www.zhihu.com/question/21911352
 3. https://developer.mozilla.org/en-US/docs/Web/CSS/calc
+4. https://blog.csdn.net/qq_20343517/article/details/82990211
+5. https://blog.csdn.net/txun123/article/details/124237083

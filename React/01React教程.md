@@ -382,7 +382,7 @@ export default class APP extends Component {
 
 ## 事件处理
 
-- **事件函数定义方式**
+### **事件函数定义方式**
 
 ```
 import React, { Component } from 'react'
@@ -426,18 +426,267 @@ export default class App extends Component {
 
 ```
 
+### `this`指向问题
+
+> 在js中，`this`是谁调用指向谁，但有三种方式改变`this`执行
+>
+> - `call`:改变`this`指向，自动执行函数
+> - `apply`:改变`this`指向，自动执行函数
+> - `bind`:改变`this`指向，手动执行函数
+
+- **范例**
+
+```
+var obj1 = {
+  name:"obj1",
+  getName(){
+    console.log(this.name);
+  }
+}
+
+var obj2 = {
+  name:"obj2",
+  getName(){
+    console.log(this.name);
+  }
+}
+//obj1.getName();
+
+obj1.getName.call(obj2);  //打印结果:obj2 ;将对象obj1的this指向改为obj2，会自动执行函数getName
+obj1.getName.apply(obj2); //打印结果:obj2 ； 将对象obj1的this指向改为obj2，会自动执行函数getName
+obj1.getName.bind(obj2)();//打印结果:obj2,将对象obj1的this指向改为obj2，需加(),才会执行函数getName()
+```
+
+- **范例**
+
+```
+import React, { Component } from 'react'
+
+export default class App extends Component {
+  a = 100;
+  render() {
+    return (
+      <div>
+        {/*在此处this指向的是当前类的实例*/}
+        <input/>
+        <button onClick={()=>{
+            console.log("click1；如果处理内容过多，不适合==="+this.a);
+        }}>Add1</button>
+         {/*使用bind改变this指向,此处this执行App实例；不推荐该函数写法，需要手动改变this指向*/}
+        <button onClick={this.handleClick2.bind(this)}>Add2</button>
+
+         {/*事件绑定写法3:使用ES6箭头函数定义click操作对应函数；比较推荐该种写法*/}
+        <button onClick={this.handleClick3}>Add3</button>
+
+         {/*比较推荐，传参的时候比较适用*/}
+         <button onClick={()=>{
+             this.handleClick4();
+         }}>Add4</button>
+      </div>
+    )
+  }
+
+  handleClick2(){
+      console.log("click2"+this.a);//若不使用bind改变this指向，此时this为undefined会报错
+  }
+
+  handleClick3  = (evt)=>{
+      console.log("click3"+this.a);//在箭头函数中，this始终指向最外层调用对象；无法使用函数如call等改变this执行
+      console.log(evt.target);
+  }
+
+  handleClick4  = ()=>{
+    console.log("click4"+this.a);
+}
+
+}
+```
+
+### Reac&原生事件区别
+
+> 采用on+事件名的方式来绑定一个事件，注意，这里和原生的事件是有区别的，原生的事件全是小写。`onclick`, React里的事件是驼峰`onClick`, **React的事件并不是原生事件，而是合成事件**。
+>
+> React并不会真正的绑定事件到每一个具体的元素上，而是采用事件代理的模式,将事件绑定在根节点`root`上。有点类似冒泡的算法。
+> ![image-20220905130938177](images/image-20220905130938177.png)
+
+####  事件handler的写法
+
+ • 直接在render里写行内的箭头函数（不推荐）
+ • 在组件内使用箭头函数定义一个方法（推荐）
+ • 直接在组件内定义一个非箭头函数的方法，然后在render里直接使用。`onClick= {this, handleclick, bind （this）}`（不推荐）
+ • 直接在组件内定义一个非箭头函数的方法，然后在constructor里`bind(this)（推荐）`
+
+#### Event 对象
+
+和普通浏览器一样，事件handler会被自动传入一个event对象，这个对象和普通的浏览器`event`对象所包含的 方法和属性都基本一致。不同的是React中的`event`对象并不是浏览器提供的，而是它自己内部所构建的。它同 样具有`event.stopPropagation、event.preventDefault` 这种常用的方法
+
+## Ref的应用
+
+- **给标签设置`ref="username"`**
+        通过这个获取`this.refs.username`, `ref`何以获取到应用的真实dom
+- **给组件设置 `ref="username"`**
+  通过这个获取`this.refs.username` ,`ref`何以获取到组件对象
+
+- **新的写法**
+
+```
+ myRef = React.c reateRef()
+ <div ref={this.myRef}>hel1o</div>
+  访问 this. myRef. current
+```
+
+- **范例**
+
+```
+import React, { Component } from 'react'
+
+export default class App extends Component {
+  a = 100;
+  myRef=React.createRef();
+  render() {
+    return (
+      <div>
+        {/*refs将过期写法*/}
+        <input ref="myText"/>
+        <button onClick={()=>{
+            {/**此处获取的是input dom节点 */}
+            console.log("click1==="+this.refs.myText);
+             {/**此处获取的是input dom节点值 */}
+             console.log("click1==="+this.refs.myText.value);
+        }}>Add1</button>
+        <br/>
+        {/*新的写法*/}
+        <input ref={this.myRef}/>
+        <button onClick={()=>{
+            {/**此处获取当前input dom节点 */}
+            console.log("click2==="+this.myRef.current);
+             {/**此处获取的是input dom节点值 */}
+             console.log("click2==="+this.myRef.current.value);
+        }}>Add2</button>
+      </div>
+    )
+  }
+}
+```
+
+## 组件的数据挂载方式
+
+### 状态
+
+> 状态就是组件描述某种显示情况的数据，由组件自己设置和更改，也就是说由组件自己维护，使用状态的目的就是为了在不同的状态下使组件的显示不同(自己管理)
+
+#### 状态定义方式1
+
+> `this.state`是纯js对象，在vue中，data属性是利用`object.defineProperty`处理过的，更改data的数据的时 候会触发数据的`getter`和`setter`,但是React中没有做这样的处理，如果直接更改的话，`react`是无法得知的， 所以，需要使用特殊的更改状态的方法`setState`
+>
+> `myShow`存放在实例的`state`对象当中，组件的`render`函数内，会根据组件的`state`的中的`myShow`不同显 示‘取消"或'收藏”内容。下面给`button`加上了点击的事件监听。
+>
+> - `setState`函数里的对象，其实是与类组件定义的属性对象`state`进行合并，当其中有属性值进行修改时，则替换，没有则保持原样
+
+```
+import React, { Component } from 'react'
+
+export default class APP extends Component {
+    // state 名称是固定写法，不能更改
+  state={
+      text: "收藏",
+      myShow:true
+  }
+  render() {
+    return (
+      <div>
+        <h1>欢迎欢迎</h1>
+        <button onClick={()=>{
+            //this.state.text="取消收藏"  直接修改text值会报错
+            this.setState({//间接修改text值
+                myShow:!this.state.myShow //myShow取反
+            })
+        }}>
+            {this.state.myShow?this.state.text:"取消收藏"}
+        </button>
+      </div>
+    )
+  }
+}
+
+```
+
+#### 状态定义方式2
+
+```
+import React, { Component } from 'react'
+
+export default class APP extends Component {
+    // state 名称是固定写法，不能更改
+//   state={
+//       text: "收藏",
+//       myShow:true
+//   }
+ constructor(){
+     super() //使用构造器定义state，必须加上该函数，继承Component属性
+     this.state={
+        text: "收藏",
+        myShow:true,
+        name:"Joy"
+     }
+ }
+  render() {
+    return (
+      <div>
+        <h1>欢迎欢迎</h1>
+        <button onClick={()=>{
+            //this.state.text="取消收藏"  直接修改text值会报错
+            this.setState({//间接修改text值
+                myShow:!this.state.myShow,
+                name:"张三"
+            })
+        }}>
+            {this.state.myShow?this.state.text:"取消收藏"}
+        </button>
+      </div>
+    )
+  }
+}
+
+```
+
+### 列表渲染
+
+```
+import React, { Component } from 'react'
+
+export default class APP extends Component {
+
+  state = {
+      list:["1111","2222","3333"]
+  }
+  render() {
+    return (
+      <div>
+        <ul>
+            {
+                //使用原生js map循环实现列表渲染;列表渲染，最好设置key值，作为虚拟dom的唯一标识
+                //1.在数据更新的时候避免数据婚礼,便于列表的复用和重排;2.提交性能：虚拟dom节点可以直接根据key值进行比对，不需重复循环比对
+                //不涉及列表的删除，增加，key设置成索引没有问题
+                this.state.list.map(item=>
+                <li key={item}>{item}</li>
+                )
+            }
+        </ul>
+      </div>
+    )
+  }
+}
+
+```
+
+#### 案例todolist
 
 
 
-
-
-
-
-
-
-
-
+# VS code react插件快捷键
 
 # 参考资料来源
 
 1. https://www.bilibili.com/video/BV1dP4y1c7qd?spm_id_from=333.337.search-card.all.click&vd_source=fac4be3bb979a84f531a60420866c84a
+2. https://blog.csdn.net/weixin_41016986/article/details/125762439

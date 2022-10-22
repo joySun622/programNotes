@@ -278,7 +278,11 @@
 
    ![img](images/20200526105139325.png)
 
+# Git配置
 
+1. 选择`File → Settings`打开设置窗口，找到`Version Control`下的Git选项
+
+   ![请添加图片描述](images/1f99b94f7c2949f98fb7d975406566e3.png)
 
 
 

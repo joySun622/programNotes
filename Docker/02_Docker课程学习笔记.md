@@ -410,6 +410,22 @@ REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
 hello-world   latest    feb5d9fea6a5   9 months ago   13.3kB
 ```
 
+- **机器导出镜像**
+
+> 注：如果指定的基础镜像没有找到的话，会自动从仓库中pull对应的镜像。这里还有一种情况，如果是内网情况并且镜像仓库中没有所需要的镜像。可以在有这个镜像的服务器上先导出镜像，然后再复制到当前服务器进行导入即可。
+>
+> ```
+> # nginx.tar是导出tar包的文件名，
+> # nginx:1.14是仓库中的镜像名称，这里也可以直接使用镜像ID
+> # 导出镜像
+> docker save -o nginx.tar nginx:1.14
+> 
+> # 导入镜像，nginx.tar就是刚才导出的包
+> docker load -i nginx.tar
+> ```
+>
+> 
+
 ## 删除镜像
 
 - **删除单个镜像**
@@ -458,6 +474,13 @@ hello-world   latest    feb5d9fea6a5   9 months ago   13.3kB
 hello         latest    feb5d9fea6a5   9 months ago   13.3kB
 
 ```
+
+## 获取镜像方式
+
+> 1. 直接从本地仓库，或者远程仓库拉取已有镜像到本地，然后使用；
+> 2. 从已有启动容器导出镜像，然后再导入镜像；
+> 3. 适应Dockerfile，构建镜像；
+> 4. 使用Compose构建镜像
 
 # 镜像仓库
 
@@ -1441,7 +1464,8 @@ mysql> show databases;
 >
 > 1. 指定其后构建新镜像所使用的基础镜像；
 > 2. 必是Dockerfile文件中的首条命令；
-> 3. 指定的基础image可以是官方远程仓库中的，也可以位于本地仓库，优先本地仓库
+> 3. 指定的基础image可以是官方远程仓库中的，也可以位于本地仓库，优先本地仓库；当本地机器上已拉取镜像，会直接使用本地已拉取的镜像,注：如果指定的基础镜像没有找到的话，会自动从仓库中pull对应的镜像。；
+> 4. 可以使用镜像ID或者镜像名称 例如 nginx:1.14
 
 ```
 格式：FROM <image>:<tag>

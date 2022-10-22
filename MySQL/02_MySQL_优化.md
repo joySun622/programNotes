@@ -222,7 +222,9 @@ mysql> EXPLAIN SELECT * FROM EMP E JOIN DEPT D ON E.DEPTNO=D.DEPTNO JOIN SALGRAD
 | `count(主键id)` | 对于 `count(主键id)` 来说，`InnoDB` 引擎会遍历整张表，把每一行的 `id` 值都取出来，<br />返回给 `server` 层。`server` 层拿到 `id` 后，判断 `id` 不为 `NULL` 的，就按行累加 |
 | `count(字段)`   | 如果这个 `“字段”` 定义为 `not null`，一行行地从记录里面读出这个字段，<br />判断不可能为 `null`，按行累加 如果这个 `“字段”` 定义为 `null`，那么执行的时候，<br />判断到有可能是 `null`，还要把值取出来再判断一下，不是 `null` 才累加 |
 
+# mysql复合索引
 
+> 联合索引又叫复合索引。对于复合索引：Mysql从左到右的使用索引中的字段，一个查询可以只使用索引中的一部份，但只能是最左侧部分(最左匹配原则)。例如索引是key index （a,b,c）。 可以支持a | a,b| a,b,c 3种组合进行查找，但不支持 b,c进行查找 .当最左侧字段是常量引用时，索引就十分有效。
 
 # 参考资料
 

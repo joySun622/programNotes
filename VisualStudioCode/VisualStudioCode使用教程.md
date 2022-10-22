@@ -99,7 +99,99 @@
 取消注释：再按一遍  Alt+Shift+A 
 ```
 
+# VSCODE+Git配置
+
+>  当我们在VScode中编写代码后，需要提交到git仓库时，但是我们又不想切换到git的命令行窗口，我们可以在VScode中配置git，然后就可以很方便快捷的把代码提交到仓库中。
+
+## 1. 安装Git命令行工具
+
+点击git官网，然后点击download，来到下面的界面
+
+![img](images/0f34ba0f6ab34da4946b6cf46d45747d.png)
+
+ 根据自己的电脑，选择相应的版本
+
+**注意：一定要记得自己安装的路径！！！**
+
+安装完成后，在桌面上点击右键，出现下图所示的图标，则表示安装成功：
+
+![img](images/b03d65248d114cf69ecf0a27af885839.png)
+
+## 2. 配置VScode中的git
+
+ 1. 打开VScode，依次点击下图中的地方
+
+![img](images/f861266b930b482684535b99200e89d3.png)
+
+ 2. 在输入框中输入 git.path ，再点击第二个地方，打开 settings.json 文件
+
+![img](images/43de2e35cbee4778a2c767f0952bf6b5.png)
+
+3. 在 settings.json 文件中，添加 git 的安装路径
+
+![img](images/934d3479d8124defb2148a8aad7b4aa6.png)
+
+ ![img](images/f0b37eb2ba1949bc926e8ad6ddfba261.png)
+
+**注意：冒号前面是 git.path ，路径是 cmd 文件夹中的 git.exe** 
+
+然后关闭 VScode ，再次打开，过几秒钟后，点击左侧的第3个图标，也就是下图的第一个地方，发现第2和第3个地方变成了可点击状态，不是暗色的，表面git环境配置成功。
+
+![img](images/98e7cc4f76c54e49961815bebcc1aa7d.png)
+
+## 3. 使用 VScode + git，提交到仓库
+
+1）当我们修改代码时，左侧会提示我们哪个文件发生了改动 
+
+![img](images/2624282d646340bdb5f2382aebf1724f.png)
+
+2）点击上图的第3处的 **+** 号，表示 **add** 命令，如下图，这时，文件被放在暂存区
+
+![img](images/b10c2dae72944bdbbecfc9450c83b1dd.png)
+
+3）在下图的输入框中，输入要提交的备注信息，如 **again test** ，然后，可以按 **Ctrl + enter** ，或者点击橙色框中的对号，就是完成了 **commit** 命令
+
+![img](images/0117cf9d116a4c939814a98a196ded9f.png)
+
+4）接着，点击下图的第一个地方，依次点击拉取、推送，即 **pull** 命令和 **push** 命令。
+
+![img](images/28060c9660e14943af078dde958c86c8.png)
+
+# vscode中设置工作区隐藏文件或文件夹
+
+> 使用vscode在写python的时候，运行python程序，会在文件夹中生成`*.pyc`文件，或生成`__pycache__`文件夹，影响操作：
+
+![img](images/1724024-d52f9c8bb2f92a0f.png)
+
+- **在vscode中可以将其设置隐藏**：
+
+1. ctrl+shift+P打开显示所有命令，在输入框中输入settings回车
+
+![img](images/1724024-33400a0b3bac7e62.png)
+
+2. 进入User Settings页面搜索files.exclude
+
+![img](images/1724024-60fa64886d31853f.png)
+
+3. 在右侧用户设置中添加 `"**/__pycache__": true` ，与之前用逗号隔开，覆盖默认值并保存
+
+   ```
+   "files.exclude": {
+           "**/.git": true,
+           "**/.svn": true,
+           "**/.hg": true,
+           "**/CVS": true,
+           "**/.DS_Store": true,
+           "**/__pycache__": true
+       }
+   ```
+
+   ![img](images/1724024-a18492a715c9332f.png)
+
+   4. 可以看到左侧的**pycache**目录被隐藏了。
+      如果要隐藏文件的话添加 `"**/*.pyc": true` 即可，`*.pyc` 是后缀名是pyc的文件，想隐藏其他类型文件，将后缀名替换即可。
+
 # 参考资料
 
 1. https://blog.csdn.net/weixin_39934063/article/details/109914910
-2. 
+2. https://blog.csdn.net/czjl6886/article/details/122129576

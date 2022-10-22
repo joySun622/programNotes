@@ -1040,6 +1040,21 @@ matchStr:  匹配的字符
 index:     从第几个匹配的字符,为正数时从左边开始查找并向左截取，为负数时从右边开始查找并向右截取
 ```
 
+#### 字符串分割(SUBSTRING_INDEX)
+
+```
+SUBSTRING_INDEX(str,delim,count)函数
+参数：
+str: 要分割的字符串
+delim: 分割符（比如逗号,和点.）
+count: 计数（分割到第几个），正数表示从左向右数，负数表示从右向左数
+
+SELECT SUBSTRING_INDEX('www.baidu.com','.',1); -- 得到www
+SELECT SUBSTRING_INDEX('www.baidu.com','.',2); -- 得到www.baidu
+SELECT SUBSTRING_INDEX('www.baidu.com','.',-1); -- 得到com
+SELECT SUBSTRING_INDEX('www.baidu.com','.',-2); -- 得到baidu.com
+```
+
 #### LENGTH
 
 ```
@@ -1257,6 +1272,9 @@ mysql> SELECT EMPNO,ENAME,SAL,(SAL+IFNULL(COMM,0))*12 AS YEARSAL FROM EMP;
 | min   | 取最小值   |
 
 #### COUNT
+
+> - COUNT(NULL)：0
+> - COUNT(非NULL)：1
 
 ```
 ### 取得所有的员工数:Count(*)表示取得所有记录，忽略 null，为 null 的值也会取得

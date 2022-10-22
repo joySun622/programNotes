@@ -59,8 +59,103 @@
 > git config --global core.safecrlf true
 >         ```
 >
-> 
+
+# 解决Git 出现 Unlink of file 'xxx' failed. Should I try again.
+
+- **问题描述**
+
+​       出现如下图所示弹框 Unlink of file 'xxxxx'
+
+- **问题原因**
+   该版本控制中的文件被其他程序或者IDE调用。导致Git无法对它进行操作。
+-  **解决办法**
+   关闭IDE或者其他调用该文件的程序。再次点击【是(Y)】按钮进行提交。
+
+![img](images/25546667-0dd2fbf06a5f3d6b.png)
+
+
+
+# Git 执行reset后恢复误删文件
+
+- **场景描述**
+
+> 执行`git reset`后，一些修改文件夹下的文件也被删除了，但这部分文件是所需要的，需要将误删的文件找回来
+
+- **解决方案1**
+
+> 1. `git reflog` 获取之前所有操作日志
+>
+> ![img](images/v2-9ad72bcc34935cbac63c138d2acccb5e_720w.jpg)
+>
+> 2. **`git reset --hard [索引值]`** 
+>
+>    ```
+>    git reset --soft HEAD^ ：保留工作目录，并把重置 HEAD 所带来的新的差异放进暂存区；
+>    git reset --mixed HEAD^ ： reset 如果不加参数 那么默认使用–mixed 参数 。它的行为是：保留工作目录 并且清空暂存区. 也就是说 工作目录的修改、暂存区的内容以及由reset所导致的新的文件的差异，都会被放进工作目录。
+>    git reset --hard HEAD^ ： 重置stage区和工作目录，没有commit的修改会被全部丢失，即，工作目录里的新改动和已经add到stage区的新改动全部丢失（慎用！）
+>    ```
+>
+> 3. 输入`git fsck --lost-found` 然后到项目的 `.git/lost-found `文件夹里可以找回部分或者全部的文件 ( `git fsck --lost-found `可以通过一些神奇的方式把曾经add到暂存区过的文件以某种算法算出来加到  .git/lost-found 文件夹里，直接去文件夹里找便可以找到丢失的特殊文件）
+>
+>    ![img](images/2474459-20220517200457385-1149649364.png)
+
+- **解决方案2**
+
+> 选择项目目录/文件查看VS code 【打开时间线】查看本地历史记录，选择对应的记录进行恢复
+>
+> ![image-20220921100013448](images/image-20220921100013448.png)
+
+
+
+# git 单个文件回滚到指定版本
+
+##### 1 .进入到文件所在文件目录，或者能找到文件的路径
+
+查看文件的修改记录：git log fileName
+ `git log pdf_extractor.py`
+
+![img](https:////upload-images.jianshu.io/upload_images/24452689-f6a400c5952c888c.png?imageMogr2/auto-orient/strip|imageView2/2/w/586/format/webp)
+
+git log
+
+
+ ab50632384c452dcfec99c13e7bc64182cee5d0f
+
+
+
+##### 2.回退到指定版本
+
+git reset 版本号  fileName
+ `git reset ab50632384c452dcfec99c13e7bc64182cee5d0f pdf_extractor.py`
+
+##### 3.提交到本地参考
+
+git commit -m “提交的描述信息”
+ `git commit -m “提交的描述信息”`
+
+##### 4.更新到工作目录
+
+git checkout fileName
+ `git checkout pdf_extractor.py`
+
+![img](https:////upload-images.jianshu.io/upload_images/24452689-9deda3f4b990c0c2.png?imageMogr2/auto-orient/strip|imageView2/2/w/568/format/webp)
+
+stepp3&4
+
+
+
+##### 5.提交到远程仓库
+
+git push
+
+
+
+![img](https:////upload-images.jianshu.io/upload_images/24452689-410bf4d02e6bbbec.png?imageMogr2/auto-orient/strip|imageView2/2/w/521/format/webp)
+
+push
 
 # 参考资料来源
 
 1. https://javaforall.cn/112449.html
+2. https://www.jianshu.com/p/3d94619fb1d8
+3. https://www.jianshu.com/p/551741eb1735

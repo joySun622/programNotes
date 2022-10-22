@@ -268,6 +268,20 @@ $ npm uninstall express
 $ npm ls
 ```
 
+# npm删除项目所有依赖和清缓存
+
+```
+1. 清理缓存的办法，一个是
+npm cache verify
+npm cache clean -f
+npm cache clean --force
+
+2. 删除项目所有依赖
+npm uninstall *
+```
+
+
+
 # 更新模块
 
 ```
@@ -279,6 +293,20 @@ $ npm update express
 ```
 $ npm search express
 ```
+
+# 查看依赖包版本
+
+```
+查看依赖包的版本：
+npm view sass-loader versions --json
+
+查看依赖包本地安装的：
+npm ls sass-loader
+
+npm ls sass-loader -g （全局安装）
+```
+
+
 
 # 创建&发布模块
 
@@ -392,7 +420,47 @@ npm cache clear
 npm unpublish <package>@<version>
 ```
 
+# 问题记录
+
+## npm安装报错解决办法
+
+- **报错信息如下**
+
+> npm安装以及卸载的时候报的这个错误。反正是说什么依赖不能解析的。
+
+```
+npm ERR! code ERESOLVE
+npm ERR! ERESOLVE unable to resolve dependency tree
+npm ERR!
+npm ERR! While resolving: flexbox@0.1.0
+npm ERR! Found: vue@3.2.37
+npm ERR! node_modules/vue
+npm ERR!   vue@"^3.2.13" from the root project
+npm ERR!
+npm ERR! Could not resolve dependency:
+npm ERR! peer vue@"^2.5.17" from element-ui@2.15.9
+npm ERR! node_modules/element-ui
+npm ERR!   element-ui@"*" from the root project
+npm ERR!
+npm ERR! Fix the upstream dependency conflict, or retry
+npm ERR! this command with --force, or --legacy-peer-deps
+npm ERR! to accept an incorrect (and potentially broken) dependency resolution.
+npm ERR!
+npm ERR! See C:\Users\Administrator\AppData\Local\npm-cache\eresolve-report.txt for a full report.
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     C:\Users\Administrator\AppData\Local\npm-cache\_logs\2022-07-19T05_46_30_652Z-debug-0.log
+```
+
+- **解决办法**
+
+> 不能解析依赖树 ，需要先修复上面依赖关系冲突或者重新执行一下`npm install`命令，
+> 后面跟`–force`或者`–legacy-peer-deps`去接受不正确的(并可能被破坏的)依赖解析。
+>
+> 根据它的建议，我们去执行`npm install --force`或者 `npm install --legacy-peer-deps`
+
 # 参考资料
 
 1. https://www.runoob.com/nodejs/nodejs-npm.html
 2. https://my.oschina.net/u/3563387/blog/4633086
+3. https://blog.csdn.net/seeeeeeeeeee/article/details/125870653
