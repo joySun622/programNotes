@@ -205,6 +205,8 @@ WHERE origin = 'Web';
 > ```
 > SELECT count(origin) FROMuser_operation_log
 > ```
+>
+> 使用`count`加字段条件限定时，where条件失效，使统计结果和预期有偏差
 
 ```
 SELECT
@@ -240,9 +242,97 @@ FROM user_operation_log;
 SELECT origin,count(*) num FROM user_operation_log GROUP BY origin;
 ```
 
+# 字符串模糊查询
+
+mysql模糊查询用的是LIKE关键字。
+
+LIKE是模式匹配运算符，用于指出一个字符串是否与指定的字符串相匹配。使用LIKE运算符的语法格式如下：
+
+```sql
+[NOT] LIKE '匹配字符串' [ ESCAPE ' <转换字符>']
+```
+
+其中，方括号中的内容是可选的。例如，如果LIKE关键字前面有个NOT 关键字，表示条件取反。ESCAPE子句用于指定转义字符。匹配字符串是一个完整的字符串，也可以包含通配符 % 、 _ 、[] 、[^] 这四种通配符的含义如下所示：
+
+| 通配符 | 含义                               |
+| ------ | ---------------------------------- |
+| %      | 代表任意长度（可以为0）的字符串    |
+| _      | 代表任意单个字符                   |
+| []     | 指定范围或集合中的任意单个字符     |
+| [^]    | 不在指定范围或集合中的任意单个字符 |
+
+需求强调的是，带有通配符的字符串必须使用单引号引起来。下面是一些嗲有通配符的示例。
+
+```sql
+LIKE 'AB%'    返回以AB开始的任意字符串 
+LIKE '%ABC'	  返回以ABC结束的任意字符串 
+LIKE '%ABC%'  返回包含ABC的任意字符串 
+LIKE '_AB'	  返回以AB结束的3个字符的字符串 
+LIKE '[ACE]%'  返回以A,B,E开始的任意字符串 
+LIKE 'L[^a]%'  返回以L开始、第2个字符不是a的任意字符串 
+```
+
+## 方式1
+
+```
+select * from sys_user where name like '%张%'
+```
+
+## 方式2
+
+```
+select * from sys_user where name like CONCAT('%','张','%')
+```
+
+## 方式3
+
+```
+SELECT * FROM sys_user  where INSTR(name,'张')>0
+```
+
+## INSTR函数
+
+使用方式：INSTR(STR,SUBSTR)
+STR：我们要进行判断的字段 （name）
+SUBSTR：模糊匹配的字符
+在字符串STR里面,字符串SUBSTR出现的第一个位置(INDEX)，INDEX是从1开始计算，如果没有找到就直接返回0，没有返回负数的情况
+
+## LOCATE（'substr',str,pos）方法
+
+> 解释：返回 [substr](https://so.csdn.net/so/search?q=substr&spm=1001.2101.3001.7020) 在 str 中第一次出现的位置，如果 substr 在 str 中不存在，返回值为 0 。如果pos存在，返回 substr 在 str 第pos个位置后第一次出现的位置，如果 substr 在 str 中不存在，返回值为0。
+
+```
+SELECT *
+FROM ksh
+WHERE LOCATE('11',name) > 0
+```
+
+## POSITION('substr' IN `field`)方法
+
+> 和`locate()`方法的作用是一样。
+
+```
+SELECT *
+FROM ksh
+WHERE POSITION('11' IN name)
+```
+
+## FIND_IN_SET(str1,str2)
+
+> 返回str2中str1所在的位置索引，其中str2必须以","分割开。
+
+```
+SELECT *
+FROM ksh
+WHERE FIND_IN_SET('11',`name`)
+```
+
+
+
 
 
 # 参考资料来源
 
 1. https://www.cnblogs.com/silenceshining/p/14916119.html
 2. https://blog.csdn.net/t194978/article/details/123490979
+3. https://www.cnblogs.com/longkui-site/p/15858921.html

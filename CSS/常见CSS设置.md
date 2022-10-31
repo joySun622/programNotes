@@ -406,7 +406,125 @@ form:has(:focus){
 >
 > `none` 	文本不被选择
 
+# scaleX
 
+> 该`scaleX()` CSS函数定义了沿x轴（水平）调整元素大小的变换。沿 x 轴的缩放比例。 默认值为 1
+>
+> `scaleX(sx)` 是 `scale(sx, 1)` 或 `scale3d(sx, 1, 1)` 的一个速记/缩写,**`scaleX(-1)` **定义一个 [轴向对称性 (axial symmetry)](http://en.wikipedia.org/wiki/Axial_symmetry) ，它具有一个垂直轴通过原点 (由 [`transform-origin`](https://developer.mozilla.org/zh-CN/docs/Web/CSS/transform-origin) 属性规定).
+>
+> 介于 0 和 1 之间的值会降低缩放对象的宽度;大于 1 的值会增加缩放对象的宽度。 值为 1 表示对象不按 x 方向缩放。
+>
+> 负值水平翻转缩放对象。 介于 0 和 -1 之间的值将缩放对象翻转并减小其宽度。 小于 -1 的值翻转对象并增加其宽度。 值为 -1 可翻转缩放的对象，但不更改其水平大小。
+>
+> ```
+> scaleX(x)  x:应用在元素的每个点的横坐标的缩放比例的<Double>
+> ```
+
+# transform-origin
+
+> 更改一个元素变形的原点,`transform-origin`属性表示在对元素进行变换的时候，设置围绕哪个点进行变化的。默认情况，变换的原点在元素的中心点，即是元素X轴和Y轴的50%处
+
+> - **语法**
+>
+> ```
+> transform-origin: x-axis y-axis z-axis;
+> ```
+>
+> - **默认值**
+>
+> ```
+> transform-origin:50% 50% 0;
+> ```
+>
+> - **单位**
+>   `transform-origin`属性值可以是百分比、em、px等具体的值，也可以是top、right、bottom、left和center这样的关键词。
+
+# 网页长度单位
+
+> 在css中单位长度用的最多的是px、em、rem，这三个的区别是：
+>
+> 　　px是固定的像素，一旦设置了就无法因为适应页面大小而改变。
+>
+> 　　em和rem相对于px更具有灵活性，他们是相对长度单位，意思是长度不是定死了的，更适用于响应式布局。
+>
+> 对于em和rem的区别一句话概括：**em相对于父元素，rem相对于根元素。**
+>
+> rem中的r意思是root（根源）
+
+- **em**
+
+> - 子元素字体大小的em是相对于父元素字体大小
+> - 元素的width/height/padding/margin用em的话是相对于该元素的font-size
+>
+> ```
+> <div>
+>     我是父元素div
+>     <p>
+>         我是子元素p
+>         <span>我是孙元素span</span>
+>     </p>
+> </div>
+> 
+> 
+> div {
+>   font-size: 40px;
+>   width: 10em; /* 400px */
+>   height: 10em;
+>   border: solid 1px black;
+> }
+> p {
+>   font-size: 0.5em; /* 20px */ 
+>   width: 10em; /* 200px */
+>   height: 10em;
+>   border: solid 1px red;
+> }
+> span {
+>   font-size: 0.5em;  
+>   width: 10em;
+>   height: 10em;
+>   border: solid 1px blue;
+>   display: block;
+> }
+> ```
+
+- **rem**
+
+> rem是全部的长度都相对于根元素，根元素是谁？<html>元素。通常做法是给html元素设置一个字体大小，然后其他元素的长度单位就为rem。
+>
+> 上代码：（html代码如上，只是把css代码的元素长度单位变了）
+>
+> ```
+> html {
+>     font-size: 10px;
+>     }
+> div {
+>     font-size: 4rem; /* 40px */
+>     width: 30rem;  /* 300px */
+>     height: 30rem;
+>     border: solid 1px black;
+> }
+> p {
+>     font-size: 2rem; /* 20px */
+>     width: 15rem;
+>     height: 15rem;
+>     border: solid 1px red;
+> }
+> span {
+>     font-size: 1.5rem;
+>     width: 10rem;
+>     height: 10rem;
+>     border: solid 1px blue;
+>     display: block;
+> } 
+> ```
+>
+> **总结**：
+>
+> 在做项目的时候用什么单位长度取决于你的需求，一般是这样的：
+>
+> 像素（px）：用于元素的边框或定位。
+>
+> em/rem：用于做响应式页面，不过我更倾向于rem，因为em不同元素的参照物不一样（都是该元素父元素），所以在计算的时候不方便，相比之下rem就只有一个参照物（html元素），这样计算起来更清晰。
 
 # 参考资料
 
