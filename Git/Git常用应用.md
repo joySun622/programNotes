@@ -109,7 +109,7 @@
 
 # git 单个文件回滚到指定版本
 
-##### 1 .进入到文件所在文件目录，或者能找到文件的路径
+## 1 .进入到文件所在文件目录，或者能找到文件的路径
 
 查看文件的修改记录：git log fileName
  `git log pdf_extractor.py`
@@ -123,17 +123,17 @@ git log
 
 
 
-##### 2.回退到指定版本
+## 2.回退到指定版本
 
 git reset 版本号  fileName
  `git reset ab50632384c452dcfec99c13e7bc64182cee5d0f pdf_extractor.py`
 
-##### 3.提交到本地参考
+## 3.提交到本地参考
 
 git commit -m “提交的描述信息”
  `git commit -m “提交的描述信息”`
 
-##### 4.更新到工作目录
+## 4.更新到工作目录
 
 git checkout fileName
  `git checkout pdf_extractor.py`
@@ -144,7 +144,7 @@ stepp3&4
 
 
 
-##### 5.提交到远程仓库
+## 5.提交到远程仓库
 
 git push
 
@@ -152,10 +152,110 @@ git push
 
 ![img](https:////upload-images.jianshu.io/upload_images/24452689-410bf4d02e6bbbec.png?imageMogr2/auto-orient/strip|imageView2/2/w/521/format/webp)
 
-push
+# git commit后，如何进行撤销commit操作
+
+- **场景描述**
+
+> 在我们使用git作为版本控制工具进行代码管理之后，经常性的会碰到一个问题：git commit后，如何撤销commit，下面详细讲一下。
+>
+> git add newFiles
+>
+> git commit -m '新增xx页面'
+>
+> 执行commit后，还没执行push时，想要撤销这次的commit，该怎么办？
+
+- **解决方案**
+- 
+
+> - 我们可以使用命令：`git reset --soft HEAD^`  这样就成功撤销了commit。
+>
+> - 使用`git reset --hard HEAD^ ` 这样连add也撤销了。
+> - `git reset --hard <commit ID>`回退到某一指定版本，`commitID`可以使用`git log`获取。会直接将所有修改都撤销，直接回退到该指定版本状态
+>
+> **命令解释**：
+>
+> ```
+> HEAD^ 表示上一个版本，即上一次的commit，几个^代表几次提交，如果回滚两次就是HEAD^^。
+> 也可以写成HEAD~1，如果进行两次的commit，想要都撤回，可以使用HEAD~2。
+> ```
+>
+> ```
+> --soft
+> 不删除工作空间的改动代码 ，撤销commit，不撤销add
+> 
+> --hard
+> 删除工作空间的改动代码，撤销commit且撤销add
+> 
+> 如果commit后面的注释写错了，先别急着撤销，可以运行git commit --amend 
+> 进入vim编辑模式，修改完保存即可
+> ```
+
+# `git stash pop`冲突
+
+- **场景描述**
+
+> `git stash pop`后，出现冲突，`git stash list`记录没有删除
+
+- **解决方案**
+
+> **1、解决文件中冲突的的部分，**
+>
+> 打开冲突的文件，会看到类似如下的内容：
+>
+> git冲突内容
+>
+> 其中Updated upstream 和=====之间的内容就是pull下来的内容，====和stashed changes之间的内容就是本地修改的内容。碰到这种情况，git也不知道哪行内容是需要的，所以要自行确定需要的内容。
+>
+> 解决完成之后，就可以正常的提交了。
+>
+> **2、删除stash**。**git stash drop <stash@{id}>**  如果不加stash编号，默认的就是删除最新的，也就是编号为0的那个，加编号就是删除指定编号的stash。或者 **git  stash clear** 是清除所有stash,整个世界一下子清净了！
+
+# 撤销 git add
+
+- **场景描述**
+
+> `git add`添加了不必要的内容，需要撤销add 内容
+
+- **解决方案**
+
+> `git reset HEAD` 后面什么都不跟的，就是上一次add 里面的内容全部撤销
+> `git reset HEAD XXX` 后面跟文件名，就是对某个文件进行撤销
+
+# 撤销`git rm`操作
+
+- **场景描述**
+
+> `add`文件的时候，不小心把一个不需要提交的也给加上了，但是删除的时候错误使用了`git rm`命令，导致工作区文件被删除。
+>
+> ```
+> / 误删除
+> $ git rm XXX/CMakeLists.txt 
+> > rm 'XXX/CMakeLists.txt'
+> 
+> //查看当前状态
+> $ git status
+> > Changes to be committed:
+>   (use "git restore --staged <file>..." to unstage)
+>         deleted:    XXXX/CMakeLists.txt
+> ```
+
+- **解决方案**
+
+> ```
+> $ git reset -- XXXX/CMakeLists.txt
+> > Unstaged changes after reset:
+> D       XXX/CMakeLists.txt
+> # 其实在上面的 git status中，已经提示使用 "git restore --staged <file>..." to unstage
+> # 所以这里除了使用reset，也可以使用restore
+> $ git checkout -- XXXX/CMakeLists.txt
+> ```
+
+
 
 # 参考资料来源
 
 1. https://javaforall.cn/112449.html
 2. https://www.jianshu.com/p/3d94619fb1d8
 3. https://www.jianshu.com/p/551741eb1735
+4. https://blog.csdn.net/w_p_wyd/article/details/126028094
+5. https://www.pudn.com/news/62f9238a5425817ffc474b31.html

@@ -364,6 +364,18 @@ parseFloat(string)
 // Note: the parentheses are added for clarity, not required.
 ```
 
+## 字符串&日期转换
+
+- 使用`moment`插件实现字符串与日期转换
+
+```
+let tmpTime = "2022-01-01 23:32:12";
+let startTime = moment(tmpTime, 'YYYY-MM-DD HH:mm:ss');//转换为moment对象
+let tStartTime = startTime.format('YYYY-MM-DD') + ' 00:00:00'; //将moment对象转为指定格式
+```
+
+
+
 # 控制流和异常处理
 
 ## 块语句

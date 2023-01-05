@@ -343,6 +343,54 @@ test {
 
 保存文件，`IDEA`提示下载依赖，选择自动下载。
 
+- **项目依赖包配置**(2.x版本依赖的说明，括号里对应的是3.0版本的依赖方式)
+
+> - `compile(api)`使用该方式依赖的库将会参与编译和打包
+>
+> - `implementation`这个指令的特点就是，对于使用了该命令编译的依赖，对该项目有依赖的项目将无法访问到使用该命令编译的依赖中的任何程序，也就是将该依赖隐藏在内部，而不对外部公开。
+>
+> - `provided（compileOnly）`只在编译时有效，不会参与打包，可以在自己的moudle中使用该方式依赖。比如`com.android.support，gson`这些使用者常用的库，避免冲突。
+>
+> - `apk（runtimeOnly）`
+>
+>   只在生成apk的时候参与打包，编译时不会参与，很少用。
+>
+> - `testCompile（testImplementation）`
+>
+>   `testCompile` 只在单元测试代码的编译以及最终打包测试apk时有效。
+>
+> - `debugCompile（debugImplementation）`
+>
+>   `debugCompile` 只在debug模式的编译和最终的debug apk打包时有效。
+>
+> - `releaseCompile（releaseImplementation）`
+>
+>   `releaseCompile` 仅仅针对Release模式的编译和最终的Release apk打包。
+
+```
+dependencies {
+	### 引入依赖方式1: compile 'group名:插件名:版本'；gradle 3.0时，compile 指令被标注为过时方法
+	compile 'com.jakewharton:butterknife:7.0.1'
+	compile group: 'com.alibaba', name: 'fastjson', version: '1.2.83'
+	compile fileTree(dir: 'libs', include: ['*.jar']) ## 引入本地jar包
+	### 引入依赖方式2
+	implementation 'org.springframework.boot:spring-boot-starter-test:3.10.2'
+    implementation("org.springframework.boot:spring-boot-starter-test:3.10.2")
+    implementation group: 'com.aliyun.oss', name: 'aliyun-sdk-oss', version: '3.10.2'
+    implementation files('lib/artemis-http-client-1.1.7.jar') #引入本地包
+    ### 引入依赖方式3:和compile等同
+    api fileTree(dir: 'libs', include: ['*.jar'])
+    ### 测试单元
+    testImplementation('org.springframework.boot:spring-boot-starter-test') { ### 测试包配置：并配置不引入的jar包
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+}
+
+
+```
+
+
+
 ### 2) `gradle-wrapper.properties`（版本管理）
 
 若发现`gradle`版本问题，可以修改此文件，提升`gradle`版本；项目默认为：
@@ -492,3 +540,4 @@ gradle bootrun
 1. https://blog.csdn.net/qq_40977118/article/details/114385222
 2. https://blog.51cto.com/u_15352995/5274168
 3. https://blog.csdn.net/qq_38288606/article/details/121031239
+4. https://blog.csdn.net/xiaojin21cen/article/details/125804123

@@ -146,6 +146,8 @@ var arr = [
   { id: 2, text: 'bb', done: false }
 ]
 console.log(arr.filter(item => item.done))
+
+arr.filter(item => item.include("a")) //当数组包含a时返回true
 ```
 
 **转为ES5**
@@ -303,7 +305,137 @@ let count = Object.keys(data).length;
 JSON.stringify(evtValue)=='{}'
 ```
 
+# 对象合并
 
+## 1. 拓展运算符`...`
+
+> ES6入门中是这样说的:
+>
+> 对象的扩展运算符（`...`）用于取出参数对象的所有可遍历属性，拷贝到当前对象之中。
+>
+> 由下面的代码可以看出：
+>
+> - 同名属性：合并，并且后边的（obj2）把前边的（obj1）覆盖。
+> - 不同名属性：属性值不变，只合并。
+>
+> 注：第一级是深拷贝，第二级开始都是浅拷贝。
+
+```
+let obj1 = {
+    name: '陈伟霆',
+    gender: '男',
+    hobby: '唱歌'
+};
+let obj2 = {
+    name: '陈伟霆',
+    gender: '男',
+    hobby: '跳舞',
+    nationality: '中国'
+};
+ 
+let obj = {...obj1, ...obj2};
+console.log(obj);  // { name: '陈伟霆', gender: '男', hobby: '跳舞', nationality: '中国' }
+```
+
+## 2. Object.assign()
+
+> MDN上是这样写的：
+>
+> `**Object.assign()**` 方法用于将所有可枚举属性的值从一个或多个源对象分配到目标对象。它将返回目标对象
+
+```
+### 用于对象合并，写法如下： 
+let obj = Object.assign({}, obj1, obj2);
+console.log(obj);  // { name: '陈伟霆', gender: '男', hobby: '跳舞', nationality: '中国' }
+
+```
+
+由上面的代码可以看出，效果与法一相同。 
+注：第一级是深拷贝，第二级开始都是浅拷贝。
+
+## 3. 递归赋值
+
+```
+let obj = obj1;
+for (var p in obj2){
+    if(obj2.hasOwnProperty(p))
+    obj[p] = obj2[p];
+}
+console.log(obj);  // { name: '陈伟霆', gender: '男', hobby: '跳舞', nationality: '中国' }
+```
+
+由上面的代码可以看出，效果与法一相同。 类似于直接赋值增加属性
+
+注：第一级是深拷贝，第二级开始都是浅拷贝
+
+## 4. [jquery](https://so.csdn.net/so/search?q=jquery&spm=1001.2101.3001.7020)中的extend()
+
+```
+jQuery.extend() 函数用于将一个或多个对象的内容合并到目标对象。
+$.extend(obj1, obj2)  // 浅拷贝
+$.extend(true, obj1, obj2)  // 深拷贝
+```
+
+# 数组合并
+
+## 1. 扩展操作符
+
+> 使用ES6语法的拓展运算符：这个方法也是创建一个新数组
+
+```
+var newArray = [...array,...elements]
+console.log(newArray); // ["a", "b", 0, 1, 2]
+```
+
+## 2. 使用`array.concat`方法进行合并
+
+> 使用concat方法：这个方法不是添加到现有数组，而是创建并返回一个新数组。
+
+```
+var array = ["a", "b"];
+var elements = [0, 1, 2];
+ 
+var newArray = array.concat(elements);
+console.log(array); //['a', 'b']
+console.log(newArray);// ["a", "b", 0, 1, 2]
+```
+
+## 3. 关于Apply
+
+> 使用Apply方法：这个方法是将数组各项添加到另一个数组当中，是一种改变原数组的方法
+
+```
+var array = ["a", "b"];
+var elements = [0, 1, 2];
+array.push.apply(array, elements);
+console.log(array); // ["a", "b", 0, 1, 2]
+```
+
+## 4. array.push()方法进行合并
+
+```
+const heroes = ['Batman'];
+heroes.push('Superman');
+heroes; // ['Batman', 'Superman']
+
+const heroes = ['Batman', 'Superman'];
+const villains = ['Joker', 'Bane']; 
+heroes.push(...villains);
+heroes; // ['Batman', 'Superman', 'Joker', 'Bane']
+```
+
+
+
+# 视频
+
+## 视频倍速播放
+
+> 代码： `document.getElementsByTagName("video")[0].playbackRate = 1.75`
+> 数字1.75代表1.75倍速
+>
+> 按`F12`或者`fn+F12`来进入开发调试工具选择Console打开控制台输入代码，即可完成自定义倍速播放
+>
+> ![image-20221112101742785](images/image-20221112101742785.png)
 
 # 参考资料来源
 

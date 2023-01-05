@@ -327,7 +327,21 @@ FROM ksh
 WHERE FIND_IN_SET('11',`name`)
 ```
 
+# mysql指定字段内某些值放到最后
 
+- **原始表截图**
+  ![img](images/b39ca67ad9844dd9b2dc2778db5fcebc.png)
+
+- **需求**：指定name1字段内某两条数据排序后放在最后
+
+- **解决方案1**:使用order by 与field组合
+  `SELECT * from test order by field(name1,'cilly','qutty')`
+
+- **解决方案2**：使用order by 与in组合 
+  `SELECT * from test order by name1 in ('cilly','qutty') `
+  输出：
+
+![img](images/2db0953d7dee4446ac34339ee64e647b.png)
 
 
 
@@ -336,3 +350,4 @@ WHERE FIND_IN_SET('11',`name`)
 1. https://www.cnblogs.com/silenceshining/p/14916119.html
 2. https://blog.csdn.net/t194978/article/details/123490979
 3. https://www.cnblogs.com/longkui-site/p/15858921.html
+4. https://blog.csdn.net/qq_38824458/article/details/125620002
