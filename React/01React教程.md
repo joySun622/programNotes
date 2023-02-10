@@ -1217,6 +1217,42 @@ export default class App extends Component {
 }
 ```
 
+## ref相关操作方法
+
+```
+getFieldError: ƒ (name)
+getFieldInstance: ƒ getFieldInstance(name)
+getFieldValue: ƒ (name)
+getFieldWarning: ƒ (name)
+getFieldsError: ƒ (nameList)
+getFieldsValue: ƒ (nameList, filterFunc)
+getInternalHooks: ƒ (key)
+isFieldTouched: ƒ (name)
+isFieldValidating: ƒ (name)
+isFieldsTouched: ƒ ()
+isFieldsValidating: ƒ (nameList)
+resetFields: ƒ (nameList)
+scrollToField: ƒ scrollToField(name)
+setFieldValue: ƒ (name, value)
+setFields: ƒ (fields)
+setFieldsValue: ƒ (store)
+submit: ƒ ()
+validateFields: ƒ (nameList, options)
+__INTERNAL__: {name: undefined, itemRef: ƒ}
+_init: true
+```
+
+- **使用范例**
+
+```
+//创建引用
+this.formRef = React.createRef();
+//重置表单域
+this.formRef.current.resetFields();
+```
+
+
+
 # 组件通信的方式
 
 ## 1. 父子组件通信方式
@@ -2270,7 +2306,7 @@ function Child() {
 }
 ```
 
-### useLayoutEffect & useEffect区别
+## useLayoutEffect & useEffect区别
 
 > **useEffect 和 useLayoutEffect 有什么区别？**
 > 简单来说就是调用时机不同，`useLayoutEffect` 和原来 `componentDidMount` &` componentDidupdate` 一致，在 react完成DOM更新后马上同步调用的代码，会阻塞页面渲染。而`useEffect`是会在整个页面渲染完才会调用的 代码。

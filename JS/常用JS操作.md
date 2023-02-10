@@ -437,6 +437,59 @@ heroes; // ['Batman', 'Superman', 'Joker', 'Bane']
 >
 > ![image-20221112101742785](images/image-20221112101742785.png)
 
+# 判断变量是否存在
+
+## 判断是否为undefined
+
+- **方案1**
+
+```
+if (t1===undefined)
+```
+
+- **方案2**
+
+```
+if(typeOf(x) ===   "undefined")
+```
+
+- **说明**
+
+```
+### 变量已声明
+var type; //type 变量未赋值
+1. type==undefined //true
+2. type===undefined //true
+3. typeof(type)=='undefined' //true
+4. typeof(type)==='undefined' //ture
+5. typeof type == 'undefined' //和第3种等价，true
+6. typeof type === 'undefined' //和第4种等价，true
+7. type==null //true
+8. type===null //false
+
+注： typeof type 的值是"undefined"，（typeof 返回的是字符串，有六种可能："number"、"string"、"boolean"、"object"、"function"、"undefined"）。
+
+### 变量未声明
+1. type1==undefined //Error: Uncaught ReferenceError: type1 is not defined at <anonymous>:1:1
+2. type1===undefined //Error
+3. typeof(type1)=='undefined' //true
+4. typeof(type1)==='undefined' //ture
+5. typeof type1 == 'undefined' //和第3种等价，true
+6. typeof type1 === 'undefined' //和第4种等价，true
+7. type1==null //Error: Uncaught ReferenceError: type1 is not defined at <anonymous>:1:1
+8. type1===null //Error: Uncaught ReferenceError: type1 is not defined at <anonymous>:1:1
+```
+
+
+
+## 如何判断变量是否为null
+
+```
+if (exp === null)
+```
+
+
+
 # 参考资料来源
 
 1. https://www.jb51.net/article/121164.htm

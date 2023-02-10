@@ -1,6 +1,8 @@
 [toc]
 
-###  1. 前期准备
+# 安装&应用
+
+##  1. 前期准备
 
 > 1.1. GitHub 账号；
 
@@ -14,7 +16,7 @@
 
 
 
-### 2. 用户配置
+## 2. 用户配置
 
 > 打开git bash,执行以下命令
 >
@@ -24,7 +26,7 @@
 > 
 > ```
 
-#### 提交代码不输入账号密码配置
+### 提交代码不输入账号密码配置
 
 - **方案1**
 
@@ -72,9 +74,9 @@
   > 2. git push 代码
   >    `push`你的代码 (`git push`), 这时会让你输入`用户名`和`密码`, 这一步输入的用户名密码会被`记住`, 下次再push代码时就不用输入用户名密码!这一步会在用户目录下生成文件`.git-credential`记录用户名密码的信息。
 
-### 3. 建立连接
+## 3. 建立连接
 
-#### 配置SSH
+### 配置SSH
 
 **3.1. 检查你电脑上是否有SSH Key**
 
@@ -145,7 +147,7 @@
 **Hi “用户名”! You’ve successfully authenticated, but GitHub does not provide shell access.**
 如果你看到 **access denied**，者表示拒绝访问，那么你就需要使用 https 去访问。
 
-### 4.新建远程仓库
+## 4.新建远程仓库
 
 > 1. 打开github右上角，点击new repository
 >    ![在这里插入图片描述](images/20200425220537666.png)
@@ -155,7 +157,7 @@
 >
 >    ![image-20200903232558052](images/image-20200903232558052.png)
 
-### 5. 本地上传操作
+## 5. 本地上传操作
 
 **5.1.  在本地空文件夹内，右键选择Git Bash Here**
 
@@ -184,7 +186,7 @@ git commit -m “你的提交信息”
 git push
 ```
 
-### 6. 常用命令
+## 6. 常用命令
 
 > 默认的远程仓库服务器为：origin
 
@@ -300,7 +302,7 @@ git help config  获得 git config 命令的手册
 git add -h  获得add参考资料
 ```
 
-### 7. 如何生成token
+## 7. 如何生成token
 
 1. 打开Github，在个人设置页面，找到【Setting】，然后打开找到【Devloper Settting】，如下图。
 
@@ -338,9 +340,9 @@ git remote set-url origin https://<your_token>@github.com/<USERNAME>/<REPO>.git
 git remote set-url origin https://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@github.com/shliang0603/Yolov4_DeepSocial.git/
 ```
 
-### 8. 报错集结
+## 8. 报错集结
 
-#### 公库可以提交，私库无法提交
+### 公库可以提交，私库无法提交
 
 1. **场景描述**：在github上创建了一个公有库，一个私有库。公有库可以正常提交文件，私有库无法push数据。报错信息如下
 
@@ -424,7 +426,7 @@ git remote set-url origin https://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@githu
    > $ git config -e
    > ```
 
-#### 提交时端口连接超时
+### 提交时端口连接超时
 
 - **问题描述**
 
@@ -580,9 +582,53 @@ fatal: not a git repository (or any of the parent directories): .git
 
   **结果**：除了网络原因导致的端口问题，最终呈现出导致无法提交成功的原因：GIT HUB的验证方式发生了改变。这个需要时刻关注官方信息，不然会浪费一大堆时间去寻找出问题的地方。
 
-### 参考资料
+# 	github无法链接
+
+- **场景描述**
+
+> 使用chrom浏览器打开github网站，无法打开。
+
+- **解决方案**
+
+> 1. **查询当前github对应的ip地址**:在查询IP的网站内分别输出`github.com`,`github.global.ssl.fastly.net`,`assets-cdn.github.com`，获取这几个域名的IP
+>    查询IP网址：[在线工具](https://tool.lu/ip/),[中国站长DNS查询](https://tool.chinaz.com/dns/)，[中国站长IP查询](https://ip.chinaz.com/)
+>
+>    ![image-20230210174052079](images/image-20230210174052079.png)
+>
+> 2. **在`hosts`文件中添加上一步骤查到的github相关IP映射**
+>
+>    - `hosts`文件所在目录：`C:\Windows\System32\drivers\etc`
+>
+>    - 添加IP映射
+>
+>      ```
+>      # GitHub Start
+>      20.205.243.166  github.com
+>      104.244.43.182  github.global.ssl.fastly.net
+>      69.171.234.48 github.global.ssl.fastly.net
+>      185.199.108.153  assets-cdn.github.com
+>      185.199.109.153  assets-cdn.github.com
+>      185.199.110.153  assets-cdn.github.com
+>      185.199.111.153  assets-cdn.github.com
+>      ```
+>
+> 3. 添加保存后，**使用快捷键 `win+R`打开运行窗口,输入`cmd`,按回车**;在window命令窗口,输入`ipconfig /flushdns`;**刷新DNS解析缓存**
+
+- **其他问题**
+
+> 在`hosts`文件中添加相关`github`映射后，chrome浏览器还是无法打开github，但其他浏览器可以。查看后发现是因为自己再chrome浏览器中设置了代理，将代理关闭后，chrome可以正常访问	github	
+>
+> 查看chrome浏览器代理设置：
+>
+> 浏览器右侧隐藏工具栏—>【设置】—>【高级】—>【系统】
+> ![image-20230210174606278](images/image-20230210174606278.png)
+> 若没有，查看是否设置了手动代理；若设置了，将手动代理关闭
+> ![image-20230210174647022](images/image-20230210174647022.png)
+
+# 参考资料
 
 1. https://www.cnblogs.com/iisheng/p/13425658.html
 2. https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/error-agent-admitted-failure-to-sign
 3. https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
 4. https://zhuanlan.zhihu.com/p/414028184
+5. https://blog.csdn.net/azlnhaha/article/details/125551663
